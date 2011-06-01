@@ -1,0 +1,8 @@
+name: XcraftGate
+main: de.xcraft.engelier.XcraftGate.XcraftGate
+version: 0.1
+author: Engelier
+commands:
+  gate:
+    description: Modify Teleporters
+    usage: /<command> help
