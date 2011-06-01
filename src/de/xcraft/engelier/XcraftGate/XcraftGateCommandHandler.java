@@ -118,7 +118,7 @@ public class XcraftGateCommandHandler {
 				plugin.gateLocations.remove(plugin.getLocationString(plugin.gates.get(args[1]).gateLocation));
 				plugin.gates.remove(args[1]);
 				for (Map.Entry<String, XcraftGateGate> sourceGate: plugin.gates.entrySet()) {
-					if (sourceGate.getValue().gateTarget.equals(args[1])) {
+					if (sourceGate.getValue().gateTarget != null && sourceGate.getValue().gateTarget.equals(args[1])) {
 						sourceGate.getValue().gateTarget = null;
 					}
 				}
