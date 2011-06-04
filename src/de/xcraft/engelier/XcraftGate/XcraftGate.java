@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -16,6 +17,7 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.config.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
 import com.nijiko.permissions.PermissionHandler;
@@ -24,9 +26,12 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 public class XcraftGate extends JavaPlugin {
 	private XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(this);
 	private XcraftGatePlayerListener playerListener = new XcraftGatePlayerListener(this);
-	public PermissionHandler permissions = null;
 	private XcraftGateCommandHandler commandHandler = new XcraftGateCommandHandler(this);
+
+	public Configuration config = null;
 	
+	public PermissionHandler permissions = null;
+
 	public Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
 	public Map<String, String> gateLocations = new HashMap<String, String>();
 	public Map<String, Boolean> justTeleported = new HashMap<String, Boolean>();
@@ -35,6 +40,7 @@ public class XcraftGate extends JavaPlugin {
 
 	public void onDisable() {
 		saveGates();
+		config.save();
 	}
 
 	public void onEnable() {
@@ -52,17 +58,28 @@ public class XcraftGate extends JavaPlugin {
 		
 		log.info(getNameBrackets() + "by Engelier loaded.");
 		
+		loadConfig();
+		loadWorlds();
 		loadGates();
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+		String error;
+
 		if (cmd.getName().equalsIgnoreCase("gate")) {
-			String error = commandHandler.parse((Player)sender, args);
+			error = commandHandler.parseGate((Player)sender, args);
 			if (error != null)
 				sender.sendMessage(ChatColor.RED + "Error: " + error);
 
 			return true;
+		} else if (cmd.getName().equalsIgnoreCase("gworld")) {
+			error = commandHandler.parseWorld((Player)sender, args);
+			if (error != null)
+				sender.sendMessage(ChatColor.RED + "Error: " + error);
+
+			return true;			
 		}
+		
 		return false;
 	}
 	
@@ -83,7 +100,11 @@ public class XcraftGate extends JavaPlugin {
 	}
 	
 	public String getLocationString(Location location) {
-		return location.getWorld().getName() + "," + Math.floor(location.getX()) + "," + Math.floor(location.getY()) + "," + Math.floor(location.getZ());
+		if (location.getWorld() != null) {
+			return location.getWorld().getName() + "," + Math.floor(location.getX()) + "," + Math.floor(location.getY()) + "," + Math.floor(location.getZ());
+		} else {
+			return null;
+		}
 	}
 	
 	public void createGate(Location location, String name) {
@@ -114,6 +135,54 @@ public class XcraftGate extends JavaPlugin {
 		return "[" + this.getDescription().getFullName() + "] ";
 	}
 	
+	private void loadConfig() {
+		File configFile = new File(getDataFolder(), "worlds.yml");
+		
+		if (!configFile.exists()) {
+			if (!getDataFolder().exists()) {
+				getDataFolder().mkdirs();
+				getDataFolder().setExecutable(true);
+				getDataFolder().setWritable(true);
+			}
+			
+			try {
+				configFile.createNewFile();
+			} catch (Exception ex) {
+				log.severe(getNameBrackets() + "unable to create config file");
+				ex.printStackTrace();
+			}
+		}
+		
+		config = new Configuration(configFile);
+		config.load();
+		
+		if (config.getKeys("worlds") == null ) {
+			for (World world: getServer().getWorlds()) {
+				if (world.getEnvironment() == World.Environment.NORMAL) {
+					config.setProperty("worlds." + world.getName() + ".type", "normal");
+				} else if (world.getEnvironment() == World.Environment.NETHER) {
+					config.setProperty("worlds." + world.getName() + ".type", "nether");					
+				}
+			}
+		}
+	}
+	
+	private void loadWorlds() {
+		if (config.getKeys("worlds") == null)
+			return;
+		
+		for (String thisWorld: config.getKeys("worlds")) {
+			String type = config.getString("worlds." + thisWorld + ".type");
+			if (type.equalsIgnoreCase("normal")) {
+				getServer().createWorld(thisWorld, World.Environment.NORMAL);
+			} else if (type.equalsIgnoreCase("nether")) {
+				getServer().createWorld(thisWorld, World.Environment.NETHER);
+			} else {
+				log.severe(getNameBrackets() + "invalid type for world " + thisWorld + ": " + type);
+			}			
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void loadGates() {
 		File configFile = new File(getDataFolder(), "gates.yml");
@@ -129,6 +198,12 @@ public class XcraftGate extends JavaPlugin {
 			for (Map.Entry<String, Object> thisGate: gatesYaml.entrySet()) {
 				String gateName = thisGate.getKey();
 				Map<String, Object> gateData = (Map<String, Object>) thisGate.getValue();
+				
+				if (getServer().getWorld((String)gateData.get("world")) == null) {
+					log.severe(getNameBrackets() + "gate " + gateName + " found in unkown world " + gateData.get("world") + ". REMOVED!");
+					continue;
+				}
+				
 				Location gateLocation = new Location(getServer().getWorld((String)gateData.get("world")),
 						(Double)gateData.get("locX"),
 						(Double)gateData.get("locY"),
