@@ -26,6 +26,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 public class XcraftGate extends JavaPlugin {
 	private XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(this);
 	private XcraftGatePlayerListener playerListener = new XcraftGatePlayerListener(this);
+	private XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(this);
 	private XcraftGateCommandHandler commandHandler = new XcraftGateCommandHandler(this);
 
 	public Configuration config = null;
@@ -35,6 +36,7 @@ public class XcraftGate extends JavaPlugin {
 	public Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
 	public Map<String, String> gateLocations = new HashMap<String, String>();
 	public Map<String, Boolean> justTeleported = new HashMap<String, Boolean>();
+	public Map<String, Integer> creatureCounter = new HashMap<String, Integer>();
 	
 	public Logger log = Logger.getLogger("Minecraft");
 
@@ -47,6 +49,7 @@ public class XcraftGate extends JavaPlugin {
 		PluginManager pm = this.getServer().getPluginManager();
 		
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener, Event.Priority.Monitor, this);
 		

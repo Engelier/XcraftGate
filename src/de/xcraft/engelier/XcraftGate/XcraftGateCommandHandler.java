@@ -29,10 +29,12 @@ public class XcraftGateCommandHandler {
 	public void printWUsage(Player player) {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets() + "by Engelier");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld list" + ChatColor.WHITE + " | " + ChatColor.AQUA + "lists active worlds on your server");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld info <world>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "displays some basic info about your world");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld create <name> [normal|nether]" + ChatColor.WHITE + " | " + ChatColor.AQUA + "creates a new world");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld delete <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "deletes a world (but NOT on disk!)");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld warpto <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "teleports you to world <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld setborder <world> <#>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "prevents users from exploring a world farther than x/z > #");		
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld setcreaturelimit <world> <#>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "limits amount of creatures active to <#> for the world");		
 	}
 
 	public void reply(Player player, String message) {
@@ -251,7 +253,47 @@ public class XcraftGateCommandHandler {
 			} else {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
-
+		} else if (args[0].equals("setcreaturelimit")) {
+			if (args.length < 3) {
+				printWUsage(player);
+				return null;
+			}
+			
+			if (plugin.config.getString("worlds." + args[1] + ".type") == null) {
+				error = "World " + args[1] + " unknown.";
+			}
+			
+			if (plugin.getServer().getWorld(args[1]) != null) {
+				Integer border;
+				try { border = new Integer(args[2]); } catch(Exception ex) { return "Invalid number: " + args[2]; }
+				if (border <= 0) {
+					plugin.config.removeProperty("worlds." + args[1] + ".creatureLimit");
+					reply(player, "Creature limit of world " + args[1] + " removed.");
+				} else {
+					plugin.config.setProperty("worlds." + args[1] + ".creatureLimit", border);
+					reply(player, "Creature limit of world " + args[1] + " set to " + border + ".");
+				}
+			} else {
+				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
+			}
+		} else if (args[0].equals("info")) {
+			if (args.length < 2) {
+				printWUsage(player);
+				return null;
+			}
+			
+			if (plugin.config.getString("worlds." + args[1] + ".type") == null) {
+				error = "World " + args[1] + " unknown.";
+			}
+			
+			if (plugin.getServer().getWorld(args[1]) != null) {
+				reply(player, "Infos for world " + args[1] + ":");
+				player.sendMessage("Worldname: " + args[1]);
+				player.sendMessage("Border: " + plugin.config.getInt("worlds." + args[1] + ".border", 0));
+				player.sendMessage("Creature limit: " + plugin.config.getInt("worlds." + args[1] + ".creatureLimit", 0));
+				player.sendMessage("Creature count: " + (plugin.getServer().getWorld(args[1]).getLivingEntities().size() - plugin.getServer().getWorld(args[1]).getPlayers().size()));
+				player.sendMessage("Player count: " + plugin.getServer().getWorld(args[1]).getPlayers().size());
+			}
 		} else if (args[0].equals("list")) {
 			String worlds = "";
 			for (World world: plugin.getServer().getWorlds()) {

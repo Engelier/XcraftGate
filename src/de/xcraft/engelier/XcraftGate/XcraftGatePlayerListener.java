@@ -15,9 +15,9 @@ public class XcraftGatePlayerListener extends PlayerListener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Location location = event.getTo();
 		String gateName = null;
-		Integer border = null;
+		Integer border = 0;
 		
-		if ((border = plugin.config.getInt("worlds." + location.getWorld().getName() + ".border", Integer.MAX_VALUE)) != null) {
+		if ((border = plugin.config.getInt("worlds." + location.getWorld().getName() + ".border", 0)) > 0) {
 			if (Math.abs(location.getX()) > border || Math.abs(location.getZ()) > border) {
 				event.setCancelled(true);
 				event.getPlayer().teleport(event.getFrom());
