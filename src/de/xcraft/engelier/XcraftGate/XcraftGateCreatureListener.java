@@ -19,7 +19,6 @@ public class XcraftGateCreatureListener extends EntityListener {
 		Integer alive = event.getLocation().getWorld().getLivingEntities().size() - event.getLocation().getWorld().getPlayers().size();
 		
 		if (max > 0 && max <= alive) {
-			event.setCancelled(true);
 			WorldServer world = ((CraftWorld)event.getLocation().getWorld()).getHandle();
 			world.allowAnimals  = false;
 			world.allowMonsters = false;
