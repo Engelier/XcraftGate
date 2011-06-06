@@ -23,7 +23,7 @@ public class XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate unloop <name1> <name2>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "removes double-link between <name1> and <name2>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate delete <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "removes gate <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate listsolo" + ChatColor.WHITE + " | " + ChatColor.AQUA + "list gates with no source/destination");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate warp <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "teleporst you to gate <name>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate warp <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "teleports you to gate <name>");
 	}
 
 	public void printWUsage(Player player) {
