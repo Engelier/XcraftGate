@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -29,6 +30,8 @@ public class XcraftGate extends JavaPlugin {
 	private XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(this);
 	private XcraftGateCommandHandler commandHandler = new XcraftGateCommandHandler(this);
 
+	public XcraftGateCreatureLimiter creatureLimiter = new XcraftGateCreatureLimiter(this);
+	
 	public Configuration config = null;
 	
 	public PermissionHandler permissions = null;
@@ -41,6 +44,7 @@ public class XcraftGate extends JavaPlugin {
 	public Logger log = Logger.getLogger("Minecraft");
 
 	public void onDisable() {
+		getServer().getScheduler().cancelTasks(this);
 		saveGates();
 		config.save();
 	}
@@ -50,7 +54,6 @@ public class XcraftGate extends JavaPlugin {
 		
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_DEATH, creatureListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener, Event.Priority.Monitor, this);
 		
@@ -65,6 +68,8 @@ public class XcraftGate extends JavaPlugin {
 		loadConfig();
 		loadWorlds();
 		loadGates();
+		
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, creatureLimiter, 1200, 1200);
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
