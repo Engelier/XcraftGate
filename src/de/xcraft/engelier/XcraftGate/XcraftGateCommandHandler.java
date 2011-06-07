@@ -190,10 +190,12 @@ public class XcraftGateCommandHandler {
 				plugin.config.setProperty("worlds." + args[1] + ".type", "normal");
 				plugin.getServer().createWorld(args[1], World.Environment.NORMAL);
 				reply(player, "World " + args[1] + " created with environment NORMAL.");
+				plugin.config.save();
 			} else if (args[2].equalsIgnoreCase("nether")) {
 				plugin.config.setProperty("worlds." + args[1] + ".type", "nether");
 				plugin.getServer().createWorld(args[1], World.Environment.NETHER);				
 				reply(player, "World " + args[1] + " created with environment NETHER.");
+				plugin.config.save();
 			} else {
 				error = "Unknown environment: " + args[2];
 			}
@@ -210,6 +212,7 @@ public class XcraftGateCommandHandler {
 			if (plugin.getServer().getWorld(args[1]) != null) {
 				plugin.config.removeProperty("worlds." + args[1]);
 				reply(player, "World " + args[1] + " removed. Restart server to make changes take effect.");
+				plugin.config.save();
 			} else {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
@@ -250,6 +253,7 @@ public class XcraftGateCommandHandler {
 					plugin.config.setProperty("worlds." + args[1] + ".border", border);
 					reply(player, "Border of world " + args[1] + " set to " + border + ".");
 				}
+				plugin.config.save();
 			} else {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
@@ -273,6 +277,7 @@ public class XcraftGateCommandHandler {
 					plugin.config.setProperty("worlds." + args[1] + ".creatureLimit", border);
 					reply(player, "Creature limit of world " + args[1] + " set to " + border + ".");
 				}
+				plugin.config.save();
 			} else {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}

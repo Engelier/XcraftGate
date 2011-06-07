@@ -120,10 +120,12 @@ public class XcraftGate extends JavaPlugin {
 		XcraftGateGate newGate = new XcraftGateGate(this, name, location);
 		gates.put(name, newGate);
 		gateLocations.put(getLocationString(location), name);
+		saveGates();
 	}
 
 	public void createGateLink(String source, String destination) {
 		gates.get(source).gateTarget = destination;
+		saveGates();
 	}
 	
 	public void createGateLoop(String gate1, String gate2) {
@@ -133,6 +135,7 @@ public class XcraftGate extends JavaPlugin {
 	
 	public void removeGateLink(String gate) {
 		gates.get(gate).gateTarget = null;
+		saveGates();
 	}
 	
 	public void removeGateLoop(String gate1, String gate2) {
