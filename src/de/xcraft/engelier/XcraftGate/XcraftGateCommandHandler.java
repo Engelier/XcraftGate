@@ -213,7 +213,8 @@ public class XcraftGateCommandHandler {
 			
 			if (plugin.getServer().getWorld(args[1]) != null) {
 				plugin.config.removeProperty("worlds." + args[1]);
-				reply(player, "World " + args[1] + " removed. Restart server to make changes take effect.");
+				reply(player, "World " + args[1] + " removed.");
+				plugin.getServer().unloadWorld(args[1], true);
 				plugin.config.save();
 			} else {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
