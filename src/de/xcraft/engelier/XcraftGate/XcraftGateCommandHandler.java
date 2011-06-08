@@ -308,10 +308,12 @@ public class XcraftGateCommandHandler {
 				if (allowed) {
 					plugin.config.setProperty("worlds." + args[1] + ".animalsAllowed", true);
 					plugin.creatureLimiter.allowAnimals(plugin.getServer().getWorld(args[1]));
+					reply(player, "Animal spawn on " + args[1] + " enabled.");
 				} else {
 					plugin.config.setProperty("worlds." + args[1] + ".animalsAllowed", false);
 					plugin.creatureLimiter.denyAnimals(plugin.getServer().getWorld(args[1]));
 					plugin.creatureLimiter.killAllAnimals(plugin.getServer().getWorld(args[1]));
+					reply(player, "Animal spawn on " + args[1] + " disabled.");
 				}
 				plugin.config.save();
 			} else {
@@ -341,10 +343,12 @@ public class XcraftGateCommandHandler {
 				if (allowed) {
 					plugin.config.setProperty("worlds." + args[1] + ".monstersAllowed", true);
 					plugin.creatureLimiter.allowMonsters(plugin.getServer().getWorld(args[1]));
+					reply(player, "Monster spawn on " + args[1] + " enabled.");
 				} else {
 					plugin.config.setProperty("worlds." + args[1] + ".monstersAllowed", false);
 					plugin.creatureLimiter.denyMonsters(plugin.getServer().getWorld(args[1]));
 					plugin.creatureLimiter.killAllMonsters(plugin.getServer().getWorld(args[1]));
+					reply(player, "Monster spawn on " + args[1] + " disabled.");
 				}
 				plugin.config.save();
 			} else {
