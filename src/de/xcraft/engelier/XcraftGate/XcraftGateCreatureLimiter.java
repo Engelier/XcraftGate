@@ -1,15 +1,56 @@
 package de.xcraft.engelier.XcraftGate;
 
-import net.minecraft.server.WorldServer;
-
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.entity.*;
 
 public class XcraftGateCreatureLimiter implements Runnable {
 	private XcraftGate plugin;
 	
 	public XcraftGateCreatureLimiter (XcraftGate instance) {
 		plugin = instance;
+	}
+	
+	public void killAllMonsters(World world) {
+		for (LivingEntity entity: world.getLivingEntities()) {
+			if (entity instanceof Zombie ||
+					entity instanceof Skeleton ||
+					entity instanceof PigZombie ||
+					entity instanceof Creeper ||
+					entity instanceof Ghast ||
+					entity instanceof Spider ||
+					entity instanceof Giant ||
+					entity instanceof Slime)
+				entity.remove();
+		}
+	}
+	
+	public void killAllAnimals(World world) {
+		for (LivingEntity entity: world.getLivingEntities()) {
+			if (entity instanceof Pig ||
+					entity instanceof Sheep ||
+					entity instanceof Wolf ||
+					entity instanceof Cow ||
+					entity instanceof Squid ||
+					entity instanceof Chicken)
+				entity.remove();
+		}		
+	}
+	
+	public void denyMonsters(World world) {
+		((CraftWorld)world).getHandle().allowMonsters = false;
+	}
+	
+	public void denyAnimals(World world) {
+		((CraftWorld)world).getHandle().allowAnimals = false;
+	}
+	
+	public void allowMonsters(World world) {
+		((CraftWorld)world).getHandle().allowMonsters = true;
+	}
+	
+	public void allowAnimals(World world) {
+		((CraftWorld)world).getHandle().allowAnimals = true;
 	}
 	
 	public void checkLimit(World world) {
@@ -19,16 +60,12 @@ public class XcraftGateCreatureLimiter implements Runnable {
 		if (max <= 0)
 			return;
 
-		WorldServer worldS = ((CraftWorld)world).getHandle();
-		
 		if (alive >= max) {
-			// disable creature spawn
-			worldS.allowAnimals  = false;
-			worldS.allowMonsters = false;
+			denyMonsters(world);
+			denyAnimals(world);
 		} else if (alive <= max * 0.8) {
-			// enable creature spawn
-			worldS.allowAnimals  = true;
-			worldS.allowMonsters = true;
+			allowMonsters(world);
+			allowAnimals(world);
 		}
 	}
 	

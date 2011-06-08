@@ -35,6 +35,8 @@ public class XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld warpto <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "teleports you to world <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld setborder <world> <#>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "prevents users from exploring a world farther than x/z > #");		
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld setcreaturelimit <world> <#>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "limits amount of creatures active to <#> for the world");		
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld allowanimals <world> <true|false>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "allows/denys animals to spawn in the world");		
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld allowmonsters <world> <true|false>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "allows/denys monsters to spawn in the world");		
 	}
 
 	public void reply(Player player, String message) {
@@ -268,14 +270,80 @@ public class XcraftGateCommandHandler {
 			}
 			
 			if (plugin.getServer().getWorld(args[1]) != null) {
-				Integer border;
-				try { border = new Integer(args[2]); } catch(Exception ex) { return "Invalid number: " + args[2]; }
-				if (border <= 0) {
+				Integer limit;
+				try { limit = new Integer(args[2]); } catch(Exception ex) { return "Invalid number: " + args[2]; }
+				if (limit <= 0) {
 					plugin.config.removeProperty("worlds." + args[1] + ".creatureLimit");
 					reply(player, "Creature limit of world " + args[1] + " removed.");
 				} else {
-					plugin.config.setProperty("worlds." + args[1] + ".creatureLimit", border);
-					reply(player, "Creature limit of world " + args[1] + " set to " + border + ".");
+					plugin.config.setProperty("worlds." + args[1] + ".creatureLimit", limit);
+					reply(player, "Creature limit of world " + args[1] + " set to " + limit + ".");
+				}
+				plugin.config.save();
+			} else {
+				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
+			}
+		} else if (args[0].equals("allowanimals")) {
+			if (args.length < 3) {
+				printWUsage(player);
+				return null;
+			}
+			
+			if (plugin.config.getString("worlds." + args[1] + ".type") == null) {
+				error = "World " + args[1] + " unknown.";
+			}
+			
+			if (plugin.getServer().getWorld(args[1]) != null) {
+				Boolean allowed;
+				if (args[2].equalsIgnoreCase("true")) {
+					allowed = true;
+				} else if (args[2].equalsIgnoreCase("false")) {
+					allowed = false;
+				} else {
+					printWUsage(player);
+					return error;
+				}
+				
+				if (allowed) {
+					plugin.config.setProperty("worlds." + args[1] + ".animalsAllowed", true);
+					plugin.creatureLimiter.allowAnimals(plugin.getServer().getWorld(args[1]));
+				} else {
+					plugin.config.setProperty("worlds." + args[1] + ".animalsAllowed", false);
+					plugin.creatureLimiter.denyAnimals(plugin.getServer().getWorld(args[1]));
+					plugin.creatureLimiter.killAllAnimals(plugin.getServer().getWorld(args[1]));
+				}
+				plugin.config.save();
+			} else {
+				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
+			}
+		} else if (args[0].equals("allowmonsters")) {
+			if (args.length < 3) {
+				printWUsage(player);
+				return null;
+			}
+			
+			if (plugin.config.getString("worlds." + args[1] + ".type") == null) {
+				error = "World " + args[1] + " unknown.";
+			}
+			
+			if (plugin.getServer().getWorld(args[1]) != null) {
+				Boolean allowed;
+				if (args[2].equalsIgnoreCase("true")) {
+					allowed = true;
+				} else if (args[2].equalsIgnoreCase("false")) {
+					allowed = false;
+				} else {
+					printWUsage(player);
+					return error;
+				}
+				
+				if (allowed) {
+					plugin.config.setProperty("worlds." + args[1] + ".monstersAllowed", true);
+					plugin.creatureLimiter.allowMonsters(plugin.getServer().getWorld(args[1]));
+				} else {
+					plugin.config.setProperty("worlds." + args[1] + ".monstersAllowed", false);
+					plugin.creatureLimiter.denyMonsters(plugin.getServer().getWorld(args[1]));
+					plugin.creatureLimiter.killAllMonsters(plugin.getServer().getWorld(args[1]));
 				}
 				plugin.config.save();
 			} else {
@@ -295,6 +363,8 @@ public class XcraftGateCommandHandler {
 				reply(player, "Infos for world " + args[1] + ":");
 				player.sendMessage("Worldname: " + args[1]);
 				player.sendMessage("Border: " + plugin.config.getInt("worlds." + args[1] + ".border", 0));
+				player.sendMessage("Animals allowed: " + (plugin.config.getBoolean("worlds." + args[1] + ".animalsAllowed", true) ? "yes" : "no"));
+				player.sendMessage("Monsters allowed: " + (plugin.config.getBoolean("worlds." + args[1] + ".monstersAllowed", true) ? "yes" : "no"));
 				player.sendMessage("Creature limit: " + plugin.config.getInt("worlds." + args[1] + ".creatureLimit", 0));
 				player.sendMessage("Creature count: " + (plugin.getServer().getWorld(args[1]).getLivingEntities().size() - plugin.getServer().getWorld(args[1]).getPlayers().size()));
 				player.sendMessage("Player count: " + plugin.getServer().getWorld(args[1]).getPlayers().size());

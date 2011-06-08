@@ -176,7 +176,7 @@ public class XcraftGate extends JavaPlugin {
 					config.setProperty("worlds." + world.getName() + ".type", "nether");					
 				}
 			}
-		}
+		}		
 	}
 	
 	private void loadWorlds() {
@@ -185,13 +185,30 @@ public class XcraftGate extends JavaPlugin {
 		
 		for (String thisWorld: config.getKeys("worlds")) {
 			String type = config.getString("worlds." + thisWorld + ".type");
+			World world = null;
 			if (type.equalsIgnoreCase("normal")) {
-				getServer().createWorld(thisWorld, World.Environment.NORMAL);
+				world = getServer().createWorld(thisWorld, World.Environment.NORMAL);
 			} else if (type.equalsIgnoreCase("nether")) {
-				getServer().createWorld(thisWorld, World.Environment.NETHER);
+				world = getServer().createWorld(thisWorld, World.Environment.NETHER);
 			} else {
 				log.severe(getNameBrackets() + "invalid type for world " + thisWorld + ": " + type);
-			}			
+			}
+			
+			if (world != null) {
+				if (config.getBoolean("worlds." + thisWorld + ".allowAnimals", true)) {
+					creatureLimiter.allowAnimals(world);
+				} else {
+					creatureLimiter.denyAnimals(world);					
+					creatureLimiter.killAllAnimals(world);
+				}
+
+				if (config.getBoolean("worlds." + thisWorld + ".allowMonsters", true)) {
+					creatureLimiter.allowMonsters(world);
+				} else {
+					creatureLimiter.denyMonsters(world);					
+					creatureLimiter.killAllMonsters(world);
+				}
+			}
 		}
 	}
 	
