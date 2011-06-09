@@ -69,7 +69,7 @@ public class XcraftGate extends JavaPlugin {
 		loadWorlds();
 		loadGates();
 		
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, creatureLimiter, 1200, 1200);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, creatureLimiter, 600, 600);
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
@@ -77,29 +77,18 @@ public class XcraftGate extends JavaPlugin {
 
 		if (cmd.getName().equalsIgnoreCase("gate")) {
 			error = commandHandler.parseGate((Player)sender, args);
-			if (error != null)
-				sender.sendMessage(ChatColor.RED + "Error: " + error);
-
-			return true;
 		} else if (cmd.getName().equalsIgnoreCase("gworld")) {
 			error = commandHandler.parseWorld((Player)sender, args);
-			if (error != null)
-				sender.sendMessage(ChatColor.RED + "Error: " + error);
-
-			return true;			
+		} else {
+			return false;
 		}
-		
-		return false;
+
+		if (error != null)
+			sender.sendMessage(ChatColor.RED + "Error: " + error);
+
+		return true;			
 	}
 	
-	public Boolean hasPermission(Player player, String permission) {
-		if (permissions != null) {
-			return permissions.has(player, permission);
-		} else {
-			return true;
-		}
-	}
-
 	public Boolean hasOpPermission(Player player, String permission) {
 		if (permissions != null) {
 			return permissions.has(player, permission);

@@ -31,7 +31,6 @@ public class XcraftGatePlayerListener extends PlayerListener {
 			}
 		} else if (plugin.justTeleported.get(event.getPlayer().getName()) != null) {
 			plugin.justTeleported.remove(event.getPlayer().getName());
-		}
-
+		}		
 	}	
 }

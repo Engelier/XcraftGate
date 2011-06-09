@@ -46,12 +46,12 @@ public class XcraftGateCommandHandler {
 	public String parseGate(Player player, String[] args) {
 		String error = null;
 		
-		if (!plugin.hasOpPermission(player, "XcraftGate.admin.gate"))
-			return "You don't have permission to use this command.";
-		
 		if (args.length == 0) {
 			printUsage(player);
 		} else if (args[0].equals("create")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.create"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printUsage(player);
 				return null;
@@ -66,6 +66,9 @@ public class XcraftGateCommandHandler {
 				reply(player, "Gate " + args[1] + " created: " + plugin.getLocationString(player.getLocation()));
 			}
 		} else if (args[0].equals("link")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.link"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 3) {
 				printUsage(player);
 				return null;
@@ -80,6 +83,9 @@ public class XcraftGateCommandHandler {
 				reply(player, "Linked Gate " + args[1] + " to " + args[2]);
 			}
 		} else if (args[0].equals("loop")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.link"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 3) {
 				printUsage(player);
 				return null;
@@ -94,6 +100,9 @@ public class XcraftGateCommandHandler {
 				reply(player, "Created loop between gates " + args[1] + " <=> " + args[2]);
 			}
 		} else if (args[0].equals("unlink")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.unlink"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printUsage(player);
 				return null;
@@ -106,6 +115,9 @@ public class XcraftGateCommandHandler {
 				reply(player, "removed link from gate " + args[1]);
 			}
 		} else if (args[0].equals("unloop")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.unlink"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 3) {
 				printUsage(player);
 				return null;
@@ -122,6 +134,9 @@ public class XcraftGateCommandHandler {
 				reply(player, "removes gate loop " + args[1] + " <=> " + args[2]);
 			}
 		} else if (args[0].equals("delete")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.delete"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printUsage(player);
 				return null;
@@ -140,6 +155,9 @@ public class XcraftGateCommandHandler {
 				reply(player, "Gate " + args[1] + " removed.");
 			}
 		} else if (args[0].equals("listsolo")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.list"))
+				return "You don't have permission to use this command.";
+			
 			for (Map.Entry<String, XcraftGateGate> thisGate: plugin.gates.entrySet()) {
 				if (thisGate.getValue().gateTarget == null) {
 					boolean hasSource = false;
@@ -153,6 +171,9 @@ public class XcraftGateCommandHandler {
 				}
 			}
 		} else if (args[0].equals("warp")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.gate.warp"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printUsage(player);
 				return null;
@@ -173,12 +194,12 @@ public class XcraftGateCommandHandler {
 	public String parseWorld(Player player, String[] args) {
 		String error = null;
 		
-		if (!plugin.hasOpPermission(player, "XcraftGate.admin.gworld"))
-			return "You don't have permission to use this command.";
-		
 		if (args.length == 0) {
 			printWUsage(player);
 		} else if (args[0].equals("create")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.create"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printWUsage(player);
 				return null;
@@ -207,6 +228,9 @@ public class XcraftGateCommandHandler {
 				error = "Unknown environment: " + args[2];
 			}
 		} else if (args[0].equals("delete")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.delete"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printWUsage(player);
 				return null;
@@ -225,6 +249,9 @@ public class XcraftGateCommandHandler {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
 		} else if (args[0].equals("warpto")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.warp"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printWUsage(player);
 				return null;
@@ -242,6 +269,9 @@ public class XcraftGateCommandHandler {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
 		} else if (args[0].equals("setborder")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.setborder"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 3) {
 				printWUsage(player);
 				return null;
@@ -266,6 +296,9 @@ public class XcraftGateCommandHandler {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
 		} else if (args[0].equals("setcreaturelimit")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.setcreaturelimit"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 3) {
 				printWUsage(player);
 				return null;
@@ -290,6 +323,9 @@ public class XcraftGateCommandHandler {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
 		} else if (args[0].equals("allowanimals")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.setcreaturelimit"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 3) {
 				printWUsage(player);
 				return null;
@@ -325,6 +361,9 @@ public class XcraftGateCommandHandler {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
 		} else if (args[0].equals("allowmonsters")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.setcreaturelimit"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 3) {
 				printWUsage(player);
 				return null;
@@ -360,6 +399,9 @@ public class XcraftGateCommandHandler {
 				error = "World " + args[1] + " known, but not loaded. This should not happen?!";
 			}
 		} else if (args[0].equals("info")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.info"))
+				return "You don't have permission to use this command.";
+			
 			if (args.length < 2) {
 				printWUsage(player);
 				return null;
@@ -380,6 +422,9 @@ public class XcraftGateCommandHandler {
 				player.sendMessage("Player count: " + plugin.getServer().getWorld(args[1]).getPlayers().size());
 			}
 		} else if (args[0].equals("list")) {
+			if (!plugin.hasOpPermission(player, "XcraftGate.world.info"))
+				return "You don't have permission to use this command.";
+			
 			String worlds = "";
 			for (World world: plugin.getServer().getWorlds()) {
 				worlds += ", " + world.getName();
