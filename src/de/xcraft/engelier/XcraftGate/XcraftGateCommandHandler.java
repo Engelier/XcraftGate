@@ -30,7 +30,7 @@ public class XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets() + "by Engelier");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld list" + ChatColor.WHITE + " | " + ChatColor.AQUA + "lists active worlds on your server");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld info <world>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "displays some basic info about your world");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld create <name> [normal|nether]" + ChatColor.WHITE + " | " + ChatColor.AQUA + "creates a new world");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld create <name> [normal|nether|skylands]" + ChatColor.WHITE + " | " + ChatColor.AQUA + "creates a new world");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld delete <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "deletes a world (but NOT on disk!)");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld warpto <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "teleports you to world <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gworld setborder <world> <#>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "prevents users from exploring a world farther than x/z > #");		
@@ -197,6 +197,11 @@ public class XcraftGateCommandHandler {
 				plugin.config.setProperty("worlds." + args[1] + ".type", "nether");
 				plugin.getServer().createWorld(args[1], World.Environment.NETHER);				
 				reply(player, "World " + args[1] + " created with environment NETHER.");
+				plugin.config.save();
+			} else if (args[2].equalsIgnoreCase("skylands")) {
+				plugin.config.setProperty("worlds." + args[1] + ".type", "skylands");
+				plugin.getServer().createWorld(args[1], World.Environment.SKYLANDS);				
+				reply(player, "World " + args[1] + " created with environment SKYLANDS.");
 				plugin.config.save();
 			} else {
 				error = "Unknown environment: " + args[2];

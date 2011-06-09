@@ -174,6 +174,8 @@ public class XcraftGate extends JavaPlugin {
 					config.setProperty("worlds." + world.getName() + ".type", "normal");
 				} else if (world.getEnvironment() == World.Environment.NETHER) {
 					config.setProperty("worlds." + world.getName() + ".type", "nether");					
+				} else if (world.getEnvironment() == World.Environment.SKYLANDS) {
+					config.setProperty("worlds." + world.getName() + ".type", "skylands");					
 				}
 			}
 		}		
@@ -190,6 +192,8 @@ public class XcraftGate extends JavaPlugin {
 				world = getServer().createWorld(thisWorld, World.Environment.NORMAL);
 			} else if (type.equalsIgnoreCase("nether")) {
 				world = getServer().createWorld(thisWorld, World.Environment.NETHER);
+			} else if (type.equalsIgnoreCase("skylands")) {
+				world = getServer().createWorld(thisWorld, World.Environment.SKYLANDS);
 			} else {
 				log.severe(getNameBrackets() + "invalid type for world " + thisWorld + ": " + type);
 			}
