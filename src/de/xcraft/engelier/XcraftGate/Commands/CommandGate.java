@@ -149,7 +149,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				}
 			}
 		} else if (args[0].equals("listsolo")) {
-			if (!isPermitted("gate", "delete")) {
+			if (!isPermitted("gate", "info")) {
 				error("You don't have permission to use this command.");
 			} else {			
 				for (Map.Entry<String, XcraftGateGate> thisGate: plugin.gates.entrySet()) {
@@ -166,7 +166,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				}
 			}
 		} else if (args[0].equals("warp")) {
-			if (!isPermitted("gate", "delete")) {
+			if (!isPermitted("gate", "warp")) {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 2)) {
 				printUsage();
