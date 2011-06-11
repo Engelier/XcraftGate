@@ -8,11 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
@@ -24,11 +21,12 @@ import org.yaml.snakeyaml.Yaml;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
+import de.xcraft.engelier.XcraftGate.Commands.*;
+
 public class XcraftGate extends JavaPlugin {
 	private XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(this);
 	private XcraftGatePlayerListener playerListener = new XcraftGatePlayerListener(this);
 	private XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(this);
-	private XcraftGateCommandHandler commandHandler = new XcraftGateCommandHandler(this);
 
 	public XcraftGateCreatureLimiter creatureLimiter = new XcraftGateCreatureLimiter(this);
 	
@@ -70,23 +68,8 @@ public class XcraftGate extends JavaPlugin {
 		loadGates();
 		
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, creatureLimiter, 600, 600);
-	}
-
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-		String error;
-
-		if (cmd.getName().equalsIgnoreCase("gate")) {
-			error = commandHandler.parseGate((Player)sender, args);
-		} else if (cmd.getName().equalsIgnoreCase("gworld")) {
-			error = commandHandler.parseWorld((Player)sender, args);
-		} else {
-			return false;
-		}
-
-		if (error != null)
-			sender.sendMessage(ChatColor.RED + "Error: " + error);
-
-		return true;			
+		getCommand("gate").setExecutor(new CommandGate(this));
+		getCommand("gworld").setExecutor(new CommandWorld(this));
 	}
 	
 	public Boolean hasOpPermission(Player player, String permission) {
@@ -242,6 +225,13 @@ public class XcraftGate extends JavaPlugin {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+		
+		for (Map.Entry<String, XcraftGateGate> thisGate: gates.entrySet()) {
+			if (gates.get(thisGate.getValue().gateTarget) == null) {
+				log.severe(getNameBrackets() + "gate " + thisGate.getKey() + " has an invalid destination. Destination removed.");
+				thisGate.getValue().gateTarget = null;
+			}
 		}
 
 	}
