@@ -5,8 +5,8 @@ import org.bukkit.event.entity.EntityListener;
 
 public class XcraftGateCreatureListener extends EntityListener {
 	private XcraftGate plugin;
-	
-	public XcraftGateCreatureListener (XcraftGate instance) {
+
+	public XcraftGateCreatureListener(XcraftGate instance) {
 		plugin = instance;
 	}
 

@@ -19,38 +19,58 @@ public class CommandGate extends XcraftGateCommandHandler {
 	}
 
 	public void printUsage() {
-		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets() + "by Engelier");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate create <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "creates a new gate at your location");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate link <name1> <name2>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "links <name1> to <name2>");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate loop <name1> <name2>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "links <name1> to <name2> and vice versa");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate unlink <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "removes destination from <name>");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate unloop <name1> <name2>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "removes double-link between <name1> and <name2>");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate delete <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "removes gate <name>");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate listsolo" + ChatColor.WHITE + " | " + ChatColor.AQUA + "list gates with no source/destination");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN + "/gate warp <name>" + ChatColor.WHITE + " | " + ChatColor.AQUA + "teleports you to gate <name>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets()
+				+ "by Engelier");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate create <name>" + ChatColor.WHITE + " | "
+				+ ChatColor.AQUA + "creates a new gate at your location");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate link <name1> <name2>" + ChatColor.WHITE + " | "
+				+ ChatColor.AQUA + "links <name1> to <name2>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate loop <name1> <name2>" + ChatColor.WHITE + " | "
+				+ ChatColor.AQUA + "links <name1> to <name2> and vice versa");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate unlink <name>" + ChatColor.WHITE + " | "
+				+ ChatColor.AQUA + "removes destination from <name>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate unloop <name1> <name2>" + ChatColor.WHITE + " | "
+				+ ChatColor.AQUA
+				+ "removes double-link between <name1> and <name2>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate delete <name>" + ChatColor.WHITE + " | "
+				+ ChatColor.AQUA + "removes gate <name>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate listsolo" + ChatColor.WHITE + " | " + ChatColor.AQUA
+				+ "list gates with no source/destination");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate warp <name>" + ChatColor.WHITE + " | "
+				+ ChatColor.AQUA + "teleports you to gate <name>");
 	}
 
 	public boolean gateExists(String name) {
 		return plugin.gates.containsKey(name);
 	}
-	
+
 	public boolean gateExists(Location location) {
 		return plugin.gateLocations.get(plugin.getLocationString(location)) != null;
 	}
-	
-	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+
+	public boolean onCommand(CommandSender sender, Command cmd,
+			String commandLabel, String[] args) {
 		if (sender instanceof Player) {
-			player = (Player)sender;
+			player = (Player) sender;
 		} else {
-			plugin.log.warning(plugin.getNameBrackets() + " this command cannot be used from the console");
+			plugin.log.warning(plugin.getNameBrackets()
+					+ " this command cannot be used from the console");
 			return true;
 		}
-		
+
 		if (!isPermitted("gate", null)) {
 			error("You don't have permission to use this command");
 			return true;
 		}
-		
+
 		if (args.length == 0) {
 			printUsage();
 		} else if (args[0].equals("create")) {
@@ -58,14 +78,15 @@ public class CommandGate extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 2)) {
 				printUsage();
-			} else {			
+			} else {
 				if (gateExists(args[1])) {
 					reply("Gate " + args[1] + " already exists.");
 				} else if (gateExists(player.getLocation())) {
 					reply("There is already a gate at this location!");
 				} else {
 					plugin.createGate(player.getLocation(), args[1]);
-					reply("Gate " + args[1] + " created: " + plugin.getLocationString(player.getLocation()));
+					reply("Gate " + args[1] + " created: "
+							+ plugin.getLocationString(player.getLocation()));
 				}
 			}
 		} else if (args[0].equals("link")) {
@@ -73,7 +94,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 3)) {
 				printUsage();
-			} else {			
+			} else {
 				if (!gateExists(args[1])) {
 					reply("Gate " + args[1] + " not found.");
 				} else if (!gateExists(args[2])) {
@@ -88,7 +109,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 3)) {
 				printUsage();
-			} else {			
+			} else {
 				if (!gateExists(args[1])) {
 					reply("Gate " + args[1] + " not found.");
 				} else if (!gateExists(args[2])) {
@@ -103,7 +124,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 2)) {
 				printUsage();
-			} else {			
+			} else {
 				if (!gateExists(args[1])) {
 					reply("Gate " + args[1] + " not found.");
 				} else {
@@ -116,13 +137,17 @@ public class CommandGate extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 3)) {
 				printUsage();
-			} else {			
+			} else {
 				if (!gateExists(args[1])) {
 					reply("Gate " + args[1] + " not found.");
 				} else if (!gateExists(args[2])) {
 					reply("Gate " + args[2] + " not found.");
-				} else if (!plugin.gates.get(args[1]).gateTarget.equals(args[2]) || !plugin.gates.get(args[2]).gateTarget.equals(args[1])) {
-					reply("Gates " + args[1] + " and " + args[2] + " aren't linked together");
+				} else if (!plugin.gates.get(args[1]).gateTarget
+						.equals(args[2])
+						|| !plugin.gates.get(args[2]).gateTarget
+								.equals(args[1])) {
+					reply("Gates " + args[1] + " and " + args[2]
+							+ " aren't linked together");
 				} else {
 					plugin.removeGateLoop(args[1], args[2]);
 					reply("removed gate loop " + args[1] + " <=> " + args[2]);
@@ -133,15 +158,20 @@ public class CommandGate extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 2)) {
 				printUsage();
-			} else {			
-			
+			} else {
+
 				if (!gateExists(args[1])) {
 					reply("Gate not found: " + args[1]);
 				} else {
-					plugin.gateLocations.remove(plugin.getLocationString(plugin.gates.get(args[1]).gateLocation));
+					plugin.gateLocations
+							.remove(plugin.getLocationString(plugin.gates
+									.get(args[1]).gateLocation));
 					plugin.gates.remove(args[1]);
-					for (Map.Entry<String, XcraftGateGate> sourceGate: plugin.gates.entrySet()) {
-						if (sourceGate.getValue().gateTarget != null && sourceGate.getValue().gateTarget.equals(args[1])) {
+					for (Map.Entry<String, XcraftGateGate> sourceGate : plugin.gates
+							.entrySet()) {
+						if (sourceGate.getValue().gateTarget != null
+								&& sourceGate.getValue().gateTarget
+										.equals(args[1])) {
 							sourceGate.getValue().gateTarget = null;
 						}
 					}
@@ -151,15 +181,19 @@ public class CommandGate extends XcraftGateCommandHandler {
 		} else if (args[0].equals("listsolo")) {
 			if (!isPermitted("gate", "info")) {
 				error("You don't have permission to use this command.");
-			} else {			
-				for (Map.Entry<String, XcraftGateGate> thisGate: plugin.gates.entrySet()) {
+			} else {
+				for (Map.Entry<String, XcraftGateGate> thisGate : plugin.gates
+						.entrySet()) {
 					if (thisGate.getValue().gateTarget == null) {
 						boolean hasSource = false;
-						for (Map.Entry<String, XcraftGateGate> sourceGate: plugin.gates.entrySet()) {
-							if (sourceGate.getValue().gateTarget != null && sourceGate.getValue().gateTarget.equals(thisGate.getValue().gateName)) {
+						for (Map.Entry<String, XcraftGateGate> sourceGate : plugin.gates
+								.entrySet()) {
+							if (sourceGate.getValue().gateTarget != null
+									&& sourceGate.getValue().gateTarget
+											.equals(thisGate.getValue().gateName)) {
 								hasSource = true;
 							}
-						}	
+						}
 						if (!hasSource)
 							reply("Found orphan: " + thisGate.getKey());
 					}
@@ -170,7 +204,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else if (!checkArgs(args, 2)) {
 				printUsage();
-			} else {			
+			} else {
 				if (!gateExists(args[1])) {
 					reply("Gate not found: " + args[1]);
 				} else {
@@ -180,7 +214,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 		} else {
 			printUsage();
 		}
-		
+
 		return true;
 	}
 }

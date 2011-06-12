@@ -9,28 +9,31 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class XcraftGatePluginListener extends ServerListener {
 	private XcraftGate plugin = null;
-	
-	public XcraftGatePluginListener (XcraftGate instance) {
+
+	public XcraftGatePluginListener(XcraftGate instance) {
 		plugin = instance;
 	}
 
 	@Override
 	public void onPluginEnable(PluginEnableEvent event) {
 		Plugin thisPlugin = event.getPlugin();
-				
+
 		if (thisPlugin.getDescription().getName().equals("Permissions")) {
-			plugin.permissions = ((Permissions)thisPlugin).getHandler();
-			plugin.log.info(plugin.getNameBrackets() + "hooked into Permissions " + thisPlugin.getDescription().getVersion());
+			plugin.permissions = ((Permissions) thisPlugin).getHandler();
+			plugin.log.info(plugin.getNameBrackets()
+					+ "hooked into Permissions "
+					+ thisPlugin.getDescription().getVersion());
 		}
 	}
-	
+
 	@Override
 	public void onPluginDisable(PluginDisableEvent event) {
-		Plugin thisPlugin = event.getPlugin();		
+		Plugin thisPlugin = event.getPlugin();
 
 		if (thisPlugin.getDescription().getName().equals("Permissions")) {
 			plugin.permissions = null;
-			plugin.log.info(plugin.getNameBrackets() + "lost Permissions plugin.");
+			plugin.log.info(plugin.getNameBrackets()
+					+ "lost Permissions plugin.");
 		}
 	}
 
