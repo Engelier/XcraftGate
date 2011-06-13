@@ -10,12 +10,12 @@ import java.util.logging.Logger;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
 import com.nijiko.permissions.PermissionHandler;
@@ -31,13 +31,9 @@ public class XcraftGate extends JavaPlugin {
 	private XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(
 			this);
 
-	public XcraftGateCreatureLimiter creatureLimiter = new XcraftGateCreatureLimiter(
-			this);
-
-	public Configuration config = null;
-
 	public PermissionHandler permissions = null;
 
+	public Map<String, XcraftGateWorld> worlds = new HashMap<String, XcraftGateWorld>();
 	public Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
 	public Map<String, String> gateLocations = new HashMap<String, String>();
 	public Map<String, Boolean> justTeleported = new HashMap<String, Boolean>();
@@ -45,10 +41,18 @@ public class XcraftGate extends JavaPlugin {
 
 	public Logger log = Logger.getLogger("Minecraft");
 
+	class RunCreatureLimit implements Runnable {
+		public void run() {
+			for(Map.Entry<String, XcraftGateWorld> thisWorld: worlds.entrySet()) {
+				thisWorld.getValue().checkCreatureLimit();
+			}
+		}
+	}
+	
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
 		saveGates();
-		config.save();
+		saveWorlds();
 	}
 
 	public void onEnable() {
@@ -72,12 +76,10 @@ public class XcraftGate extends JavaPlugin {
 
 		log.info(getNameBrackets() + "by Engelier loaded.");
 
-		loadConfig();
 		loadWorlds();
 		loadGates();
 
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this,
-				creatureLimiter, 600, 600);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this,	new RunCreatureLimit(), 600, 600);
 		getCommand("gate").setExecutor(new CommandGate(this));
 		getCommand("gworld").setExecutor(new CommandWorld(this));
 	}
@@ -132,76 +134,84 @@ public class XcraftGate extends JavaPlugin {
 		return "[" + this.getDescription().getFullName() + "] ";
 	}
 
-	private void loadConfig() {
+	@SuppressWarnings("unchecked")
+	private void loadWorlds() {
 		File configFile = new File(getDataFolder(), "worlds.yml");
-
+	
 		if (!configFile.exists()) {
-			if (!getDataFolder().exists()) {
-				getDataFolder().mkdirs();
-				getDataFolder().setExecutable(true);
-				getDataFolder().setWritable(true);
-			}
+			getDataFolder().mkdir();
+			getDataFolder().setWritable(true);
+			getDataFolder().setExecutable(true);
 
 			try {
 				configFile.createNewFile();
 			} catch (Exception ex) {
-				log.severe(getNameBrackets() + "unable to create config file");
 				ex.printStackTrace();
+				return;
 			}
 		}
 
-		config = new Configuration(configFile);
-		config.load();
+		try {
+			Yaml yaml = new Yaml();
+			Map<String, Object> worldsYaml = (Map<String, Object>) yaml.load(new FileInputStream(configFile));
+			for (Map.Entry<String, Object> thisWorld : ((Map<String, Object>)worldsYaml.get("worlds")).entrySet()) {
+				String worldName = thisWorld.getKey();
+				Map<String, Object> worldData = (Map<String, Object>) thisWorld.getValue();
 
-		if (config.getKeys("worlds") == null) {
-			for (World world : getServer().getWorlds()) {
-				config.setProperty("worlds." + world.getName() + ".type", world
-						.getEnvironment().toString().toLowerCase());
+				String env = (String) worldData.get("type");
+				
+				XcraftGateWorld newWorld = new XcraftGateWorld(this);
+				for(Environment thisEnv: World.Environment.values()) {
+					if (thisEnv.toString().equalsIgnoreCase(env)) {
+						newWorld.load(worldName, thisEnv);
+					}
+				}
+				
+				if (newWorld.name == null) newWorld.load(worldName, World.Environment.NORMAL);
+
+				newWorld.setBorder((Integer)worldData.get("border"));
+				newWorld.setAllowAnimals((Boolean)worldData.get("allowAnimals"));
+				newWorld.setAllowMonsters((Boolean)worldData.get("allowMonsters"));
+				newWorld.setCreatureLimit((Integer)worldData.get("creatureLimit"));
+
+				worlds.put(worldName, newWorld);
 			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 
-	private void loadWorlds() {
-		if (config.getKeys("worlds") == null)
-			return;
+	public void saveWorlds() {
+		File configFile = new File(getDataFolder(), "worlds.yml");
+		
+		Map<String, Object> toDump = new HashMap<String, Object>();
 
-		for (String thisWorld : config.getKeys("worlds")) {
-			String type = config.getString("worlds." + thisWorld + ".type");
-			World world = null;
-			if (type.equalsIgnoreCase("normal")) {
-				world = getServer().createWorld(thisWorld,
-						World.Environment.NORMAL);
-			} else if (type.equalsIgnoreCase("nether")) {
-				world = getServer().createWorld(thisWorld,
-						World.Environment.NETHER);
-			} else if (type.equalsIgnoreCase("skylands")) {
-				world = getServer().createWorld(thisWorld,
-						World.Environment.SKYLANDS);
-			} else {
-				log.severe(getNameBrackets() + "invalid type for world "
-						+ thisWorld + ": " + type);
-			}
+		for (Map.Entry<String, XcraftGateWorld> thisWorld : worlds.entrySet()) {
+			String worldName = thisWorld.getKey();
 
-			if (world != null) {
-				if (config.getBoolean("worlds." + thisWorld + ".allowAnimals",
-						true)) {
-					creatureLimiter.allowAnimals(world);
-				} else {
-					creatureLimiter.denyAnimals(world);
-					creatureLimiter.killAllAnimals(world);
-				}
+			Map<String, Object> values = new HashMap<String, Object>();
+			values.put("name", thisWorld.getValue().name);
+			values.put("type", thisWorld.getValue().environment.toString());
+			values.put("creatureLimit", thisWorld.getValue().creatureLimit);
+			values.put("allowAnimals", thisWorld.getValue().allowAnimals);
+			values.put("allowMonsters", thisWorld.getValue().allowMonsters);
 
-				if (config.getBoolean("worlds." + thisWorld + ".allowMonsters",
-						true)) {
-					creatureLimiter.allowMonsters(world);
-				} else {
-					creatureLimiter.denyMonsters(world);
-					creatureLimiter.killAllMonsters(world);
-				}
-			}
+			toDump.put(worldName, values);
+		}
+
+		Yaml yaml = new Yaml();
+		String dump = yaml.dump(new HashMap<String, Object>().put("worlds", toDump));
+
+		try {
+			FileOutputStream fh = new FileOutputStream(configFile);
+			new PrintStream(fh).println(dump);
+			fh.flush();
+			fh.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	private void loadGates() {
 		File configFile = new File(getDataFolder(), "gates.yml");
@@ -262,10 +272,6 @@ public class XcraftGate extends JavaPlugin {
 		File configFile = new File(getDataFolder(), "gates.yml");
 
 		if (!configFile.exists()) {
-			getDataFolder().mkdir();
-			getDataFolder().setWritable(true);
-			getDataFolder().setExecutable(true);
-
 			try {
 				configFile.createNewFile();
 			} catch (Exception ex) {
