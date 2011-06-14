@@ -15,8 +15,8 @@ public class XcraftGatePlayerListener extends PlayerListener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Location location = event.getTo();
 		String gateName = null;
-
-		if (!plugin.worlds.get(location.getWorld().toString()).checkBorder(location)) {
+		
+		if (!plugin.worlds.get(location.getWorld().getName()).checkBorder(location)) {
 				event.setCancelled(true);
 				event.getPlayer().teleport(event.getFrom());
 				event.getPlayer()

@@ -1,11 +1,13 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.5
+version: 0.6
 author: Engelier
 commands:
   gate:
     description: Modify Teleporters
     usage: /<command> help
+    permission: XcraftGate.gate
   gworld:
     description: Manage Worlds
     usage: /<command> help
+    permission: XcraftGate.world

@@ -21,15 +21,14 @@ import org.yaml.snakeyaml.Yaml;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
+import de.xcraft.engelier.XcraftGate.XcraftGateWorld.Weather;
 import de.xcraft.engelier.XcraftGate.Commands.*;
 
 public class XcraftGate extends JavaPlugin {
-	private XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(
-			this);
-	private XcraftGatePlayerListener playerListener = new XcraftGatePlayerListener(
-			this);
-	private XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(
-			this);
+	private XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(this);
+	private XcraftGatePlayerListener playerListener = new XcraftGatePlayerListener(this);
+	private XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(this);
+	private XcraftGateWeatherListener weatherListener = new XcraftGateWeatherListener(this);
 
 	public PermissionHandler permissions = null;
 
@@ -66,6 +65,8 @@ public class XcraftGate extends JavaPlugin {
 				Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,
 				Event.Priority.Monitor, this);
+		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener,
+				Event.Priority.Normal, this);
 
 		Plugin permissionsCheck = pm.getPlugin("Permissions");
 		if (permissionsCheck != null && permissionsCheck.isEnabled()) {
@@ -154,7 +155,20 @@ public class XcraftGate extends JavaPlugin {
 		try {
 			Yaml yaml = new Yaml();
 			Map<String, Object> worldsYaml = (Map<String, Object>) yaml.load(new FileInputStream(configFile));
-			for (Map.Entry<String, Object> thisWorld : ((Map<String, Object>)worldsYaml.get("worlds")).entrySet()) {
+			
+			if (worldsYaml == null) {
+				for (World thisWorld: getServer().getWorlds()) {
+					XcraftGateWorld newWorld = new XcraftGateWorld(this);
+					newWorld.load(thisWorld.getName(), thisWorld.getEnvironment());
+					worlds.put(thisWorld.getName(), newWorld);
+				}
+				return;
+			}
+			
+			if (worldsYaml.get("worlds") != null)
+				worldsYaml = (Map<String, Object>) worldsYaml.get("worlds");
+			
+			for (Map.Entry<String, Object> thisWorld : worldsYaml.entrySet()) {
 				String worldName = thisWorld.getKey();
 				Map<String, Object> worldData = (Map<String, Object>) thisWorld.getValue();
 
@@ -170,11 +184,20 @@ public class XcraftGate extends JavaPlugin {
 				if (newWorld.name == null) newWorld.load(worldName, World.Environment.NORMAL);
 
 				newWorld.setBorder((Integer)worldData.get("border"));
+				newWorld.setAllowPvP((Boolean)worldData.get("allowPvP"));
 				newWorld.setAllowAnimals((Boolean)worldData.get("allowAnimals"));
 				newWorld.setAllowMonsters((Boolean)worldData.get("allowMonsters"));
-				newWorld.setCreatureLimit((Integer)worldData.get("creatureLimit"));
+				newWorld.setCreatureLimit(castInt(worldData.get("creatureLimit")));
+				newWorld.setAllowWeatherChange((Boolean)worldData.get("allowWeatherChange"));
 
 				worlds.put(worldName, newWorld);
+
+				String weather = (String) worldData.get("setWeather");
+				for(Weather thisWeather: XcraftGateWorld.Weather.values()) {
+					if (thisWeather.toString().equalsIgnoreCase(weather)) {
+						newWorld.setWeather(thisWeather);
+					}
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -187,20 +210,11 @@ public class XcraftGate extends JavaPlugin {
 		Map<String, Object> toDump = new HashMap<String, Object>();
 
 		for (Map.Entry<String, XcraftGateWorld> thisWorld : worlds.entrySet()) {
-			String worldName = thisWorld.getKey();
-
-			Map<String, Object> values = new HashMap<String, Object>();
-			values.put("name", thisWorld.getValue().name);
-			values.put("type", thisWorld.getValue().environment.toString());
-			values.put("creatureLimit", thisWorld.getValue().creatureLimit);
-			values.put("allowAnimals", thisWorld.getValue().allowAnimals);
-			values.put("allowMonsters", thisWorld.getValue().allowMonsters);
-
-			toDump.put(worldName, values);
+			toDump.put(thisWorld.getKey(), thisWorld.getValue().toMap());
 		}
 
 		Yaml yaml = new Yaml();
-		String dump = yaml.dump(new HashMap<String, Object>().put("worlds", toDump));
+		String dump = yaml.dump(toDump);
 
 		try {
 			FileOutputStream fh = new FileOutputStream(configFile);
@@ -215,6 +229,7 @@ public class XcraftGate extends JavaPlugin {
 	@SuppressWarnings("unchecked")
 	private void loadGates() {
 		File configFile = new File(getDataFolder(), "gates.yml");
+		int counter = 0;
 
 		if (!configFile.exists()) {
 			log.warning(getNameBrackets()
@@ -253,19 +268,21 @@ public class XcraftGate extends JavaPlugin {
 
 				gates.put(gateName, newGate);
 				gateLocations.put(getLocationString(gateLocation), gateName);
+				counter++;
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 
 		for (Map.Entry<String, XcraftGateGate> thisGate : gates.entrySet()) {
-			if (gates.get(thisGate.getValue().gateTarget) == null) {
+			if (thisGate.getValue().gateTarget != null && gates.get(thisGate.getValue().gateTarget) == null) {
 				log.severe(getNameBrackets() + "gate " + thisGate.getKey()
 						+ " has an invalid destination. Destination removed.");
 				thisGate.getValue().gateTarget = null;
 			}
 		}
 
+		log.info(getNameBrackets() + "loaded " + counter + " gates");
 	}
 
 	private void saveGates() {
@@ -311,5 +328,22 @@ public class XcraftGate extends JavaPlugin {
 			ex.printStackTrace();
 		}
 	}
-
+	
+	private static Integer castInt(Object o) {
+		if (o == null) {
+			return null;
+		} else if (o instanceof Byte) {
+			return (int)(Byte)o;
+		} else if (o instanceof Integer) {
+			return (Integer)o;
+		} else if (o instanceof Double) {
+			return (int)(double)(Double)o;
+		} else if (o instanceof Float) {
+			return (int)(float)(Float)o;
+		} else if (o instanceof Long) {
+			return (int)(long)(Long)o;
+		} else {
+			return null;
+		}
+	}
 }

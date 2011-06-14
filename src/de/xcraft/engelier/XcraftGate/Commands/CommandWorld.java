@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import de.xcraft.engelier.XcraftGate.XcraftGate;
 import de.xcraft.engelier.XcraftGate.XcraftGateCommandHandler;
 import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
+import de.xcraft.engelier.XcraftGate.XcraftGateWorld.Weather;
 
 public class CommandWorld extends XcraftGateCommandHandler {
 
@@ -53,6 +54,18 @@ public class CommandWorld extends XcraftGateCommandHandler {
 				+ "/gworld allowmonsters <world> <true|false>"
 				+ ChatColor.WHITE + " | " + ChatColor.AQUA
 				+ "allows/denys monsters to spawn in the world");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld allowpvp <world> <true|false>"
+				+ ChatColor.WHITE + " | " + ChatColor.AQUA
+				+ "allows/denys pvp combat in the world");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld allowweatherchange <world> <true|false>"
+				+ ChatColor.WHITE + " | " + ChatColor.AQUA
+				+ "allows/denys weather changes in the world");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld setweather <world> <sun|storm>"
+				+ ChatColor.WHITE + " | " + ChatColor.AQUA
+				+ "set current weather in the world");
 	}
 
 	public boolean hasWorld(String world) {
@@ -126,8 +139,11 @@ public class CommandWorld extends XcraftGateCommandHandler {
 				error("Unkown world: " + args[1]);
 			} else {
 				Location loc = player.getLocation();
-				loc.setWorld(plugin.getServer().getWorld(args[1]));
-				player.teleport(loc);
+				loc = plugin.worlds.get(args[1]).getSafeDestination(loc);
+				if (loc != null)
+					player.teleport(loc);
+				else
+					error("Couldn't find a safe spot at your destination");
 			}
 		} else if (args[0].equals("setborder")) {
 			if (!isPermitted("world", "setborder")) {
@@ -223,6 +239,72 @@ public class CommandWorld extends XcraftGateCommandHandler {
 				reply("Monster spawn on " + args[1] + (allowed ? " enabled." : " disabled."));
 				plugin.saveWorlds();
 			}
+		} else if (args[0].equals("allowpvp")) {
+			if (!isPermitted("world", "allowpvp")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 3)) {
+				printUsage();
+			} else if (!hasWorld(args[1])) {
+				error("Unkown world: " + args[1]);
+			} else {
+				Boolean allowed;
+				if (args[2].equalsIgnoreCase("true")) {
+					allowed = true;
+				} else if (args[2].equalsIgnoreCase("false")) {
+					allowed = false;
+				} else {
+					printUsage();
+					return true;
+				}
+
+				plugin.worlds.get(args[1]).setAllowPvP(allowed);
+				reply("PvP combat on " + args[1] + (allowed ? " enabled." : " disabled."));
+				plugin.saveWorlds();
+			}
+		} else if (args[0].equals("allowweatherchange")) {
+			if (!isPermitted("world", "weather")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 3)) {
+				printUsage();
+			} else if (!hasWorld(args[1])) {
+				error("Unkown world: " + args[1]);
+			} else {
+				Boolean allowed;
+				if (args[2].equalsIgnoreCase("true")) {
+					allowed = true;
+				} else if (args[2].equalsIgnoreCase("false")) {
+					allowed = false;
+				} else {
+					printUsage();
+					return true;
+				}
+
+				plugin.worlds.get(args[1]).setAllowWeatherChange(allowed);
+				reply("Weather changes on " + args[1] + (allowed ? " enabled." : " disabled."));
+				plugin.saveWorlds();
+			}
+		} else if (args[0].equals("setweather")) {
+			if (!isPermitted("world", "weather")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 3)) {
+				printUsage();
+			} else {
+				if (!hasWorld(args[1])) {
+					error("World " + args[1] + " unknown.");
+				} else {
+					for (Weather thisWeather : XcraftGateWorld.Weather.values()) {
+						if (thisWeather.toString().equalsIgnoreCase(args[2])) {
+							plugin.worlds.get(args[1]).setWeather(thisWeather);
+							reply("Weather of world " + args[1]
+									+ " changed to " + args[2] + ".");
+							plugin.saveWorlds();
+							return true;
+						}
+					}
+
+					reply("Unknown weather type: " + args[1] + ". Use \"sun\" or \"storm\"");
+				}
+			}
 		} else if (args[0].equals("info")) {
 			if (!isPermitted("world", "info")) {
 				error("You don't have permission to use this command.");
@@ -234,18 +316,20 @@ public class CommandWorld extends XcraftGateCommandHandler {
 				XcraftGateWorld thisWorld = plugin.worlds.get(args[1]);
 				reply("Infos for world " + args[1] + ":");
 				player.sendMessage("Worldname: " + args[1]);
-				player.sendMessage("Border: " + thisWorld.border);
-				player.sendMessage("Animals allowed: " + (thisWorld.allowAnimals ? "yes" : "no"));
-				player.sendMessage("Monsters allowed: " + (thisWorld.allowMonsters ? "yes" : "no"));
-				player.sendMessage("Creature limit: " + thisWorld.creatureLimit);
-				player.sendMessage("Creature count: "
-						+ (plugin.getServer().getWorld(args[1])
-								.getLivingEntities().size() - plugin
-								.getServer().getWorld(args[1]).getPlayers()
-								.size()));
 				player.sendMessage("Player count: "
 						+ plugin.getServer().getWorld(args[1]).getPlayers()
 								.size());
+				player.sendMessage("Border: " + (thisWorld.border > 0 ? thisWorld.border : "none"));
+				player.sendMessage("PvP allowed: " + (thisWorld.allowPvP ? "yes" : "no"));
+				player.sendMessage("Animals allowed: " + (thisWorld.allowAnimals ? "yes" : "no"));
+				player.sendMessage("Monsters allowed: " + (thisWorld.allowMonsters ? "yes" : "no"));
+				player.sendMessage("Creature count/limit: "
+						+ (plugin.getServer().getWorld(args[1])
+								.getLivingEntities().size() - plugin
+								.getServer().getWorld(args[1]).getPlayers()
+								.size()) + "/" + (thisWorld.creatureLimit > 0 ? thisWorld.creatureLimit : "unlimited"));
+				player.sendMessage("Weather changes allowed: " + (thisWorld.allowWeatherChange ? "yes" : "no"));
+				player.sendMessage("Current Weather: " + thisWorld.setWeather.toString());
 			}
 		} else if (args[0].equals("list")) {
 			if (!isPermitted("world", "info")) {
