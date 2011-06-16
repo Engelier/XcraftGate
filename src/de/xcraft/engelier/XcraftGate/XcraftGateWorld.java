@@ -175,7 +175,7 @@ public class XcraftGateWorld {
 	}
 
 	public void setAllowMonsters(Boolean allow) {
-		this.allowAnimals = (allow != null ? allow : true);
+		this.allowMonsters = (allow != null ? allow : true);
 		((CraftWorld) world).getHandle().allowMonsters = allow;
 		if (!allow) killAllMonsters();
 	}
