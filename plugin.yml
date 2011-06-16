@@ -1,6 +1,6 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.6
+version: 0.6.1
 author: Engelier
 commands:
   gate:

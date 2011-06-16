@@ -11,6 +11,8 @@ import java.util.logging.Logger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.Plugin;
@@ -80,11 +82,29 @@ public class XcraftGate extends JavaPlugin {
 		loadWorlds();
 		loadGates();
 
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this,	new RunCreatureLimit(), 600, 600);
-		getCommand("gate").setExecutor(new CommandGate(this));
-		getCommand("gworld").setExecutor(new CommandWorld(this));
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
+		try {
+			getCommand("gate").setExecutor(new CommandGate(this));
+			getCommand("gworld").setExecutor(new CommandWorld(this));
+		} catch (Exception ex) {
+			log.warning(getNameBrackets() + "getCommand().setExecutor() failed! Seems I got enabled by another plugin. Nag the bukkit team about this!");
+		}
 	}
 
+	public boolean onCommand(CommandSender sender, Command cmd,	String commandLabel, String[] args) {
+		if (cmd.getName().equalsIgnoreCase("gate")) {
+			getCommand("gate").setExecutor(new CommandGate(this));
+			getCommand("gate").execute(sender, commandLabel, args);
+			return true;
+		} else if (cmd.getName().equalsIgnoreCase("gworld")) {
+			getCommand("gworld").setExecutor(new CommandWorld(this));						
+			getCommand("gworld").execute(sender, commandLabel, args);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public Boolean hasOpPermission(Player player, String permission) {
 		if (permissions != null) {
 			return permissions.has(player, permission);
