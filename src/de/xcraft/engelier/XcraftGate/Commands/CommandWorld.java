@@ -313,23 +313,8 @@ public class CommandWorld extends XcraftGateCommandHandler {
 			} else if (!hasWorld(args[1])) {
 				error("Unkown world: " + args[1]);
 			} else {
-				XcraftGateWorld thisWorld = plugin.worlds.get(args[1]);
 				reply("Infos for world " + args[1] + ":");
-				player.sendMessage("Worldname: " + args[1]);
-				player.sendMessage("Player count: "
-						+ plugin.getServer().getWorld(args[1]).getPlayers()
-								.size());
-				player.sendMessage("Border: " + (thisWorld.border > 0 ? thisWorld.border : "none"));
-				player.sendMessage("PvP allowed: " + (thisWorld.allowPvP ? "yes" : "no"));
-				player.sendMessage("Animals allowed: " + (thisWorld.allowAnimals ? "yes" : "no"));
-				player.sendMessage("Monsters allowed: " + (thisWorld.allowMonsters ? "yes" : "no"));
-				player.sendMessage("Creature count/limit: "
-						+ (plugin.getServer().getWorld(args[1])
-								.getLivingEntities().size() - plugin
-								.getServer().getWorld(args[1]).getPlayers()
-								.size()) + "/" + (thisWorld.creatureLimit > 0 ? thisWorld.creatureLimit : "unlimited"));
-				player.sendMessage("Weather changes allowed: " + (thisWorld.allowWeatherChange ? "yes" : "no"));
-				player.sendMessage("Current Weather: " + thisWorld.setWeather.toString());
+				plugin.worlds.get(args[1]).sendInfo(player);
 			}
 		} else if (args[0].equals("list")) {
 			if (!isPermitted("world", "info")) {

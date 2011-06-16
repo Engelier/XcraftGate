@@ -137,8 +137,8 @@ public class XcraftGateWorld {
 			((CraftWorld) world).getHandle().allowAnimals = false;
 			((CraftWorld) world).getHandle().allowMonsters = false;
 		} else if (alive <= max * 0.8) {
-			((CraftWorld) world).getHandle().allowAnimals = true;
-			((CraftWorld) world).getHandle().allowMonsters = true;
+			((CraftWorld) world).getHandle().allowAnimals = this.allowAnimals;
+			((CraftWorld) world).getHandle().allowMonsters = this.allowMonsters;
 		}
 		
 	}		
@@ -170,13 +170,13 @@ public class XcraftGateWorld {
 	
 	public void setAllowAnimals(Boolean allow) {
 		this.allowAnimals = (allow != null ? allow : true);
-		((CraftWorld) world).getHandle().allowAnimals = allow;
+		((CraftWorld) world).getHandle().allowAnimals = this.allowAnimals;
 		if (!allow) killAllAnimals();
 	}
 
 	public void setAllowMonsters(Boolean allow) {
 		this.allowMonsters = (allow != null ? allow : true);
-		((CraftWorld) world).getHandle().allowMonsters = allow;
+		((CraftWorld) world).getHandle().allowMonsters = this.allowMonsters;
 		if (!allow) killAllMonsters();
 	}
 	
@@ -203,5 +203,19 @@ public class XcraftGateWorld {
 	
 	public boolean checkBorder(Location location) {
 		return (border > 0 && Math.abs(location.getX()) <= border && Math.abs(location.getZ()) <= border) || border == 0;
+	}
+	
+	public void sendInfo(Player player) {
+		player.sendMessage("Worldname: " + name);
+		player.sendMessage("Player count: "	+ world.getPlayers().size());
+		player.sendMessage("Border: " + (border > 0 ? border : "none"));
+		player.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));
+		player.sendMessage("Animals allowed: " + (allowAnimals ? "yes" : "no"));
+		player.sendMessage("Monsters allowed: " + (allowMonsters ? "yes" : "no"));
+		player.sendMessage("Creature count/limit: "
+				+ (world.getLivingEntities().size() - world.getPlayers().size()) + "/"
+				+ (creatureLimit > 0 ? creatureLimit : "unlimited"));
+		player.sendMessage("Weather changes allowed: " + (allowWeatherChange ? "yes" : "no"));
+		player.sendMessage("Current Weather: " + setWeather.toString());
 	}
 }
