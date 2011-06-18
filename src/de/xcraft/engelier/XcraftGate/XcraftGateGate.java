@@ -19,6 +19,7 @@ public class XcraftGateGate {
 
 		@Override
 		public void run() {
+			plugin.justTeleported.put(player.getName(), gateLocation);
 			this.player.teleport(gateLocation);
 		}
 	}
@@ -30,11 +31,8 @@ public class XcraftGateGate {
 	}
 
 	public void portHere(Player player) {
-		plugin.justTeleported.put(player.getName(), true);
-
 		// escape from any PLAYER_MOVE events, prevents "moved too quickly"
-		plugin.getServer().getScheduler()
-				.scheduleSyncDelayedTask(plugin, new Port(player), 1L);
+		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Port(player), 1L);
 	}
 
 	public void portToTarget(Player player) {

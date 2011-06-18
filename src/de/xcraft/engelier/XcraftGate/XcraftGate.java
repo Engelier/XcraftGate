@@ -37,7 +37,7 @@ public class XcraftGate extends JavaPlugin {
 	public Map<String, XcraftGateWorld> worlds = new HashMap<String, XcraftGateWorld>();
 	public Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
 	public Map<String, String> gateLocations = new HashMap<String, String>();
-	public Map<String, Boolean> justTeleported = new HashMap<String, Boolean>();
+	public Map<String, Location> justTeleported = new HashMap<String, Location>();
 	public Map<String, Integer> creatureCounter = new HashMap<String, Integer>();
 
 	public Logger log = Logger.getLogger("Minecraft");
@@ -46,6 +46,16 @@ public class XcraftGate extends JavaPlugin {
 		public void run() {
 			for(Map.Entry<String, XcraftGateWorld> thisWorld: worlds.entrySet()) {
 				thisWorld.getValue().checkCreatureLimit();
+			}
+		}
+	}
+	
+	class RunTimeFrozen implements Runnable {
+		public void run() {
+			for (Map.Entry<String, XcraftGateWorld> thisWorld: worlds.entrySet()) {
+				if (thisWorld.getValue().timeFrozen) {
+					thisWorld.getValue().resetFrozenTime();
+				}
 			}
 		}
 	}
@@ -83,6 +93,7 @@ public class XcraftGate extends JavaPlugin {
 		loadGates();
 
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
 		try {
 			getCommand("gate").setExecutor(new CommandGate(this));
 			getCommand("gworld").setExecutor(new CommandWorld(this));
@@ -209,7 +220,9 @@ public class XcraftGate extends JavaPlugin {
 				newWorld.setAllowMonsters((Boolean)worldData.get("allowMonsters"));
 				newWorld.setCreatureLimit(castInt(worldData.get("creatureLimit")));
 				newWorld.setAllowWeatherChange((Boolean)worldData.get("allowWeatherChange"));
-
+				newWorld.setTimeFrozen((Boolean)worldData.get("timeFrozen"));
+				newWorld.setDayTime(castInt(worldData.get("setTime")));
+				
 				worlds.put(worldName, newWorld);
 
 				String weather = (String) worldData.get("setWeather");
@@ -351,7 +364,7 @@ public class XcraftGate extends JavaPlugin {
 	
 	private static Integer castInt(Object o) {
 		if (o == null) {
-			return null;
+			return 0;
 		} else if (o instanceof Byte) {
 			return (int)(Byte)o;
 		} else if (o instanceof Integer) {
@@ -363,7 +376,7 @@ public class XcraftGate extends JavaPlugin {
 		} else if (o instanceof Long) {
 			return (int)(long)(Long)o;
 		} else {
-			return null;
+			return 0;
 		}
 	}
 }

@@ -6,6 +6,9 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class XcraftGatePlayerListener extends PlayerListener {
+	private Location location;
+	private Location portTo;
+	private String gateName = null;	
 	private XcraftGate plugin = null;
 
 	public XcraftGatePlayerListener(XcraftGate instance) {
@@ -13,8 +16,7 @@ public class XcraftGatePlayerListener extends PlayerListener {
 	}
 
 	public void onPlayerMove(PlayerMoveEvent event) {
-		Location location = event.getTo();
-		String gateName = null;
+		location = event.getTo();
 		
 		if (!plugin.worlds.get(location.getWorld().getName()).checkBorder(location)) {
 				event.setCancelled(true);
@@ -25,13 +27,12 @@ public class XcraftGatePlayerListener extends PlayerListener {
 										+ "You reached the border of this world.");
 		}
 
-		if ((gateName = plugin.gateLocations.get(plugin
-				.getLocationString(location))) != null) {
-			if (plugin.justTeleported.get(event.getPlayer().getName()) == null) {
-				plugin.gates.get(gateName).portToTarget(event.getPlayer());
-			}
-		} else if (plugin.justTeleported.get(event.getPlayer().getName()) != null) {
-			plugin.justTeleported.remove(event.getPlayer().getName());
+		if ((portTo = plugin.justTeleported.get(event.getPlayer().getName())) != null) {
+			if (Math.floor(portTo.getX()) != Math.floor(location.getX()) ||
+					Math.floor(portTo.getZ()) != Math.floor(location.getZ()))
+				plugin.justTeleported.remove(event.getPlayer().getName());
+		} else if ((gateName = plugin.gateLocations.get(plugin.getLocationString(location))) != null) {
+			plugin.gates.get(gateName).portToTarget(event.getPlayer());
 		}
 	}
 }
