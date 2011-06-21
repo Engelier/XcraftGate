@@ -21,6 +21,8 @@ public class XcraftGateWorld {
 	public Integer creatureLimit = 0;
 	public Integer border = 0;
 	public Weather setWeather = Weather.SUN;
+	public long setTime = 100;
+	public Boolean timeFrozen = false;
 		
 	private XcraftGate plugin;
 	private Server server;
@@ -56,11 +58,39 @@ public class XcraftGateWorld {
 			}
 		}
 	}
+
+	public enum DayTime {
+		SUNRISE(100),
+		NOON(6000),
+		SUNSET(12100),
+		MIDNIGHT(18000);
+
+		private final int id;
+		private static final Map<Integer, DayTime> lookup = new HashMap<Integer, DayTime>();
+
+		private DayTime(int id) {
+			this.id = id;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public static DayTime getDayTime(int id) {
+			return lookup.get(id);
+		}
+
+		static {
+			for (DayTime env : values()) {
+				lookup.put(env.getId(), env);
+			}
+		}
+	}
 	
 	public void load(String name, Environment env) {
 		this.name = name;
 		this.environment = env;
-		this.plugin.log.info(plugin.getNameBrackets() + "loading world " + name + "(" + env.toString() + ")");
+		this.plugin.log.info(plugin.getNameBrackets() + "loading world " + name + " (" + env.toString() + ")");
 		this.world = server.createWorld(name, env);
 	}
 
@@ -75,6 +105,8 @@ public class XcraftGateWorld {
 		values.put("allowPvP", allowPvP);
 		values.put("allowWeatherChange", allowWeatherChange);
 		values.put("setWeather", setWeather.toString());
+		values.put("setTime", setTime);
+		values.put("timeFrozen", timeFrozen);
 		return values;
 	}
 	
@@ -139,9 +171,13 @@ public class XcraftGateWorld {
 		} else if (alive <= max * 0.8) {
 			((CraftWorld) world).getHandle().allowAnimals = this.allowAnimals;
 			((CraftWorld) world).getHandle().allowMonsters = this.allowMonsters;
-		}
-		
-	}		
+		}		
+	}	
+	
+	public void resetFrozenTime() {
+		if (!timeFrozen) return;		
+		world.setTime(setTime - 100);
+	}
 		
 	public void killAllMonsters() {
 		for (LivingEntity entity : world.getLivingEntities()) {
@@ -199,6 +235,21 @@ public class XcraftGateWorld {
 		this.world.setStorm(weather.getId() == Weather.STORM.id);
 		this.setWeather = weather;
 		this.allowWeatherChange = backup;
+	}
+
+	public void setDayTime(DayTime time) {
+		this.world.setTime(time.id);
+		this.setTime = time.id;
+	}
+
+	public void setDayTime(long time) {
+		this.world.setTime(time);
+		this.setTime = time;
+	}
+
+	public void setTimeFrozen(Boolean frozen) {
+		this.timeFrozen = (frozen != null ? frozen : false);
+		this.setTime = world.getTime();		
 	}
 	
 	public boolean checkBorder(Location location) {

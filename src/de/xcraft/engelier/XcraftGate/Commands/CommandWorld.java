@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import de.xcraft.engelier.XcraftGate.XcraftGate;
 import de.xcraft.engelier.XcraftGate.XcraftGateCommandHandler;
 import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
+import de.xcraft.engelier.XcraftGate.XcraftGateWorld.DayTime;
 import de.xcraft.engelier.XcraftGate.XcraftGateWorld.Weather;
 
 public class CommandWorld extends XcraftGateCommandHandler {
@@ -302,8 +303,52 @@ public class CommandWorld extends XcraftGateCommandHandler {
 						}
 					}
 
-					reply("Unknown weather type: " + args[1] + ". Use \"sun\" or \"storm\"");
+					reply("Unknown weather type: " + args[2] + ". Use \"sun\" or \"storm\"");
 				}
+			}
+		} else if (args[0].equals("settime")) {
+			if (!isPermitted("world", "time")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 3)) {
+				printUsage();
+			} else {
+				if (!hasWorld(args[1])) {
+					error("World " + args[1] + " unknown.");
+				} else {
+					for (DayTime thisTime : XcraftGateWorld.DayTime.values()) {
+						if (thisTime.toString().equalsIgnoreCase(args[2])) {
+							plugin.worlds.get(args[1]).setDayTime(thisTime);
+							reply("Time of world " + args[1]
+									+ " changed to " + args[2] + ".");
+							plugin.saveWorlds();
+							return true;
+						}
+					}
+
+					reply("Unknown time: " + args[2] + ". Use \"sunrise\", \"noon\", \"sunset\" or \"midnight\"");
+				}
+			}
+		} else if (args[0].equals("timefrozen")) {
+			if (!isPermitted("world", "time")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 3)) {
+				printUsage();
+			} else if (!hasWorld(args[1])) {
+				error("Unkown world: " + args[1]);
+			} else {
+				Boolean frozen;
+				if (args[2].equalsIgnoreCase("true")) {
+					frozen = true;
+				} else if (args[2].equalsIgnoreCase("false")) {
+					frozen = false;
+				} else {
+					printUsage();
+					return true;
+				}
+
+				plugin.worlds.get(args[1]).setTimeFrozen(frozen);
+				reply("Time on " + args[1] + (frozen ? " freezed." : " unfreezed."));
+				plugin.saveWorlds();
 			}
 		} else if (args[0].equals("info")) {
 			if (!isPermitted("world", "info")) {
