@@ -4,11 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
-import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.*;
 
 public class XcraftGateWorld {
@@ -23,6 +21,7 @@ public class XcraftGateWorld {
 	public Weather setWeather = Weather.SUN;
 	public long setTime = 100;
 	public Boolean timeFrozen = false;
+	public Boolean suppressHealthRegain = true;
 		
 	private XcraftGate plugin;
 	private Server server;
@@ -107,56 +106,12 @@ public class XcraftGateWorld {
 		values.put("setWeather", setWeather.toString());
 		values.put("setTime", setTime);
 		values.put("timeFrozen", timeFrozen);
+		values.put("suppressHealthRegain", suppressHealthRegain);
 		return values;
 	}
 	
-	public Location getSafeDestination(Location loc) {
-		if (loc == null)
-			return loc;
-		
-		int x = (int) Math.floor(loc.getX());
-		int y = (int) Math.floor(loc.getY());
-		int z = (int) Math.floor(loc.getZ());
-		
-		int distance = 0;
-		int maxDistance = 64;
-
-		while (isBlockAboveAir(x, y, z) || isObstructed(x, y, z)) {
-			distance++;
-			if (distance > maxDistance) return null;
-			
-			for (int cx = 0 - distance; cx <= distance; cx++) {
-				if (!isBlockAboveAir(x + cx, y, z) && !isObstructed(x + cx, y, z)) {
-					return new Location(world, x + cx, y, z, loc.getYaw(), loc.getPitch());					
-				}
-			}
-
-			for (int cy = 0 - distance; cy <= distance; cy++) {
-				if (!isBlockAboveAir(x, y + cy, z) && !isObstructed(x, y + cy, z)) {
-					return new Location(world, x, y + cy, z, loc.getYaw(), loc.getPitch());					
-				}
-			}
-
-			for (int cz = 0 - distance; cz <= distance; cz++) {
-				if (!isBlockAboveAir(x, y, z + cz) && !isObstructed(x, y, z + cz)) {
-					return new Location(world, x, y, z + cz, loc.getYaw(), loc.getPitch());					
-				}
-			}
-		}
-		
-		return null;											
-	}
-
-	private boolean isBlockAboveAir(int x, int y, int z) {
-		return world.getBlockAt(x, y - 1, z).getType() == Material.AIR;
-	}
-
-	public boolean isObstructed(int x, int y, int z)
-	{
-		if ((world.getBlockAt(x, y, z).getType() != Material.AIR) || (world.getBlockAt(x, y + 1, z).getType() != Material.AIR))
-			return true;
-		else
-			return false;
+	public void resetSpawnFlags() {
+		world.setSpawnFlags(allowMonsters, allowAnimals);
 	}
 	
 	public void checkCreatureLimit() {
@@ -166,11 +121,9 @@ public class XcraftGateWorld {
 		if (max <= 0) return;
 
 		if (alive >= max) {
-			((CraftWorld) world).getHandle().allowAnimals = false;
-			((CraftWorld) world).getHandle().allowMonsters = false;
+			world.setSpawnFlags(false, false);
 		} else if (alive <= max * 0.8) {
-			((CraftWorld) world).getHandle().allowAnimals = this.allowAnimals;
-			((CraftWorld) world).getHandle().allowMonsters = this.allowMonsters;
+			resetSpawnFlags();
 		}		
 	}	
 	
@@ -206,13 +159,13 @@ public class XcraftGateWorld {
 	
 	public void setAllowAnimals(Boolean allow) {
 		this.allowAnimals = (allow != null ? allow : true);
-		((CraftWorld) world).getHandle().allowAnimals = this.allowAnimals;
+		resetSpawnFlags();
 		if (!allow) killAllAnimals();
 	}
 
 	public void setAllowMonsters(Boolean allow) {
 		this.allowMonsters = (allow != null ? allow : true);
-		((CraftWorld) world).getHandle().allowMonsters = this.allowMonsters;
+		resetSpawnFlags();
 		if (!allow) killAllMonsters();
 	}
 	
@@ -252,8 +205,24 @@ public class XcraftGateWorld {
 		this.setTime = world.getTime();		
 	}
 	
+	public void setSuppressHealthRegain(Boolean suppressed) {
+		this.suppressHealthRegain = (suppressed != null ? suppressed : true);
+	}
+	
 	public boolean checkBorder(Location location) {
 		return (border > 0 && Math.abs(location.getX()) <= border && Math.abs(location.getZ()) <= border) || border == 0;
+	}
+	
+	public String timeToString(long time) {
+		if (time <= 3000) {
+			return "SUNRISE";
+		} else if (time <= 9000) {
+			return "NOON";
+		} else if (time <= 15000) {
+			return "SUNSET";
+		} else {
+			return "MIDNIGHT";
+		}
 	}
 	
 	public void sendInfo(Player player) {
@@ -266,7 +235,11 @@ public class XcraftGateWorld {
 		player.sendMessage("Creature count/limit: "
 				+ (world.getLivingEntities().size() - world.getPlayers().size()) + "/"
 				+ (creatureLimit > 0 ? creatureLimit : "unlimited"));
+		player.sendMessage("Health regaining suppressed: " + (suppressHealthRegain ? "yes" : "no"));
 		player.sendMessage("Weather changes allowed: " + (allowWeatherChange ? "yes" : "no"));
 		player.sendMessage("Current Weather: " + setWeather.toString());
+		player.sendMessage("Time frozen: " + (timeFrozen ? "yes" : "no"));
+		player.sendMessage("Current Time: " + timeToString(world.getTime()));
+		player.sendMessage("Seed: " + world.getSeed());
 	}
 }

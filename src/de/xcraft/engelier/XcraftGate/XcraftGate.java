@@ -27,10 +27,11 @@ import de.xcraft.engelier.XcraftGate.XcraftGateWorld.Weather;
 import de.xcraft.engelier.XcraftGate.Commands.*;
 
 public class XcraftGate extends JavaPlugin {
-	private XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(this);
-	private XcraftGatePlayerListener playerListener = new XcraftGatePlayerListener(this);
-	private XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(this);
-	private XcraftGateWeatherListener weatherListener = new XcraftGateWeatherListener(this);
+	private final XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(this);
+	private final XcraftGatePlayerListener playerListener = new XcraftGatePlayerListener(this);
+	private final XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(this);
+	private final XcraftGateEntityListener entityListener = new XcraftGateEntityListener(this);
+	private final XcraftGateWeatherListener weatherListener = new XcraftGateWeatherListener(this);
 
 	public PermissionHandler permissions = null;
 
@@ -38,9 +39,10 @@ public class XcraftGate extends JavaPlugin {
 	public Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
 	public Map<String, String> gateLocations = new HashMap<String, String>();
 	public Map<String, Location> justTeleported = new HashMap<String, Location>();
+	public Map<String, Location> justTeleportedFrom = new HashMap<String, Location>();
 	public Map<String, Integer> creatureCounter = new HashMap<String, Integer>();
 
-	public Logger log = Logger.getLogger("Minecraft");
+	public final Logger log = Logger.getLogger("Minecraft");
 
 	class RunCreatureLimit implements Runnable {
 		public void run() {
@@ -78,6 +80,8 @@ public class XcraftGate extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,
 				Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener,
+				Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener,
 				Event.Priority.Normal, this);
 
 		Plugin permissionsCheck = pm.getPlugin("Permissions");
@@ -222,6 +226,7 @@ public class XcraftGate extends JavaPlugin {
 				newWorld.setAllowWeatherChange((Boolean)worldData.get("allowWeatherChange"));
 				newWorld.setTimeFrozen((Boolean)worldData.get("timeFrozen"));
 				newWorld.setDayTime(castInt(worldData.get("setTime")));
+				newWorld.setSuppressHealthRegain((Boolean)worldData.get("suppressHealthRegain"));
 				
 				worlds.put(worldName, newWorld);
 
@@ -318,7 +323,7 @@ public class XcraftGate extends JavaPlugin {
 		log.info(getNameBrackets() + "loaded " + counter + " gates");
 	}
 
-	private void saveGates() {
+	public void saveGates() {
 		File configFile = new File(getDataFolder(), "gates.yml");
 
 		if (!configFile.exists()) {

@@ -24,49 +24,35 @@ public class CommandWorld extends XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets()
 				+ "by Engelier");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld list" + ChatColor.WHITE + " | " + ChatColor.AQUA
-				+ "lists active worlds on your server");
+				+ "/gworld list");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld info <world>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "displays some basic info about your world");
+				+ "/gworld info <world>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld create <name> [normal|nether|skylands]"
-				+ ChatColor.WHITE + " | " + ChatColor.AQUA
-				+ "creates a new world");
+				+ "/gworld create <name> [normal|nether|skylands]");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld delete <name>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "deletes a world (but NOT on disk!)");
+				+ "/gworld delete <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld warpto <name>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "teleports you to world <name>");
+				+ "/gworld warpto <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld setborder <world> <#>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA
-				+ "prevents users from exploring a world farther than x/z > #");
+				+ "/gworld setborder <world> <#>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld setcreaturelimit <world> <#>" + ChatColor.WHITE
-				+ " | " + ChatColor.AQUA
-				+ "limits amount of creatures active to <#> for the world");
+				+ "/gworld setcreaturelimit <world> <#>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld allowanimals <world> <true|false>" + ChatColor.WHITE
-				+ " | " + ChatColor.AQUA
-				+ "allows/denys animals to spawn in the world");
+				+ "/gworld allowanimals <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld allowmonsters <world> <true|false>"
-				+ ChatColor.WHITE + " | " + ChatColor.AQUA
-				+ "allows/denys monsters to spawn in the world");
+				+ "/gworld allowmonsters <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld allowpvp <world> <true|false>"
-				+ ChatColor.WHITE + " | " + ChatColor.AQUA
-				+ "allows/denys pvp combat in the world");
+				+ "/gworld allowpvp <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld allowweatherchange <world> <true|false>"
-				+ ChatColor.WHITE + " | " + ChatColor.AQUA
-				+ "allows/denys weather changes in the world");
+				+ "/gworld allowweatherchange <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld setweather <world> <sun|storm>"
-				+ ChatColor.WHITE + " | " + ChatColor.AQUA
-				+ "set current weather in the world");
+				+ "/gworld setweather <world> <sun|storm>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld timefrozen <world> <true|false>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld settime <world> <sunrise|noon|sunset|midnight>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld suppresshealthregain <world> <true|false>");
 	}
 
 	public boolean hasWorld(String world) {
@@ -139,8 +125,7 @@ public class CommandWorld extends XcraftGateCommandHandler {
 			} else if (!hasWorld(args[1])) {
 				error("Unkown world: " + args[1]);
 			} else {
-				Location loc = player.getLocation();
-				loc = plugin.worlds.get(args[1]).getSafeDestination(loc);
+				Location loc = plugin.getServer().getWorld(args[1]).getSpawnLocation();
 				if (loc != null)
 					player.teleport(loc);
 				else
@@ -348,6 +333,29 @@ public class CommandWorld extends XcraftGateCommandHandler {
 
 				plugin.worlds.get(args[1]).setTimeFrozen(frozen);
 				reply("Time on " + args[1] + (frozen ? " freezed." : " unfreezed."));
+				plugin.saveWorlds();
+			}
+		} else if (args[0].equals("suppresshealthregain")) {
+			if (!isPermitted("world", "setcreaturelimit")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 3)) {
+				printUsage();
+			} else if (!hasWorld(args[1])) {
+				error("Unkown world: " + args[1]);
+			} else {
+				Boolean suppressed;
+				if (args[2].equalsIgnoreCase("true")) {
+					suppressed = true;
+				} else if (args[2].equalsIgnoreCase("false")) {
+					suppressed = false;
+				} else {
+					printUsage();
+					return true;
+				}
+
+				plugin.worlds.get(args[1]).suppressHealthRegain = suppressed;
+				reply("Automatic health regain on " + args[1] + (suppressed ? " suppressed." : " enabled."));
+				reply("Remember: This only has effect with allowmonsters set to false.");
 				plugin.saveWorlds();
 			}
 		} else if (args[0].equals("info")) {

@@ -176,6 +176,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 						}
 					}
 					reply("Gate " + args[1] + " removed.");
+					plugin.saveGates();
 				}
 			}
 		} else if (args[0].equals("listsolo")) {

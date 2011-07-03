@@ -2,27 +2,14 @@ package de.xcraft.engelier.XcraftGate;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public class XcraftGateGate {
-	private XcraftGate plugin = null;
+	private static XcraftGate plugin;
 
 	public String gateName = null;
 	public Location gateLocation = null;
 	public String gateTarget = null;
-
-	public class Port implements Runnable {
-		private Player player;
-
-		public Port(Player player) {
-			this.player = player;
-		}
-
-		@Override
-		public void run() {
-			plugin.justTeleported.put(player.getName(), gateLocation);
-			this.player.teleport(gateLocation);
-		}
-	}
 
 	public XcraftGateGate(XcraftGate instance, String name, Location location) {
 		plugin = instance;
@@ -31,13 +18,24 @@ public class XcraftGateGate {
 	}
 
 	public void portHere(Player player) {
-		// escape from any PLAYER_MOVE events, prevents "moved too quickly"
-		plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Port(player), 1L);
+		plugin.justTeleported.put(player.getName(), gateLocation);
+		player.teleport(gateLocation);
 	}
 
+	public void portHere(PlayerMoveEvent event) {
+		plugin.justTeleported.put(event.getPlayer().getName(), gateLocation);
+		event.setTo(gateLocation);
+	}
+	
 	public void portToTarget(Player player) {
 		if (gateTarget != null) {
 			plugin.gates.get(gateTarget).portHere(player);
+		}
+	}
+
+	public void portToTarget(PlayerMoveEvent event) {
+		if (gateTarget != null) {
+			plugin.gates.get(gateTarget).portHere(event);
 		}
 	}
 }
