@@ -153,8 +153,10 @@ public class XcraftGateWorld {
 	
 	public void setCreatureLimit(Integer limit) {
 		this.creatureLimit = (limit != null ? limit : 0);
-		killAllMonsters();
-		killAllAnimals();
+		if (this.creatureLimit > 0) {
+			killAllMonsters();
+			killAllAnimals();
+		}
 	}
 	
 	public void setAllowAnimals(Boolean allow) {
