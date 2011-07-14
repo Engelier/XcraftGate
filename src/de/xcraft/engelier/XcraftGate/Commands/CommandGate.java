@@ -22,30 +22,23 @@ public class CommandGate extends XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets()
 				+ "by Engelier");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate create <name>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "creates a new gate at your location");
+				+ "/gate create <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate link <name1> <name2>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "links <name1> to <name2>");
+				+ "/gate link <name1> <name2>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate loop <name1> <name2>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "links <name1> to <name2> and vice versa");
+				+ "/gate loop <name1> <name2>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate unlink <name>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "removes destination from <name>");
+				+ "/gate unlink <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate unloop <name1> <name2>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA
-				+ "removes double-link between <name1> and <name2>");
+				+ "/gate unloop <name1> <name2>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate delete <name>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "removes gate <name>");
+				+ "/gate delete <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate listsolo" + ChatColor.WHITE + " | " + ChatColor.AQUA
-				+ "list gates with no source/destination");
+				+ "/gate list");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gate warp <name>" + ChatColor.WHITE + " | "
-				+ ChatColor.AQUA + "teleports you to gate <name>");
+				+ "/gate listsolo");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate warp <name>");
 	}
 
 	public boolean gateExists(String name) {
