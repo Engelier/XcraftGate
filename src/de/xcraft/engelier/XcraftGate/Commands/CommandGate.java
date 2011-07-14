@@ -1,5 +1,7 @@
 package de.xcraft.engelier.XcraftGate.Commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
@@ -35,6 +37,8 @@ public class CommandGate extends XcraftGateCommandHandler {
 				+ "/gate delete <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gate list");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate listnear [radius]");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gate listsolo");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
@@ -236,6 +240,49 @@ public class CommandGate extends XcraftGateCommandHandler {
 					}
 				}
 				reply(gateList);
+			}
+		} else if (args[0].equals("listnear")) {
+			if (!isPermitted("gate", "info")) {
+				error("You don't have permission to use this command.");
+			} else {
+				Integer radius = 10;
+				
+				if (args.length > 1) {
+					try {
+						radius = Integer.parseInt(args[1]);
+					} catch (Exception ex) {
+						error("Invalid radius number.");
+						return true;
+					}
+				}
+				
+				Location now = player.getLocation();
+				double xx = now.getX();
+				double yy = now.getY();
+				double zz = now.getZ();
+				List<String> gatesFound = new ArrayList<String>();
+				
+				for (int x = -radius; x <= radius; x++) {
+					for (int y = (radius > 127 ? -127 : -radius); y <= (radius > 127 ? 127 : radius); y++) {
+						for (int z = -radius; z <= radius; z++) {
+							String gateName = plugin.gateLocations.get(plugin.getLocationString(new Location(now.getWorld(), x + xx, y + yy, z + zz)));
+							if (gateName != null) {
+								gatesFound.add(gateName);
+							}
+						}
+					}
+				}
+				
+				if (gatesFound.size() == 0) {
+					reply("No gates found.");
+				} else {
+					Object[] found = gatesFound.toArray();
+					java.util.Arrays.sort(found);
+					for (Object foundO : found) {
+						XcraftGateGate gate = plugin.gates.get((String) foundO);
+						reply("Found " + gate.gateName + " at " + plugin.getLocationString(gate.gateLocation));
+					}
+				}
 			}
 		} else {
 			printUsage();
