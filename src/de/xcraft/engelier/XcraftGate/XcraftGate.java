@@ -140,7 +140,7 @@ public class XcraftGate extends JavaPlugin {
 	}
 
 	public void createGate(Location location, String name) {
-		XcraftGateGate newGate = new XcraftGateGate(this, name, location);
+		XcraftGateGate newGate = new XcraftGateGate(this, name, getSaneLocation(location));
 		gates.put(name, newGate);
 		gateLocations.put(getLocationString(location), name);
 		saveGates();
@@ -164,6 +164,14 @@ public class XcraftGate extends JavaPlugin {
 	public void removeGateLoop(String gate1, String gate2) {
 		removeGateLink(gate1);
 		removeGateLink(gate2);
+	}
+	
+	public Location getSaneLocation(Location loc) {
+		double x = Math.floor(loc.getX()) + 0.5;
+		double y = loc.getY();
+		double z = Math.floor(loc.getZ()) + 0.5;
+		
+		return new Location(loc.getWorld(), x, y, z, loc.getPitch(), loc.getYaw());
 	}
 
 	public String getNameBrackets() {
