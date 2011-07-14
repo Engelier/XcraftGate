@@ -28,7 +28,7 @@ public class CommandWorld extends XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld info <world>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld create <name> [normal|nether|skylands]");
+				+ "/gworld create <name> [normal|nether|skylands [seed]]");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld delete <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
@@ -81,7 +81,7 @@ public class CommandWorld extends XcraftGateCommandHandler {
 		} else if (args[0].equals("create")) {
 			if (!isPermitted("world", "create")) {
 				error("You don't have permission to use this command.");
-			} else if (!checkArgs(args, 3)) {
+			} else if (args.length < 2) {
 				printUsage();
 			} else {
 				if (hasWorld(args[1])) {
@@ -92,7 +92,17 @@ public class CommandWorld extends XcraftGateCommandHandler {
 					for (Environment thisEnv : World.Environment.values()) {
 						if (thisEnv.toString().equalsIgnoreCase(env)) {
 							XcraftGateWorld thisWorld = new XcraftGateWorld(plugin);
-							thisWorld.load(args[1], thisEnv);
+							if (args.length <= 3) {
+								thisWorld.load(args[1], thisEnv);								
+							} else {
+								Long seed = 0L;
+								try {
+									seed = Long.parseLong(args[3]);
+								} catch (Exception ex) {
+									seed = (long)args[3].hashCode();
+								}
+								thisWorld.load(args[1], thisEnv, seed);
+							}
 							plugin.worlds.put(args[1], thisWorld);
 							reply("World " + args[1]
 									+ " created with environment " + env + ".");

@@ -87,12 +87,20 @@ public class XcraftGateWorld {
 	}
 	
 	public void load(String name, Environment env) {
-		this.name = name;
-		this.environment = env;
-		this.plugin.log.info(plugin.getNameBrackets() + "loading world " + name + " (" + env.toString() + ")");
-		this.world = server.createWorld(name, env);
+		load(name, env, null);
 	}
 
+	public void load(String name, Environment env, Long seed) {
+		if (seed == null) {
+			this.world = server.createWorld(name, env);
+		} else {
+			this.world = server.createWorld(name, env, seed);			
+		}
+		this.name = world.getName();
+		this.environment = world.getEnvironment();
+		this.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + env.toString() + ", Seed: " + world.getSeed() + ")");
+	}
+	
 	public Map<String, Object> toMap() {
 		Map<String, Object> values = new HashMap<String, Object>();
 		values.put("name", name);
