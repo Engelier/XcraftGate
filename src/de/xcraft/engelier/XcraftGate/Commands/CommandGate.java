@@ -203,6 +203,8 @@ public class CommandGate extends XcraftGateCommandHandler {
 		} else if (args[0].equals("warp")) {
 			if (!isPermitted("gate", "warp")) {
 				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 2)) {
+				printUsage();
 			} else {
 				if (!gateExists(args[1])) {
 					reply("Gate not found: " + args[1]);
@@ -213,13 +215,34 @@ public class CommandGate extends XcraftGateCommandHandler {
 		} else if (args[0].equals("reload")) {
 			if (!isPermitted("gate", "reload")) {
 				error("You don't have permission to use this command.");
-			} else if (!checkArgs(args, 1)) {
-				printUsage();
 			} else {
 				plugin.gates.clear();
 				plugin.gateLocations.clear();
 				plugin.loadGates();
 				reply("Loaded " + plugin.gates.size() + " gates.");
+			}
+		} else if (args[0].equals("list")) {
+			if (!isPermitted("gate", "info")) {
+				error("You don't have permission to use this command.");
+			} else {
+				Object[] gatesArray = plugin.gates.keySet().toArray();
+				java.util.Arrays.sort(gatesArray);
+				
+				String gateList = "";
+				for (Object gateObj : gatesArray) {
+					String gateName = (String) gateObj;
+					if (gateList.length() + gateName.length() + 2 > 255) {
+						reply(gateList);
+						gateList = "";
+					}
+					
+					if (gateList.length() == 0) {
+						gateList = gateName;
+					} else {
+						gateList += ", " + gateName;
+					}
+				}
+				reply(gateList);
 			}
 		} else {
 			printUsage();
