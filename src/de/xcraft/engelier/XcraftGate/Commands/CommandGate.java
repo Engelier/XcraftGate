@@ -203,14 +203,23 @@ public class CommandGate extends XcraftGateCommandHandler {
 		} else if (args[0].equals("warp")) {
 			if (!isPermitted("gate", "warp")) {
 				error("You don't have permission to use this command.");
-			} else if (!checkArgs(args, 2)) {
-				printUsage();
 			} else {
 				if (!gateExists(args[1])) {
 					reply("Gate not found: " + args[1]);
 				} else {
 					plugin.gates.get(args[1]).portHere(player);
 				}
+			}
+		} else if (args[0].equals("reload")) {
+			if (!isPermitted("gate", "reload")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 1)) {
+				printUsage();
+			} else {
+				plugin.gates.clear();
+				plugin.gateLocations.clear();
+				plugin.loadGates();
+				reply("Loaded " + plugin.gates.size() + " gates.");
 			}
 		} else {
 			printUsage();

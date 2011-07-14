@@ -273,7 +273,7 @@ public class XcraftGate extends JavaPlugin {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void loadGates() {
+	public void loadGates() {
 		File configFile = new File(getDataFolder(), "gates.yml");
 		int counter = 0;
 
