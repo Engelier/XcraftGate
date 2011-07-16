@@ -96,8 +96,8 @@ public class XcraftGate extends JavaPlugin {
 		loadWorlds();
 		loadGates();
 
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
 		try {
 			getCommand("gate").setExecutor(new CommandGate(this));
 			getCommand("gworld").setExecutor(new CommandWorld(this));
@@ -199,33 +199,31 @@ public class XcraftGate extends JavaPlugin {
 			Yaml yaml = new Yaml();
 			Map<String, Object> worldsYaml = (Map<String, Object>) yaml.load(new FileInputStream(configFile));
 			
-			if (worldsYaml == null) {
-				for (World thisWorld: getServer().getWorlds()) {
-					XcraftGateWorld newWorld = new XcraftGateWorld(this);
-					newWorld.load(thisWorld.getName(), thisWorld.getEnvironment());
-					worlds.put(thisWorld.getName(), newWorld);
-				}
-				return;
+			XcraftGateWorld newWorld;
+			
+			for (World thisWorld: getServer().getWorlds()) {
+				newWorld = new XcraftGateWorld(this);
+				newWorld.load(thisWorld.getName(), thisWorld.getEnvironment());
+				worlds.put(thisWorld.getName(), newWorld);
 			}
-			
-			if (worldsYaml.get("worlds") != null)
-				worldsYaml = (Map<String, Object>) worldsYaml.get("worlds");
-			
+
 			for (Map.Entry<String, Object> thisWorld : worldsYaml.entrySet()) {
 				String worldName = thisWorld.getKey();
 				Map<String, Object> worldData = (Map<String, Object>) thisWorld.getValue();
 
-				String env = (String) worldData.get("type");
+				if ((newWorld = worlds.get(worldName)) != null) {
+					String env = (String) worldData.get("type");
 				
-				XcraftGateWorld newWorld = new XcraftGateWorld(this);
-				for(Environment thisEnv: World.Environment.values()) {
-					if (thisEnv.toString().equalsIgnoreCase(env)) {
-						newWorld.load(worldName, thisEnv);
+					newWorld = new XcraftGateWorld(this);
+					for(Environment thisEnv: World.Environment.values()) {
+						if (thisEnv.toString().equalsIgnoreCase(env)) {
+							newWorld.load(worldName, thisEnv);
+						}
 					}
+				
+					if (newWorld.name == null) newWorld.load(worldName, World.Environment.NORMAL);
 				}
 				
-				if (newWorld.name == null) newWorld.load(worldName, World.Environment.NORMAL);
-
 				newWorld.setBorder((Integer)worldData.get("border"));
 				newWorld.setAllowPvP((Boolean)worldData.get("allowPvP"));
 				newWorld.setAllowAnimals((Boolean)worldData.get("allowAnimals"));
