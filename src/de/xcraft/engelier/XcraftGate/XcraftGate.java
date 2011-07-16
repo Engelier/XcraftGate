@@ -211,7 +211,7 @@ public class XcraftGate extends JavaPlugin {
 				String worldName = thisWorld.getKey();
 				Map<String, Object> worldData = (Map<String, Object>) thisWorld.getValue();
 
-				if ((newWorld = worlds.get(worldName)) != null) {
+				if ((newWorld = worlds.get(worldName)) == null) {
 					String env = (String) worldData.get("type");
 				
 					newWorld = new XcraftGateWorld(this);

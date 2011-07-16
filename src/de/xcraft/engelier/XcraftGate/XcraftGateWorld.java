@@ -236,7 +236,7 @@ public class XcraftGateWorld {
 	}
 	
 	public void sendInfo(Player player) {
-		player.sendMessage("Worldname: " + name);
+		player.sendMessage("World: " + name + " (" + environment.toString() + ")");
 		player.sendMessage("Player count: "	+ world.getPlayers().size());
 		player.sendMessage("Border: " + (border > 0 ? border : "none"));
 		player.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));

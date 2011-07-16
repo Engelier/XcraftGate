@@ -28,6 +28,8 @@ public class CommandWorld extends XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld info <world>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld listplayers <world>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld create <name> [normal|nether|skylands [seed]]");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld delete <name>");
@@ -53,6 +55,8 @@ public class CommandWorld extends XcraftGateCommandHandler {
 				+ "/gworld settime <world> <sunrise|noon|sunset|midnight>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld suppresshealthregain <world> <true|false>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gworld listplayers <world>");
 	}
 
 	public boolean hasWorld(String world) {
@@ -122,10 +126,15 @@ public class CommandWorld extends XcraftGateCommandHandler {
 			} else if (!hasWorld(args[1])) {
 				error("Unkown world: " + args[1]);
 			} else {
-				plugin.worlds.remove(args[1]);
-				reply("World " + args[1] + " removed.");
-				plugin.getServer().unloadWorld(args[1], true);
-				plugin.saveWorlds();
+				if (plugin.getServer().getWorld(args[1]).getPlayers().size() > 0) {
+					error("Unable to unload world with active players.");
+					args[0] = "listplayers";
+				} else {
+					plugin.worlds.remove(args[1]);
+					reply("World " + args[1] + " removed.");
+					plugin.getServer().unloadWorld(args[1], true);
+					plugin.saveWorlds();
+				}
 			}
 		} else if (args[0].equals("warpto")) {
 			if (!isPermitted("world", "warp")) {
@@ -388,6 +397,25 @@ public class CommandWorld extends XcraftGateCommandHandler {
 					worlds += ", " + world.getName();
 				}
 				reply("Worlds: " + ChatColor.WHITE + worlds.substring(2));
+			}
+		} else if (args[0].equals("listplayers")) {
+			if (!isPermitted("world", "info")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 2)) {
+				printUsage();
+			} else if (!hasWorld(args[1])) {
+				error("Unkown world: " + args[1]);
+			} else {
+				String players = "";
+				for (Player player : plugin.getServer().getWorld(args[1]).getPlayers()) {
+					players += ", " + player.getName();
+				}
+				
+				if (players.length() > 0) {
+					reply("Players in world " + args[1] + ": " + players.substring(2));
+				} else {
+					reply("No players in world " + args[1] + ".");
+				}
 			}
 		} else {
 			printUsage();
