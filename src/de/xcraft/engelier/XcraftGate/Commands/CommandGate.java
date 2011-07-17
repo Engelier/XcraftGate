@@ -206,6 +206,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				if (!gateExists(args[1])) {
 					reply("Gate not found: " + args[1]);
 				} else {
+					plugin.justTeleportedFrom.put(player.getName(), plugin.gates.get(args[1]).gateLocation);
 					plugin.gates.get(args[1]).portHere(player);
 				}
 			}

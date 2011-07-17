@@ -20,15 +20,20 @@ public class XcraftGatePlayerListener extends PlayerListener {
 
 		location = event.getTo();
 		
-		if (!plugin.worlds.get(location.getWorld().getName()).checkBorder(location)) {
+		int border = plugin.worlds.get(location.getWorld().getName()).border;
+		if (border > 0) {
+			double x = location.getX();
+			double z = location.getZ();
+		
+			if (Math.abs(x) >= border || Math.abs(z) >= border) {
+				x = Math.abs(x) >= border ? (x > 0 ? border - 1 : -border + 1) : x;
+				z = Math.abs(z) >= border ? (z > 0 ? border - 1 : -border + 1) : z;
 				event.setCancelled(true);
-				event.getPlayer().teleport(event.getFrom());
-				event.getPlayer()
-						.sendMessage(
-								ChatColor.RED
-										+ "You reached the border of this world.");
+				event.getPlayer().teleport(new Location(location.getWorld(), x, location.getY(), z, location.getYaw(), location.getPitch()));
+				event.getPlayer().sendMessage(ChatColor.RED	+ "You reached the border of this world.");
+			}			
 		}
-
+		
 		portTo = plugin.justTeleported.get(event.getPlayer().getName());		
 		portFrom = plugin.justTeleportedFrom.get(event.getPlayer().getName());
 
