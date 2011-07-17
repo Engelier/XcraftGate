@@ -26,6 +26,8 @@ public class CommandGate extends XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gate create <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate move <name>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gate link <name1> <name2>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gate loop <name1> <name2>");
@@ -84,6 +86,25 @@ public class CommandGate extends XcraftGateCommandHandler {
 					plugin.createGate(player.getLocation(), args[1]);
 					reply("Gate " + args[1] + " created: "
 							+ plugin.getLocationString(player.getLocation()));
+				}
+			}
+		} else if (args[0].equals("move")) {
+			if (!isPermitted("gate", "create")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 2)) {
+				printUsage();
+			} else {
+				if (!gateExists(args[1])) {
+					reply("Gate " + args[1] + " not found.");
+				} else {
+					String oldLoc = plugin.getLocationString(plugin.gates.get(args[1]).gateLocation);
+					String newLoc = plugin.getLocationString(player.getLocation());
+					plugin.gates.get(args[1]).gateLocation = plugin.getSaneLocation(player.getLocation());
+					plugin.gateLocations.remove(oldLoc);
+					plugin.gateLocations.put(newLoc, args[1]);
+					plugin.justTeleported.put(player.getName(), plugin.gates.get(args[1]).gateLocation);
+					plugin.justTeleportedFrom.put(player.getName(), plugin.gates.get(args[1]).gateLocation);
+					reply("Gate " + args[1] + " moved to " + newLoc);
 				}
 			}
 		} else if (args[0].equals("link")) {

@@ -171,7 +171,7 @@ public class XcraftGate extends JavaPlugin {
 		double y = loc.getY();
 		double z = Math.floor(loc.getZ()) + 0.5;
 		
-		return new Location(loc.getWorld(), x, y, z, loc.getPitch(), loc.getYaw());
+		return new Location(loc.getWorld(), x, y, z, loc.getYaw(), loc.getPitch());
 	}
 
 	public String getNameBrackets() {
