@@ -24,6 +24,8 @@ public class CommandGate extends XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets()
 				+ "by Engelier");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
+				+ "/gate info <name>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gate create <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gate move <name>");
@@ -229,6 +231,23 @@ public class CommandGate extends XcraftGateCommandHandler {
 				} else {
 					plugin.justTeleportedFrom.put(player.getName(), plugin.gates.get(args[1]).gateLocation);
 					plugin.gates.get(args[1]).portHere(player);
+				}
+			}
+		} else if (args[0].equals("info")) {
+			if (!isPermitted("gate", "info")) {
+				error("You don't have permission to use this command.");
+			} else if (!checkArgs(args, 2)) {
+				printUsage();
+			} else {
+				if (!gateExists(args[1])) {
+					reply("Gate not found: " + args[1]);
+				} else {
+					reply("Info for gate " + args[1]);
+					XcraftGateGate thisGate = plugin.gates.get(args[1]);
+					sender.sendMessage("Name: " + thisGate.gateName);
+					sender.sendMessage("Position: " + plugin.getLocationString(thisGate.gateLocation));
+					sender.sendMessage("Destination: " + thisGate.gateTarget);
+					sender.sendMessage("Permission-Node: XcraftGate.use." + thisGate.gateName);
 				}
 			}
 		} else if (args[0].equals("reload")) {
