@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.bukkit.Location;
@@ -15,6 +16,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +27,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 
 import de.xcraft.engelier.XcraftGate.XcraftGateWorld.Weather;
 import de.xcraft.engelier.XcraftGate.Commands.*;
+import de.xcraft.engelier.XcraftGate.Generator.Generator;
 
 public class XcraftGate extends JavaPlugin {
 	private final XcraftGatePluginListener pluginListener = new XcraftGatePluginListener(this);
@@ -32,6 +35,7 @@ public class XcraftGate extends JavaPlugin {
 	private final XcraftGateCreatureListener creatureListener = new XcraftGateCreatureListener(this);
 	private final XcraftGateEntityListener entityListener = new XcraftGateEntityListener(this);
 	private final XcraftGateWeatherListener weatherListener = new XcraftGateWeatherListener(this);
+	private final XcraftGateWorldListener worldListener = new XcraftGateWorldListener(this);
 
 	public PermissionHandler permissions = null;
 
@@ -43,6 +47,7 @@ public class XcraftGate extends JavaPlugin {
 	public Map<String, Integer> creatureCounter = new HashMap<String, Integer>();
 
 	public final Logger log = Logger.getLogger("Minecraft");
+	public final Properties serverconfig = new Properties(); 
 
 	class RunCreatureLimit implements Runnable {
 		public void run() {
@@ -62,6 +67,26 @@ public class XcraftGate extends JavaPlugin {
 		}
 	}
 	
+	class RunCheckWorldInactive implements Runnable {
+		@Override
+		public void run() {
+			for (World thisWorld : getServer().getWorlds()) {
+				if (worlds.get(thisWorld.getName()).checkInactive() && !thisWorld.getName().equalsIgnoreCase(serverconfig.getProperty("level-name"))) {
+					log.info(getNameBrackets() + "World '" + thisWorld.getName() + "' inactive. Unloading.");
+					worlds.get(thisWorld.getName()).world = null;
+					
+					for (XcraftGateGate thisGate : gates.values()) {
+						if (thisGate.getWorldName().equalsIgnoreCase(thisWorld.getName())) {
+							gateLocations.remove(getLocationString(thisGate.getLocation()));
+						}
+					}
+
+					getServer().unloadWorld(thisWorld, true);
+				}
+			}						
+		}		
+	}
+	
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
 		saveGates();
@@ -71,24 +96,32 @@ public class XcraftGate extends JavaPlugin {
 	public void onEnable() {
 		PluginManager pm = this.getServer().getPluginManager();
 
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener,
-				Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener,
-				Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener,
-				Event.Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,
-				Event.Priority.Monitor, this);
-		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener,
-				Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener,
-				Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,	Event.Priority.Monitor, this);
+		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.Normal, this);
+		pm.registerEvent(Event.Type.WORLD_LOAD, worldListener, Event.Priority.Highest, this);
+		pm.registerEvent(Event.Type.WORLD_UNLOAD, worldListener, Event.Priority.Highest, this);
 
 		Plugin permissionsCheck = pm.getPlugin("Permissions");
 		if (permissionsCheck != null && permissionsCheck.isEnabled()) {
 			permissions = ((Permissions) permissionsCheck).getHandler();
 			log.info(getNameBrackets() + "hooked into Permissions "
 					+ permissionsCheck.getDescription().getVersion());
+		}
+		
+		File serverconfigFile = new File("server.properties");
+		if (!serverconfigFile.exists()) {
+			log.severe(getNameBrackets() + "unable to load server.properties.");
+		} else {
+			try {
+				serverconfig.load(new FileInputStream(serverconfigFile));
+			} catch (Exception ex) {
+				log.severe(getNameBrackets() + "error loading " + serverconfigFile);
+				ex.printStackTrace();
+			}
 		}
 
 		log.info(getNameBrackets() + "by Engelier loaded.");
@@ -98,6 +131,8 @@ public class XcraftGate extends JavaPlugin {
 
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), 1200, 1200);
+		
 		try {
 			getCommand("gate").setExecutor(new CommandGate(this));
 			getCommand("gworld").setExecutor(new CommandWorld(this));
@@ -140,7 +175,8 @@ public class XcraftGate extends JavaPlugin {
 	}
 
 	public void createGate(Location location, String name) {
-		XcraftGateGate newGate = new XcraftGateGate(this, name, getSaneLocation(location));
+		XcraftGateGate newGate = new XcraftGateGate(this, name);
+		newGate.setLocation(getSaneLocation(location));
 		gates.put(name, newGate);
 		gateLocations.put(getLocationString(location), name);
 		saveGates();
@@ -201,28 +237,32 @@ public class XcraftGate extends JavaPlugin {
 			
 			XcraftGateWorld newWorld;
 			
-			for (World thisWorld: getServer().getWorlds()) {
-				newWorld = new XcraftGateWorld(this);
-				newWorld.load(thisWorld.getName(), thisWorld.getEnvironment());
-				worlds.put(thisWorld.getName(), newWorld);
-			}
-
 			for (Map.Entry<String, Object> thisWorld : worldsYaml.entrySet()) {
 				String worldName = thisWorld.getKey();
 				Map<String, Object> worldData = (Map<String, Object>) thisWorld.getValue();
 
-				if ((newWorld = worlds.get(worldName)) == null) {
-					String env = (String) worldData.get("type");
+				Environment env = null;
+				Generator gen = null;
 				
-					newWorld = new XcraftGateWorld(this);
-					for(Environment thisEnv: World.Environment.values()) {
-						if (thisEnv.toString().equalsIgnoreCase(env)) {
-							newWorld.load(worldName, thisEnv);
-						}
+				String checkEnv = (String) worldData.get("type");
+				
+				for(Environment thisEnv: World.Environment.values()) {
+					if (thisEnv.toString().equalsIgnoreCase(checkEnv)) {
+						env = thisEnv;
 					}
-				
-					if (newWorld.name == null) newWorld.load(worldName, World.Environment.NORMAL);
 				}
+				
+				if (env == null) env = World.Environment.NORMAL;
+
+				String checkGen = (String) worldData.get("generator");
+				
+				for (Generator thisGen : Generator.values()) {
+					if (thisGen.toString().equalsIgnoreCase(checkGen)) {
+						gen = thisGen;
+					}
+				}
+				
+				newWorld = new XcraftGateWorld(this, worldName, env, gen);
 				
 				newWorld.setBorder((Integer)worldData.get("border"));
 				newWorld.setAllowPvP((Boolean)worldData.get("allowPvP"));
@@ -290,28 +330,27 @@ public class XcraftGate extends JavaPlugin {
 				Map<String, Object> gateData = (Map<String, Object>) thisGate
 						.getValue();
 
-				if (getServer().getWorld((String) gateData.get("world")) == null) {
+				if (worlds.get((String) gateData.get("world")) == null) {
 					log.severe(getNameBrackets() + "gate " + gateName
 							+ " found in unkown world " + gateData.get("world")
 							+ ". REMOVED!");
 					continue;
 				}
 
-				Location gateLocation = new Location(getServer().getWorld(
-						(String) gateData.get("world")),
+
+				XcraftGateGate newGate = new XcraftGateGate(this, gateName);
+				newGate.setLocation(
+						(String) gateData.get("world"),
 						(Double) gateData.get("locX"),
 						(Double) gateData.get("locY"),
 						(Double) gateData.get("locZ"),
 						((Double) gateData.get("locYaw")).floatValue(),
 						((Double) gateData.get("locP")).floatValue());
 
-				XcraftGateGate newGate = new XcraftGateGate(this, gateName,
-						gateLocation);
 				if (gateData.get("target") != null)
 					newGate.gateTarget = (String) gateData.get("target");
 
 				gates.put(gateName, newGate);
-				gateLocations.put(getLocationString(gateLocation), gateName);
 				counter++;
 			}
 		} catch (Exception ex) {
@@ -345,17 +384,17 @@ public class XcraftGate extends JavaPlugin {
 
 		for (Map.Entry<String, XcraftGateGate> thisGate : gates.entrySet()) {
 			String gateName = thisGate.getKey();
+			XcraftGateGate gate = thisGate.getValue();
 
 			Map<String, Object> values = new HashMap<String, Object>();
-			Location location = gates.get(gateName).gateLocation;
 
-			values.put("world", location.getWorld().getName());
-			values.put("locX", location.getX());
-			values.put("locY", location.getY());
-			values.put("locZ", location.getZ());
-			values.put("locP", location.getPitch());
-			values.put("locYaw", location.getYaw());
-			values.put("target", gates.get(gateName).gateTarget);
+			values.put("world", gate.getWorldName());
+			values.put("locX", gate.getX());
+			values.put("locY", gate.getY());
+			values.put("locZ", gate.getZ());
+			values.put("locP", gate.getPitch());
+			values.put("locYaw", gate.getYaw());
+			values.put("target", gate.gateTarget);
 
 			toDump.put(gateName, values);
 		}
@@ -389,5 +428,27 @@ public class XcraftGate extends JavaPlugin {
 		} else {
 			return 0;
 		}
+	}
+	
+	public Boolean castBoolean(Object o) {
+		if (o == null) {
+			return false;
+		} else if (o instanceof Boolean) {
+			return (Boolean)o;
+		} else if (o instanceof String) {
+			return ((String)o).equalsIgnoreCase("true") ? true : false;
+		} else {
+			return false;
+		}
+	}
+	
+	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+		for (Generator thisGen : Generator.values()) {
+			if (thisGen.toString().equalsIgnoreCase(id)) {
+				return thisGen.getChunkGenerator();
+			}
+		}
+
+		return null;
 	}
 }

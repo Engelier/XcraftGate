@@ -13,6 +13,7 @@ import de.xcraft.engelier.XcraftGate.XcraftGateCommandHandler;
 import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
 import de.xcraft.engelier.XcraftGate.XcraftGateWorld.DayTime;
 import de.xcraft.engelier.XcraftGate.XcraftGateWorld.Weather;
+import de.xcraft.engelier.XcraftGate.Generator.Generator;
 
 public class CommandWorld extends XcraftGateCommandHandler {
 
@@ -28,7 +29,7 @@ public class CommandWorld extends XcraftGateCommandHandler {
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld info <world>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
-				+ "/gworld listplayers <world>");
+				+ "/gworld listenv");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
 				+ "/gworld create <name> [normal|nether|skylands [seed]]");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN
@@ -92,30 +93,47 @@ public class CommandWorld extends XcraftGateCommandHandler {
 					error("World " + args[1] + " already exists.");
 				} else {
 					String env = args.length < 3 ? "normal" : args[2];
+					
+					Environment worldEnv = null;
+					Generator worldGen = null;
 
 					for (Environment thisEnv : World.Environment.values()) {
 						if (thisEnv.toString().equalsIgnoreCase(env)) {
-							XcraftGateWorld thisWorld = new XcraftGateWorld(plugin);
-							if (args.length <= 3) {
-								thisWorld.load(args[1], thisEnv);								
-							} else {
-								Long seed = 0L;
-								try {
-									seed = Long.parseLong(args[3]);
-								} catch (Exception ex) {
-									seed = (long)args[3].hashCode();
-								}
-								thisWorld.load(args[1], thisEnv, seed);
-							}
-							plugin.worlds.put(args[1], thisWorld);
-							reply("World " + args[1]
-									+ " created with environment " + env + ".");
-							plugin.saveWorlds();
-							return true;
+							worldEnv = thisEnv;
 						}
 					}
+					
+					for (Generator thisGen : Generator.values()) {
+						if (thisGen.toString().equalsIgnoreCase(env)) {
+							worldGen = thisGen;
+							worldEnv = World.Environment.NORMAL;
+						}
+					}
+					
+					if (worldEnv == null) {
+						reply("Unknown environment: " + env);
+						return true;
+					}
 
-					reply("Unknown environment: " + env);
+					XcraftGateWorld thisWorld = new XcraftGateWorld(plugin, args[1], worldEnv, worldGen);
+					plugin.worlds.put(args[1], thisWorld);
+					plugin.saveWorlds();
+
+					if (args.length <= 3) {
+						thisWorld.load();
+					} else {
+						Long seed = 0L;
+						try {
+							seed = Long.parseLong(args[3]);
+						} catch (Exception ex) {
+							seed = (long)args[3].hashCode();
+						}
+						
+						thisWorld.load(seed);
+					}
+					
+					reply("World " + args[1] + " created with environment " + env + ".");
+					return true;
 				}
 			}
 		} else if (args[0].equals("delete")) {
@@ -144,6 +162,7 @@ public class CommandWorld extends XcraftGateCommandHandler {
 			} else if (!hasWorld(args[1])) {
 				error("Unkown world: " + args[1]);
 			} else {
+				plugin.worlds.get(args[1]).load();
 				Location loc = plugin.getServer().getWorld(args[1]).getSpawnLocation();
 				if (loc != null)
 					player.teleport(loc);
@@ -393,10 +412,28 @@ public class CommandWorld extends XcraftGateCommandHandler {
 				error("You don't have permission to use this command.");
 			} else {
 				String worlds = "";
-				for (World world : plugin.getServer().getWorlds()) {
-					worlds += ", " + world.getName();
+				for (XcraftGateWorld thisWorld : plugin.worlds.values()) {
+					worlds += ", " + thisWorld.name;
+					if (plugin.getServer().getWorld(thisWorld.name) != null) {
+						worlds += "(*)";
+					}
 				}
 				reply("Worlds: " + ChatColor.WHITE + worlds.substring(2));
+				reply("World marked with (*) are currently active on the server.");
+			}
+		} else if (args[0].equals("listenv")) {
+			if (!isPermitted("world", "info")) {
+				error("You don't have permission to use this command.");
+			} else {
+				reply("Environments provided by Bukkit:");
+				for (Environment thisEnv : World.Environment.values()) {
+					sender.sendMessage(thisEnv.toString());
+				}
+				
+				reply("Environments provided by XcraftGate:");
+				for (Generator thisEnv : Generator.values()) {
+					if (thisEnv.getId() != 0) sender.sendMessage(thisEnv.toString());
+				}
 			}
 		} else if (args[0].equals("listplayers")) {
 			if (!isPermitted("world", "info")) {

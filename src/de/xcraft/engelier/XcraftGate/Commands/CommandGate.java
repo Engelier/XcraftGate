@@ -99,13 +99,13 @@ public class CommandGate extends XcraftGateCommandHandler {
 				if (!gateExists(args[1])) {
 					reply("Gate " + args[1] + " not found.");
 				} else {
-					String oldLoc = plugin.getLocationString(plugin.gates.get(args[1]).gateLocation);
+					String oldLoc = plugin.getLocationString(plugin.gates.get(args[1]).getLocation());
 					String newLoc = plugin.getLocationString(player.getLocation());
-					plugin.gates.get(args[1]).gateLocation = plugin.getSaneLocation(player.getLocation());
+					plugin.gates.get(args[1]).setLocation(plugin.getSaneLocation(player.getLocation()));
 					plugin.gateLocations.remove(oldLoc);
 					plugin.gateLocations.put(newLoc, args[1]);
-					plugin.justTeleported.put(player.getName(), plugin.gates.get(args[1]).gateLocation);
-					plugin.justTeleportedFrom.put(player.getName(), plugin.gates.get(args[1]).gateLocation);
+					plugin.justTeleported.put(player.getName(), plugin.gates.get(args[1]).getLocation());
+					plugin.justTeleportedFrom.put(player.getName(), plugin.gates.get(args[1]).getLocation());
 					reply("Gate " + args[1] + " moved to " + newLoc);
 				}
 			}
@@ -185,7 +185,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				} else {
 					plugin.gateLocations
 							.remove(plugin.getLocationString(plugin.gates
-									.get(args[1]).gateLocation));
+									.get(args[1]).getLocation()));
 					plugin.gates.remove(args[1]);
 					for (Map.Entry<String, XcraftGateGate> sourceGate : plugin.gates
 							.entrySet()) {
@@ -229,7 +229,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 				if (!gateExists(args[1])) {
 					reply("Gate not found: " + args[1]);
 				} else {
-					plugin.justTeleportedFrom.put(player.getName(), plugin.gates.get(args[1]).gateLocation);
+					plugin.justTeleportedFrom.put(player.getName(), plugin.gates.get(args[1]).getLocation());
 					plugin.gates.get(args[1]).portHere(player);
 				}
 			}
@@ -245,7 +245,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 					reply("Info for gate " + args[1]);
 					XcraftGateGate thisGate = plugin.gates.get(args[1]);
 					sender.sendMessage("Name: " + thisGate.gateName);
-					sender.sendMessage("Position: " + plugin.getLocationString(thisGate.gateLocation));
+					sender.sendMessage("Position: " + plugin.getLocationString(thisGate.getLocation()));
 					sender.sendMessage("Destination: " + thisGate.gateTarget);
 					sender.sendMessage("Permission-Node: XcraftGate.use." + thisGate.gateName);
 				}
@@ -321,7 +321,7 @@ public class CommandGate extends XcraftGateCommandHandler {
 					java.util.Arrays.sort(found);
 					for (Object foundO : found) {
 						XcraftGateGate gate = plugin.gates.get((String) foundO);
-						reply("Found " + gate.gateName + " at " + plugin.getLocationString(gate.gateLocation));
+						reply("Found " + gate.gateName + " at " + plugin.getLocationString(gate.getLocation()));
 					}
 				}
 			}

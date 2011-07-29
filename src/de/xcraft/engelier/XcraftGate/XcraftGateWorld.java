@@ -8,6 +8,9 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.*;
+import org.bukkit.generator.ChunkGenerator;
+
+import de.xcraft.engelier.XcraftGate.Generator.Generator;
 
 public class XcraftGateWorld {
 	public String name;
@@ -22,14 +25,35 @@ public class XcraftGateWorld {
 	public long setTime = 100;
 	public Boolean timeFrozen = false;
 	public Boolean suppressHealthRegain = true;
+	public Generator generator;
 		
 	private XcraftGate plugin;
 	private Server server;
-	private World world;
+	private Long lastAction = null;
+	public World world;
 	
 	public XcraftGateWorld (XcraftGate instance) {
+		this(instance, null, World.Environment.NORMAL, null);
+	}
+	
+	public XcraftGateWorld (XcraftGate instance, String worldName) {
+		this(instance, worldName, World.Environment.NORMAL, null);
+	}
+
+	public XcraftGateWorld (XcraftGate instance, String worldName, Environment env) {
+		this(instance, worldName, env, null);
+	}
+
+	public XcraftGateWorld (XcraftGate instance, String worldName, Environment env, Generator gen) {
 		this.plugin = instance;
 		this.server = plugin.getServer();
+		this.allowPvP = plugin.castBoolean(plugin.serverconfig.getProperty("pvp", "false"));
+		
+		this.world = server.getWorld(worldName);
+		this.name = worldName;
+		this.environment = env;
+		this.generator = (gen != null) ? gen : Generator.DEFAULT;
+		this.lastAction = System.currentTimeMillis();
 	}
 	
 	public enum Weather {
@@ -86,25 +110,35 @@ public class XcraftGateWorld {
 		}
 	}
 	
-	public void load(String name, Environment env) {
-		load(name, env, null);
+	public void load() {
+		load(null);
 	}
-
-	public void load(String name, Environment env, Long seed) {
-		if (seed == null) {
-			this.world = server.createWorld(name, env);
-		} else {
-			this.world = server.createWorld(name, env, seed);			
+	
+	public void load(Long seed) {
+		if (world != null) {
+			return;
 		}
-		this.name = world.getName();
-		this.environment = world.getEnvironment();
-		this.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + env.toString() + ", Seed: " + world.getSeed() + ")");
+		
+		ChunkGenerator thisGen = (generator != Generator.DEFAULT) ? generator.getChunkGenerator() : null;
+		
+		if (seed == null && thisGen == null) {
+			this.world = server.createWorld(name, environment);
+		} else if (seed == null && thisGen != null) {
+			this.world = server.createWorld(name, World.Environment.NORMAL, thisGen);
+		} else {
+			this.world = server.createWorld(name, World.Environment.NORMAL, seed, thisGen);
+		}
+		
+		lastAction = System.currentTimeMillis();
+
+		this.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
 	}
 	
 	public Map<String, Object> toMap() {
 		Map<String, Object> values = new HashMap<String, Object>();
 		values.put("name", name);
 		values.put("type", environment.toString());
+		values.put("generator", generator.toString());
 		values.put("border", border);
 		values.put("creatureLimit", creatureLimit);
 		values.put("allowAnimals", allowAnimals);
@@ -123,6 +157,8 @@ public class XcraftGateWorld {
 	}
 	
 	public void checkCreatureLimit() {
+		if (world == null) return;
+		
 		Double max = creatureLimit.doubleValue();
 		Integer alive = world.getLivingEntities().size() - world.getPlayers().size();
 
@@ -134,13 +170,30 @@ public class XcraftGateWorld {
 			resetSpawnFlags();
 		}		
 	}	
+
+	public Boolean checkInactive() {
+		if (world == null) return false;
+		
+		if (world.getPlayers().size() > 0) {
+			lastAction = System.currentTimeMillis();
+			return false;
+		}
+		
+		if (lastAction + 300 < System.currentTimeMillis()) {
+			return true;
+		}
+		
+		return false;
+	}
 	
 	public void resetFrozenTime() {
+		if (world == null) return;
 		if (!timeFrozen) return;		
 		world.setTime(setTime - 100);
 	}
 		
 	public void killAllMonsters() {
+		if (world == null) return;
 		for (LivingEntity entity : world.getLivingEntities()) {
 			if (entity instanceof Zombie || entity instanceof Skeleton
 					|| entity instanceof PigZombie || entity instanceof Creeper
@@ -151,6 +204,7 @@ public class XcraftGateWorld {
 	}
 
 	public void killAllAnimals() {
+		if (world == null) return;
 		for (LivingEntity entity : world.getLivingEntities()) {
 			if (entity instanceof Pig || entity instanceof Sheep
 					|| entity instanceof Wolf || entity instanceof Cow
@@ -169,13 +223,13 @@ public class XcraftGateWorld {
 	
 	public void setAllowAnimals(Boolean allow) {
 		this.allowAnimals = (allow != null ? allow : true);
-		resetSpawnFlags();
+		setParameters();
 		if (!allow) killAllAnimals();
 	}
 
 	public void setAllowMonsters(Boolean allow) {
 		this.allowMonsters = (allow != null ? allow : true);
-		resetSpawnFlags();
+		setParameters();
 		if (!allow) killAllMonsters();
 	}
 	
@@ -189,30 +243,30 @@ public class XcraftGateWorld {
 	
 	public void setAllowPvP(Boolean allow) {
 		this.allowPvP = (allow != null ? allow : false);
-		this.world.setPVP(this.allowPvP);
+		setParameters();
 	}
 	
 	public void setWeather(Weather weather) {
 		boolean backup = this.allowWeatherChange;
 		this.allowWeatherChange = true;
-		this.world.setStorm(weather.getId() == Weather.STORM.id);
 		this.setWeather = weather;
 		this.allowWeatherChange = backup;
+		setParameters();
 	}
 
 	public void setDayTime(DayTime time) {
-		this.world.setTime(time.id);
 		this.setTime = time.id;
+		setParameters(true);
 	}
 
 	public void setDayTime(long time) {
-		this.world.setTime(time);
 		this.setTime = time;
+		setParameters(true);
 	}
 
 	public void setTimeFrozen(Boolean frozen) {
 		this.timeFrozen = (frozen != null ? frozen : false);
-		this.setTime = world.getTime();		
+		if (world != null) this.setTime = world.getTime();		
 	}
 	
 	public void setSuppressHealthRegain(Boolean suppressed) {
@@ -233,6 +287,22 @@ public class XcraftGateWorld {
 		} else {
 			return "MIDNIGHT";
 		}
+	}
+	
+	public void setParameters() {
+		setParameters(false);
+	}
+	
+	public void setParameters(Boolean changeTime) {
+		if (world == null) {
+			return;
+		}
+		
+		world.setPVP(allowPvP);
+		world.setSpawnFlags(allowMonsters, allowAnimals);
+		world.setStorm(setWeather.getId() == Weather.STORM.getId());
+		if (changeTime) world.setTime(setTime);
+		setCreatureLimit(creatureLimit);
 	}
 	
 	public void sendInfo(Player player) {

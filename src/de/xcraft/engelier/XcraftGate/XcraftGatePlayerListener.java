@@ -51,7 +51,7 @@ public class XcraftGatePlayerListener extends PlayerListener {
 			}
 		} else if ((gateName = plugin.gateLocations.get(plugin.getLocationString(location))) != null) {
 			if (plugin.permissions == null || plugin.permissions.has(event.getPlayer(), "XcraftGate.use." + gateName)) {
-				plugin.justTeleportedFrom.put(event.getPlayer().getName(), plugin.gates.get(gateName).gateLocation);
+				plugin.justTeleportedFrom.put(event.getPlayer().getName(), plugin.gates.get(gateName).getLocation());
 				plugin.gates.get(gateName).portToTarget(event);
 			} else {
 				event.getPlayer().sendMessage(ChatColor.RED + "You're not allowed to use this gate!");
