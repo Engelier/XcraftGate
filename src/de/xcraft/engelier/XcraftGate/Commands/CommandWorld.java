@@ -144,15 +144,17 @@ public class CommandWorld extends XcraftGateCommandHandler {
 			} else if (!hasWorld(args[1])) {
 				error("Unkown world: " + args[1]);
 			} else {
-				if (plugin.getServer().getWorld(args[1]).getPlayers().size() > 0) {
-					error("Unable to unload world with active players.");
-					args[0] = "listplayers";
-				} else {
-					plugin.worlds.remove(args[1]);
-					reply("World " + args[1] + " removed.");
-					plugin.getServer().unloadWorld(args[1], true);
-					plugin.saveWorlds();
+				if (plugin.worlds.get(args[1]).world != null) {
+					if (plugin.getServer().getWorld(args[1]).getPlayers().size() > 0) {
+						error("Unable to unload world with active players.");
+						return true;
+					} else {
+						plugin.getServer().unloadWorld(args[1], true);
+					}
 				}
+				plugin.worlds.remove(args[1]);
+				reply("World " + args[1] + " removed.");
+				plugin.saveWorlds();
 			}
 		} else if (args[0].equals("warpto")) {
 			if (!isPermitted("world", "warp")) {

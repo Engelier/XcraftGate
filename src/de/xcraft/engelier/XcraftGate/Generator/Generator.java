@@ -8,7 +8,8 @@ import org.bukkit.generator.ChunkGenerator;
 public enum Generator {
 	DEFAULT(0),
 	MOON(1),
-	FLATLANDS(2);
+	FLATLANDS(2),
+	ISLAND(3);
 	
 	private final int id;
 	private static final Map<Integer, Generator> lookup = new HashMap<Integer, Generator>();
@@ -30,6 +31,7 @@ public enum Generator {
 			case 0: return (ChunkGenerator)null;
 			case 1: return new GeneratorMoon();
 			case 2: return new GeneratorFlatlands();
+			case 3: return new GeneratorIsland();
 		}
 		
 		return null;
