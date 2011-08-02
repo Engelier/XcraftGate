@@ -175,7 +175,6 @@ public class XcraftGate extends JavaPlugin {
 		Permission superPerm = getServer().getPluginManager().getPermission("XcraftGate.use.*");
 		if (superPerm != null) {
 			if (superPerm.getChildren().containsKey(gatePerm)) return;
-			log.info(getNameBrackets() + "removing super permission");
 			getServer().getPluginManager().removePermission("xcraftgate.use.*");	
 		}
 
@@ -186,9 +185,7 @@ public class XcraftGate extends JavaPlugin {
 		for (String name : gates.keySet()) {
 			children.put("XcraftGate.use." + name, true);
 		}
-		log.info(getNameBrackets() + "creating super permission");		
 		superPerm = new Permission("XcraftGate.use.*", descr, PermissionDefault.TRUE, children);
-		log.info(getNameBrackets() + "adding super permission");		
 		getServer().getPluginManager().addPermission(superPerm);
 	}
 
