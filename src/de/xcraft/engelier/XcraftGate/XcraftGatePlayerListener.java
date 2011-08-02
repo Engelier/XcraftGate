@@ -20,6 +20,8 @@ public class XcraftGatePlayerListener extends PlayerListener {
 
 		location = event.getTo();
 		
+		if (plugin.worlds.get(location.getWorld().getName()) == null) return;
+		
 		int border = plugin.worlds.get(location.getWorld().getName()).border;
 		if (border > 0) {
 			double x = location.getX();
@@ -50,7 +52,7 @@ public class XcraftGatePlayerListener extends PlayerListener {
 				plugin.justTeleportedFrom.remove(event.getPlayer().getName());
 			}
 		} else if ((gateName = plugin.gateLocations.get(plugin.getLocationString(location))) != null) {
-			if (plugin.permissions == null || plugin.permissions.has(event.getPlayer(), "XcraftGate.use." + gateName)) {
+			if (plugin.permissions == null ? event.getPlayer().hasPermission("XcraftGate.use." + gateName) : plugin.permissions.has(event.getPlayer(), "XcraftGate.use." + gateName)) {
 				plugin.justTeleportedFrom.put(event.getPlayer().getName(), plugin.gates.get(gateName).getLocation());
 				plugin.gates.get(gateName).portToTarget(event);
 			} else {

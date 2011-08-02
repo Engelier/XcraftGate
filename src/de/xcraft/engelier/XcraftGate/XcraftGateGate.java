@@ -3,6 +3,8 @@ package de.xcraft.engelier.XcraftGate;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 
 public class XcraftGateGate {
 	private static XcraftGate plugin;
@@ -20,6 +22,11 @@ public class XcraftGateGate {
 	public XcraftGateGate(XcraftGate instance, String name) {
 		plugin = instance;
 		gateName = name;
+		if (plugin.getServer().getPluginManager().getPermission("XcraftGate.use." + name) == null) {
+			Permission gatePerm = new Permission("XcraftGate.use." + name, PermissionDefault.TRUE);
+			plugin.getServer().getPluginManager().addPermission(gatePerm);
+			plugin.resetSuperPermission(name);
+		}
 	}
 	
 	public void setLocation(Location loc) {

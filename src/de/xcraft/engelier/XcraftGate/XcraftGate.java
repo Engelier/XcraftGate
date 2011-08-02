@@ -17,6 +17,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -129,6 +131,10 @@ public class XcraftGate extends JavaPlugin {
 		loadWorlds();
 		loadGates();
 
+		for(World thisWorld : getServer().getWorlds()) {
+			checkWorld(thisWorld);
+		}
+		
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), 1200, 1200);
@@ -161,6 +167,29 @@ public class XcraftGate extends JavaPlugin {
 		} else {
 			return player.isOp();
 		}
+	}
+	
+	public void resetSuperPermission(String gatePerm) {
+		gatePerm = "XcraftGate.use." + gatePerm;
+		
+		Permission superPerm = getServer().getPluginManager().getPermission("XcraftGate.use.*");
+		if (superPerm != null) {
+			if (superPerm.getChildren().containsKey(gatePerm)) return;
+			log.info(getNameBrackets() + "removing super permission");
+			getServer().getPluginManager().removePermission("xcraftgate.use.*");	
+		}
+
+		String descr = "Permission to use all gates";
+		
+		Map<String, Boolean> children = new HashMap<String, Boolean>();
+		
+		for (String name : gates.keySet()) {
+			children.put("XcraftGate.use." + name, true);
+		}
+		log.info(getNameBrackets() + "creating super permission");		
+		superPerm = new Permission("XcraftGate.use.*", descr, PermissionDefault.TRUE, children);
+		log.info(getNameBrackets() + "adding super permission");		
+		getServer().getPluginManager().addPermission(superPerm);
 	}
 
 	public String getLocationString(Location location) {
@@ -212,6 +241,30 @@ public class XcraftGate extends JavaPlugin {
 
 	public String getNameBrackets() {
 		return "[" + this.getDescription().getFullName() + "] ";
+	}
+	
+	public void checkWorld(World world) {
+		if (worlds.get(world.getName()) != null) {
+			log.info(getNameBrackets() + "World '" + world.getName() + "' loaded. Applying config.");
+			worlds.get(world.getName()).world = world;
+			worlds.get(world.getName()).setParameters();
+		} else {
+			log.info(getNameBrackets() + "World '" + world.getName() + "' detected. Adding to config.");
+			XcraftGateWorld newWorld = new XcraftGateWorld(this, world.getName(), world.getEnvironment());
+			worlds.put(world.getName(), newWorld);
+			saveWorlds();
+		}
+
+		int gateCounter = 0;
+		
+		for (XcraftGateGate thisGate : gates.values()) {
+			if (thisGate.getWorldName().equalsIgnoreCase(world.getName())) {
+				gateLocations.put(getLocationString(thisGate.getLocation()), thisGate.gateName);
+				gateCounter++;
+			}
+		}
+		
+		log.info(getNameBrackets() + "loaded " + gateCounter + " gates for world '" + world.getName() + "'");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -285,7 +338,7 @@ public class XcraftGate extends JavaPlugin {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
+		}		
 	}
 
 	public void saveWorlds() {

@@ -41,7 +41,11 @@ public abstract class XcraftGateCommandHandler implements CommandExecutor {
 				return plugin.permissions.has(player, "XcraftGate." + command);
 			}
 		} else {
-			return player.isOp();
+			if (subcommand != null) {
+				return player.hasPermission("XcraftGate." + command + "." + subcommand);
+			} else {
+				return player.hasPermission("XcraftGate." + command);
+			}
 		}
 	}
 }

@@ -34,6 +34,8 @@ public class GeneratorIsland extends GeneratorHelper {
         if (variantX == null) variantX = random.nextInt(VARIANT) - VARIANT;
         if (variantZ == null) variantZ = random.nextInt(VARIANT) - VARIANT;
         
+        int worldHeight = world.getMaxHeight();
+        int halfHeight = (int)(worldHeight / 2);
         int distance = 0;
         int height = 0;
         int realX = 0;
@@ -46,12 +48,12 @@ public class GeneratorIsland extends GeneratorHelper {
     			realX = (chunkX * 16) + x + variantX;
     			realZ = (chunkY * 16) + z + variantZ;
     			distance = (int)Math.floor(Math.sqrt(Math.pow(realX, 2) + Math.pow(realZ, 2)));
-				height = getHeight(world, chunkX + x * 0.0625, chunkY + z * 0.0625, 1) + (int)Math.floor((SIZE - distance) / MAX_HEIGHT) + 63;
+				height = getHeight(world, chunkX + x * 0.0625, chunkY + z * 0.0625, 1) + (int)Math.floor((SIZE - distance) / MAX_HEIGHT) + (halfHeight - 1);
 				
-				if (height < 64) height = 64;
+				if (height < halfHeight) height = halfHeight;
     			
                	for (int y = 0; y <= height; y++) {
-        			pos = (x * 16 + z) * 128 + y;
+        			pos = (x * 16 + z) * worldHeight + y;
 
         			if (y == 0) {
         				result[pos] = matBedrock;
@@ -61,7 +63,7 @@ public class GeneratorIsland extends GeneratorHelper {
         			if (distance > SIZE) {
         				result[pos] = matWater;
         			} else {
-    					if (height == 64) {
+    					if (height == halfHeight) {
     						result[pos] = matSand;
     					} else {
     						if (y == height) {

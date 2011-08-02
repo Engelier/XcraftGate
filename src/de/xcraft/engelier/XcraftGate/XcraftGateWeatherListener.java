@@ -11,6 +11,8 @@ public class XcraftGateWeatherListener extends WeatherListener {
 	}
 	
 	public void onWeatherChange(WeatherChangeEvent event) {
+		if (plugin.worlds.get(event.getWorld().getName()) == null) return;
+		
 		if (!plugin.worlds.get(event.getWorld().getName()).allowWeatherChange)
 			event.setCancelled(true);
 	}

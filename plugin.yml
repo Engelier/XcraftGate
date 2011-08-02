@@ -1,6 +1,6 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.9d2
+version: 0.9d3
 author: Engelier
 load: startup
 commands:
@@ -12,3 +12,70 @@ commands:
     description: Manage Worlds
     usage: /<command> help
     permission: XcraftGate.world
+permissions:
+  XcraftGate.*:
+    description: Access to all commands/gates this plugin provides
+    children:
+      XcraftGate.use.*: true
+      XcraftGate.gate.*: true
+      XcraftGate.world.*: true
+    default: false    
+  XcraftGate.gate.*:
+    description: Access to all /gate commands
+    default: op
+    children:
+      XcraftGate.gate: true
+      XcraftGate.gate.create: true
+      XcraftGate.gate.link: true
+      XcraftGate.gate.unlink: true
+      XcraftGate.gate.info: true
+      XcraftGate.gate.warp: true
+      XcraftGate.gate.reload: true
+  XcraftGate.gate:
+    description: Basic access to /gate
+  XcraftGate.gate.create:
+    description: Access to /gate create, /gate move
+  XcraftGate.gate.link:
+    description: Access to /gate link, /gate loop
+  XcraftGate.gate.unlink:
+    description: Access to /gate unlink, /gate unloop
+  XcraftGate.gate.info:
+    description: Access to /gate list, /gate listsolo, /gate listnear, /gate info
+  XcraftGate.gate.warp:
+    description: Access to /gate warp
+  XcraftGate.gate.reload:
+    description: Access to /gate reload
+  XcraftGate.world.*:
+    description: Access to all /gworld commands
+    default: op
+    children:
+      XcraftGate.world: true
+      XcraftGate.world.create: true
+      XcraftGate.world.delete: true
+      XcraftGate.world.warp: true
+      XcraftGate.world.setborder: true
+      XcraftGate.world.setcreaturelimit: true
+      XcraftGate.world.pvp: true
+      XcraftGate.world.weather: true
+      XcraftGate.world.time: true
+      XcraftGate.world.info: true
+  XcraftGate.world:
+    description: Basic access to /gworld
+  XcraftGate.world.create:
+    description: Access to /gworld create
+  XcraftGate.world.delete:
+    description: Access to /gworld delete
+  XcraftGate.world.warp:
+    description: Access to /gworld warp
+  XcraftGate.world.setborder:
+    description: Access to /gworld setborder
+  XcraftGate.world.setcreaturelimit:
+    description: Access to /gworld setcreaturelimit, /gworld allowanimals, /gworld allowmonsters, /gworld suppresshealthregain
+  XcraftGate.world.pvp:
+    description: Access to /gworld allowpvp
+  XcraftGate.world.weather:
+    description: Access to /gworld allowweatherchange, /gworld setweather
+  XcraftGate.world.time:
+    description: Access to /gworld settime, /gworld timefrozen
+  XcraftGate.world.info:
+    description: Access to /gworld info, /gworld list
