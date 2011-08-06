@@ -22,6 +22,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.config.Configuration;
 import org.yaml.snakeyaml.Yaml;
 
 import com.nijiko.permissions.PermissionHandler;
@@ -38,8 +39,9 @@ public class XcraftGate extends JavaPlugin {
 	private final XcraftGateEntityListener entityListener = new XcraftGateEntityListener(this);
 	private final XcraftGateWeatherListener weatherListener = new XcraftGateWeatherListener(this);
 	private final XcraftGateWorldListener worldListener = new XcraftGateWorldListener(this);
-
+	
 	public PermissionHandler permissions = null;
+	public Configuration config = null;
 
 	public Map<String, XcraftGateWorld> worlds = new HashMap<String, XcraftGateWorld>();
 	public Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
@@ -128,6 +130,8 @@ public class XcraftGate extends JavaPlugin {
 
 		log.info(getNameBrackets() + "by Engelier loaded.");
 
+		config = getConfiguration();
+		setConfigDefaults();
 		loadWorlds();
 		loadGates();
 
@@ -137,7 +141,10 @@ public class XcraftGate extends JavaPlugin {
 		
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
-		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), 1200, 1200);
+		
+		if (config.getBoolean("dynworld.enabled", true)) {
+			getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), 1200, 1200);
+		}
 		
 		try {
 			getCommand("gate").setExecutor(new CommandGate(this));
@@ -145,6 +152,58 @@ public class XcraftGate extends JavaPlugin {
 		} catch (Exception ex) {
 			log.warning(getNameBrackets() + "getCommand().setExecutor() failed! Seems I got enabled by another plugin. Nag the bukkit team about this!");
 		}
+	}
+	
+	private void setConfigDefaults() {
+		config.getBoolean("dynworld.enabled", true);
+		config.getInt("dynworld.checkInterval", 60);
+		config.getInt("dynworld.maxInactiveTime", 300);
+		
+		config.getInt("biomes.desert.chanceCactus", 1);
+		config.getInt("biomes.desert.chanceDeadShrub", 2);
+		config.getInt("biomes.forest.chanceLakeWater", 1);
+		config.getInt("biomes.forest.chanceTreeNormal", 32);
+		config.getInt("biomes.forest.chanceTreeBig", 2);
+		config.getInt("biomes.forest.chanceTreeBirch", 32);
+		config.getInt("biomes.forest.chanceTreeRedwood", 16);
+		config.getInt("biomes.forest.chanceTreeTallRedwood", 2);
+		config.getInt("biomes.forest.chanceFlowerYellow", 4);
+		config.getInt("biomes.forest.chanceFlowerRedRose", 4);
+		config.getInt("biomes.forest.chanceGrassTall", 50);
+		config.getInt("biomes.plains.chanceTreeNormal", 1);
+		config.getInt("biomes.plains.chanceFlowerYellow", 10);
+		config.getInt("biomes.plains.chanceFlowerRedRose", 10);
+		config.getInt("biomes.plains.chanceGrassTall", 150);
+		config.getInt("biomes.rainforest.chanceLakeWater", 3);
+		config.getInt("biomes.rainforest.chanceTreeNormal", 28);
+		config.getInt("biomes.rainforest.chanceTreeBig", 2);
+		config.getInt("biomes.rainforest.chanceTreeBirch", 28);
+		config.getInt("biomes.rainforest.chanceTreeRedwood", 32);
+		config.getInt("biomes.rainforest.chanceTreeTallRedwood", 2);
+		config.getInt("biomes.rainforest.chanceFlowerYellow", 5);
+		config.getInt("biomes.rainforest.chanceFlowerRedRose", 5);
+		config.getInt("biomes.rainforest.chanceGrassFern", 30);
+		config.getInt("biomes.rainforest.chanceGrassTall", 70);
+		config.getInt("biomes.savanna.chanceTreeNormal", 1);
+		config.getInt("biomes.seasonalforest.chanceLakeWater", 2);
+		config.getInt("biomes.seasonalforest.chanceTreeNormal", 32);
+		config.getInt("biomes.seasonalforest.chanceTreeBig", 2);
+		config.getInt("biomes.seasonalforest.chanceTreeBirch", 32);
+		config.getInt("biomes.seasonalforest.chanceTreeRedwood", 28);
+		config.getInt("biomes.seasonalforest.chanceTreeTallRedwood", 2);
+		config.getInt("biomes.seasonalforest.chanceFlowerYellow", 4);
+		config.getInt("biomes.seasonalforest.chanceFlowerRedRose", 4);
+		config.getInt("biomes.seasonalforest.chanceGrassTall", 70);
+		config.getInt("biomes.shrubland.chanceLakeLava", 1);
+		config.getInt("biomes.shrubland.chanceTreeNormal", 3);
+		config.getInt("biomes.shrubland.chanceGrassShrub", 5);
+		config.getInt("biomes.swampland.chanceSugarCane", 75);
+		config.getInt("biomes.swampland.chanceLakeWater", 10);
+		config.getInt("biomes.taiga.chanceTreeRedwood", 4);
+		config.getInt("biomes.taiga.chanceGrassTall", 2);
+		config.getInt("biomes.tundra.chanceLakeWater", 1);
+		
+		config.save();
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd,	String commandLabel, String[] args) {
@@ -495,7 +554,7 @@ public class XcraftGate extends JavaPlugin {
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
 		for (Generator thisGen : Generator.values()) {
 			if (thisGen.toString().equalsIgnoreCase(id)) {
-				return thisGen.getChunkGenerator();
+				return thisGen.getChunkGenerator(this);
 			}
 		}
 

@@ -1,6 +1,5 @@
 package de.xcraft.engelier.XcraftGate.Generator;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -11,21 +10,8 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.noise.NoiseGenerator;
 import org.bukkit.util.noise.SimplexNoiseGenerator;
 
-public class GeneratorHelper extends ChunkGenerator {
+public abstract class GeneratorHelper extends ChunkGenerator {
     private NoiseGenerator generator;
-
-    protected List<BlockPopulator> popList = (List<BlockPopulator>) Arrays.asList(
-    		new PopulatorDesert(),
-    		new PopulatorForest(),
-    		new PopulatorPlains(),
-    		new PopulatorRainforest(),
-    		new PopulatorSavanna(),
-    		new PopulatorSeasonalForest(),
-    		new PopulatorShrubland(),
-    		new PopulatorSwamp(),
-    		new PopulatorTaiga(),
-    		new PopulatorTundra()
-    		); 
     
     private NoiseGenerator getGenerator(World world) {
         if (generator == null) {
@@ -44,15 +30,10 @@ public class GeneratorHelper extends ChunkGenerator {
     }
     
     @Override
-    public List<BlockPopulator> getDefaultPopulators(World world) {
-        return popList;
-    }
+    public abstract List<BlockPopulator> getDefaultPopulators(World world);
     
 	@Override
-	public byte[] generate(World arg0, Random arg1, int arg2, int arg3) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract byte[] generate(World arg0, Random arg1, int arg2, int arg3);
 	
 	@Override
 	public boolean canSpawn(World world, int x, int z) {

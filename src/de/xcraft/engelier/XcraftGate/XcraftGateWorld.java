@@ -119,7 +119,7 @@ public class XcraftGateWorld {
 			return;
 		}
 		
-		ChunkGenerator thisGen = (generator != Generator.DEFAULT) ? generator.getChunkGenerator() : null;
+		ChunkGenerator thisGen = (generator != Generator.DEFAULT) ? generator.getChunkGenerator(plugin) : null;
 		
 		if (seed == null && thisGen == null) {
 			this.world = server.createWorld(name, environment);

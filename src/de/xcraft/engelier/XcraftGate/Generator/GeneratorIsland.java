@@ -1,9 +1,14 @@
 package de.xcraft.engelier.XcraftGate.Generator;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.generator.BlockPopulator;
+
+import de.xcraft.engelier.XcraftGate.XcraftGate;
 
 public class GeneratorIsland extends GeneratorHelper {
 	private final static int SIZE = 128;
@@ -21,11 +26,15 @@ public class GeneratorIsland extends GeneratorHelper {
 	private final byte matSand = (byte)Material.SAND.getId();
 	private final byte matStone = (byte)Material.STONE.getId();
 	private final byte matWater = (byte)Material.WATER.getId();
+	
+	private XcraftGate plugin = null;
 
     private Integer variantX = null;
     private Integer variantZ = null;
     
-    public GeneratorIsland() {}
+    public GeneratorIsland(XcraftGate plugin) {
+    	this.plugin = plugin;
+    }
      
 	@Override
 	public byte[] generate(World world, Random random, int chunkX, int chunkY) {
@@ -95,6 +104,11 @@ public class GeneratorIsland extends GeneratorHelper {
         }
         
 		return result;
+	}
+
+	@Override
+	public List<BlockPopulator> getDefaultPopulators(World world) {
+		return (List<BlockPopulator>) Arrays.asList((BlockPopulator) new PopulatorNormal(plugin));
 	}
 
 
