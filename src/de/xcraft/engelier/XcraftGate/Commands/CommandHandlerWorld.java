@@ -38,6 +38,9 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		permNodes.put("list", "info");
 		permNodes.put("listenv", "info");
 		permNodes.put("listplayers", "info");
+		permNodes.put("load", "load");
+		permNodes.put("unload", "load");
+		permNodes.put("setsticky", "load");
 
 		subcommands.put("create", new CommandWorldCreate(plugin));
 		subcommands.put("info", new CommandWorldInfo(plugin));
@@ -56,6 +59,9 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		subcommands.put("settime", new CommandWorldSetTime(plugin));
 		subcommands.put("suppresshealthregain", new CommandWorldSuppressHealthregain(plugin));
 		subcommands.put("listplayers", new CommandWorldListPlayers(plugin));
+		subcommands.put("load", new CommandWorldLoad(plugin));
+		subcommands.put("unload", new CommandWorldUnload(plugin));
+		subcommands.put("setsticky", new CommandWorldSetSticky(plugin));
 	}
 
 	public void printUsage() {
@@ -86,6 +92,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		
 		if (!isPermitted("world", (args.length > 0 ? permNodes.get(args[0]) : null))) {
 			error("You don't have permission to use this command");
+			return true;
 		}
 		
 		if (args.length == 0) {

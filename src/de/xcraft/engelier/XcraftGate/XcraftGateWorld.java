@@ -27,6 +27,7 @@ public class XcraftGateWorld {
 	public Boolean timeFrozen = false;
 	public Boolean suppressHealthRegain = true;
 	public Generator generator;
+	public Boolean sticky = false;
 		
 	private XcraftGate plugin;
 	private Server server;
@@ -135,6 +136,12 @@ public class XcraftGateWorld {
 		this.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
 	}
 	
+	public void unload() {
+		this.plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
+		plugin.getServer().unloadWorld(world, true);
+		this.world = null;
+	}
+	
 	public Map<String, Object> toMap() {
 		Map<String, Object> values = new HashMap<String, Object>();
 		values.put("name", name);
@@ -150,6 +157,7 @@ public class XcraftGateWorld {
 		values.put("setTime", setTime);
 		values.put("timeFrozen", timeFrozen);
 		values.put("suppressHealthRegain", suppressHealthRegain);
+		values.put("sticky", sticky);
 		return values;
 	}
 	
@@ -173,7 +181,7 @@ public class XcraftGateWorld {
 	}	
 
 	public Boolean checkInactive() {
-		if (world == null) return false;
+		if (world == null || sticky) return false;
 		
 		if (world.getPlayers().size() > 0) {
 			lastAction = System.currentTimeMillis();
@@ -222,6 +230,10 @@ public class XcraftGateWorld {
 		}
 	}
 	
+	public void setSticky(Boolean sticky) {
+		this.sticky = (sticky != null ? sticky : false);
+	}
+
 	public void setAllowAnimals(Boolean allow) {
 		this.allowAnimals = (allow != null ? allow : true);
 		setParameters();
@@ -307,20 +319,20 @@ public class XcraftGateWorld {
 	}
 	
 	public void sendInfo(CommandSender sender) {
-		sender.sendMessage("World: " + name + " (" + environment.toString() + ")");
-		sender.sendMessage("Player count: "	+ world.getPlayers().size());
+		sender.sendMessage("World: " + name + " (" + (generator == Generator.DEFAULT ? environment.toString() : generator.toString()) + ")" + (sticky ? " Sticky!" : ""));
+		sender.sendMessage("Seed: " + (world != null ? world.getSeed() : "world not loaded!"));
+		sender.sendMessage("Player count: "	+ (world != null ? world.getPlayers().size() : "world not loaded!"));
 		sender.sendMessage("Border: " + (border > 0 ? border : "none"));
 		sender.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));
 		sender.sendMessage("Animals allowed: " + (allowAnimals ? "yes" : "no"));
 		sender.sendMessage("Monsters allowed: " + (allowMonsters ? "yes" : "no"));
-		sender.sendMessage("Creature count/limit: "
-				+ (world.getLivingEntities().size() - world.getPlayers().size()) + "/"
-				+ (creatureLimit > 0 ? creatureLimit : "unlimited"));
+		sender.sendMessage("Creature count/limit: " + (world != null ? 
+				(world.getLivingEntities().size() - world.getPlayers().size()) + "/"
+				+ (creatureLimit > 0 ? creatureLimit : "unlimited") : "world not loaded!"));
 		sender.sendMessage("Health regaining suppressed: " + (suppressHealthRegain ? "yes" : "no"));
 		sender.sendMessage("Weather changes allowed: " + (allowWeatherChange ? "yes" : "no"));
 		sender.sendMessage("Current Weather: " + setWeather.toString());
 		sender.sendMessage("Time frozen: " + (timeFrozen ? "yes" : "no"));
-		sender.sendMessage("Current Time: " + timeToString(world.getTime()));
-		sender.sendMessage("Seed: " + world.getSeed());
+		sender.sendMessage("Current Time: " + (world != null ? timeToString(world.getTime()) : "world not loaded!"));
 	}
 }

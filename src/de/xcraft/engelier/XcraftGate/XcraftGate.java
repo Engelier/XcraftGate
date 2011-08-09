@@ -77,7 +77,6 @@ public class XcraftGate extends JavaPlugin {
 			for (World thisWorld : getServer().getWorlds()) {
 				if (worlds.get(thisWorld.getName()).checkInactive() && !thisWorld.getName().equalsIgnoreCase(serverconfig.getProperty("level-name"))) {
 					log.info(getNameBrackets() + "World '" + thisWorld.getName() + "' inactive. Unloading.");
-					worlds.get(thisWorld.getName()).world = null;
 					
 					for (XcraftGateGate thisGate : gates.values()) {
 						if (thisGate.getWorldName().equalsIgnoreCase(thisWorld.getName())) {
@@ -85,7 +84,7 @@ public class XcraftGate extends JavaPlugin {
 						}
 					}
 
-					getServer().unloadWorld(thisWorld, true);
+					worlds.get(thisWorld.getName()).unload();
 				}
 			}						
 		}		
@@ -95,7 +94,7 @@ public class XcraftGate extends JavaPlugin {
 		@Override
 		public void run() {
 			for (XcraftGateWorld thisWorld : worlds.values()) {
-				if (thisWorld.world == null) {
+				if (thisWorld.world == null && (config.getBoolean("dynworld.enabled", true) == false || thisWorld.sticky)) {
 					thisWorld.load();
 				}
 			}
@@ -155,9 +154,9 @@ public class XcraftGate extends JavaPlugin {
 		
 		if (config.getBoolean("dynworld.enabled", true)) {
 			getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), config.getInt("dynworld.checkInterval", 60) * 20, config.getInt("dynworld.checkInterval", 60) * 20);
-		} else {
-			getServer().getScheduler().scheduleSyncDelayedTask(this, new RunLoadAllWorlds());
 		}
+		
+		getServer().getScheduler().scheduleSyncDelayedTask(this, new RunLoadAllWorlds());
 		
 		try {
 			getCommand("gate").setExecutor(new CommandHandlerGate(this));
@@ -395,6 +394,7 @@ public class XcraftGate extends JavaPlugin {
 				newWorld.setTimeFrozen((Boolean)worldData.get("timeFrozen"));
 				newWorld.setDayTime(castInt(worldData.get("setTime")));
 				newWorld.setSuppressHealthRegain((Boolean)worldData.get("suppressHealthRegain"));
+				newWorld.setSticky((Boolean)worldData.get("sticky"));
 				
 				worlds.put(worldName, newWorld);
 
