@@ -16,6 +16,7 @@ public class PopulatorNormal extends PopulatorHelper {
 	private Configuration config = null;
 	
 	public PopulatorNormal (XcraftGate plugin) {
+		super(plugin);
 		this.config = plugin.config;
 	}
 	
@@ -32,11 +33,6 @@ public class PopulatorNormal extends PopulatorHelper {
 				config.getInt("biomes." + thisBio + ".chanceFlowerRedRose", 0);
 	}
 
-	private int getLakeChance(String thisBio) {
-		return config.getInt("biomes." + thisBio + ".chanceLakeWater", 0) +
-				config.getInt("biomes." + thisBio + ".chanceLakeLava", 0);
-	}
-	
 	private int getGrassChance(String thisBio) {
 		return config.getInt("biomes." + thisBio + ".chanceGrassShrub", 0) +
 				config.getInt("biomes." + thisBio + ".chanceGrassTall", 0) +
@@ -62,31 +58,15 @@ public class PopulatorNormal extends PopulatorHelper {
 				}
 
 				// make DESERT look like DESERT
-				if (bioHere.equals("desert")) {
+				if (bioHere.equals("desert") && blockBelow.getType() != Material.LEAVES) {
 					for (int y = realY - 5; y < realY; y++) {
 						world.getBlockAt(realX, y, realZ).setType(Material.SAND);
 					}
 				}
-				
+
 				// one roll to change it all ...
 				int rnd = random.nextInt(1000);
-				
-				if (rnd < getLakeChance(bioHere)) {
-					if (rnd <= config.getInt("biomes." + bioHere + ".chanceLakeWater", 0)) {
-						if (bioHere.equals("swampland")) {
-							createLake(random, world, realX, realY, realZ, 1 + random.nextInt(2), Material.WATER);
-						} else {
-							createLake(random, world, realX, realY, realZ, 2 + random.nextInt(3), Material.WATER);							
-						}
-					} else {
-						createLake(random, world, realX, realY, realZ, 2 + random.nextInt(3), Material.LAVA);													
-					}	
-					
-					continue;
-				}
 
-				rnd -= getLakeChance(bioHere);
-				
 				if (rnd < getTreeChance(bioHere) && (blockBelow.getType() == Material.GRASS || blockBelow.getType() == Material.DIRT)) {
 					int tNo = config.getInt("biomes." + bioHere + ".chanceTreeNormal", 0);
 					int tBT = config.getInt("biomes." + bioHere + ".chanceTreeBig", 0);
@@ -185,7 +165,7 @@ public class PopulatorNormal extends PopulatorHelper {
 			}
 		}
 		
-		// cover everything with SNOW in TAIGA and TUNDRA
+		// cover everything with SNOW and make top WATER to ICE in TAIGA and TUNDRA
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int realX = (chunk.getX() * 16) + x;
@@ -196,7 +176,11 @@ public class PopulatorNormal extends PopulatorHelper {
 				
 				if (blockAffected.getBiome() != Biome.TAIGA && blockAffected.getBiome() != Biome.TUNDRA) continue;
 				
-				blockAffected.setType(Material.SNOW);
+				if (world.getBlockAt(realX, realY - 1, realZ).getType() == Material.WATER) {
+					world.getBlockAt(realX, realY - 1, realZ).setType(Material.ICE);
+				} else {
+					blockAffected.setType(Material.SNOW);					
+				}
 			}
 		}
 	}

@@ -108,7 +108,7 @@ public class GeneratorIsland extends GeneratorHelper {
 
 	@Override
 	public List<BlockPopulator> getDefaultPopulators(World world) {
-		return (List<BlockPopulator>) Arrays.asList((BlockPopulator) new PopulatorNormal(plugin));
+		return (List<BlockPopulator>) Arrays.asList((BlockPopulator) new PopulatorNormal(plugin), new PopulatorMiniLakes(plugin));
 	}
 
 

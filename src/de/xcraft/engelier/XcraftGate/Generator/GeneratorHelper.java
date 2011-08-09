@@ -9,6 +9,7 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.util.noise.NoiseGenerator;
 import org.bukkit.util.noise.SimplexNoiseGenerator;
+import org.bukkit.util.noise.SimplexOctaveGenerator;
 
 public abstract class GeneratorHelper extends ChunkGenerator {
     private NoiseGenerator generator;
@@ -27,6 +28,12 @@ public abstract class GeneratorHelper extends ChunkGenerator {
         double result = gen.noise(x, y);
         result *= variance;
         return NoiseGenerator.floor(result);
+    }
+    
+    protected SimplexOctaveGenerator getOctaveGenerator(Random seed, int octaves, int scale) {
+    	SimplexOctaveGenerator gen = new SimplexOctaveGenerator(seed, octaves);
+    	gen.setScale(1 / scale);
+    	return gen;
     }
     
     @Override

@@ -13,12 +13,20 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
-public class PopulatorHelper extends BlockPopulator {
+import de.xcraft.engelier.XcraftGate.XcraftGate;
 
-	@Override
-	public void populate(World arg0, Random arg1, Chunk arg2) {	}
-
-	public int getDistance(int x1, int y1, int z1, int x2, int y2, int z2) {
+public abstract class PopulatorHelper extends BlockPopulator {
+	protected XcraftGate plugin;
+	
+	public PopulatorHelper(XcraftGate plugin) {
+		this.plugin = plugin;
+	}
+	
+	public int getDistance(Location from, Location to) {
+		return getDistance(from.getX(), from.getY(), from.getZ(), to.getY(), to.getY(), to.getZ());
+	}
+	
+	public int getDistance(double x1, double y1, double z1, double x2, double y2, double z2) {
 		Vector start = new BlockVector(x1, y1, z1);
 		return (int)Math.floor(start.distance(new BlockVector(x2, y2, z2)));
 	}
