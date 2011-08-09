@@ -1,38 +1,33 @@
-package de.xcraft.engelier.XcraftGate;
+package de.xcraft.engelier.XcraftGate.Commands;
 
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public abstract class XcraftGateCommandHandler implements CommandExecutor {
+import de.xcraft.engelier.XcraftGate.XcraftGate;
+
+public abstract class CommandHelper {
 	protected XcraftGate plugin = null;
+	protected CommandSender sender = null;
 	protected Player player;
 
-	public XcraftGateCommandHandler(XcraftGate instance) {
+	public CommandHelper(XcraftGate instance) {
 		plugin = instance;
 	}
 
-	public abstract void printUsage();
-
-	public abstract boolean onCommand(CommandSender sender, Command cmd,
-			String commandLabel, String[] args);
-
 	public void reply(String message) {
-		player.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets()
-				+ ChatColor.DARK_AQUA + message);
+		sender.sendMessage(ChatColor.LIGHT_PURPLE + plugin.getNameBrackets() + ChatColor.DARK_AQUA + message);
 	}
 
 	public void error(String message) {
-		player.sendMessage(ChatColor.RED + "Error: " + message);
-	}
-
-	public boolean checkArgs(String[] args, Integer amount) {
-		return args.length == amount;
+		sender.sendMessage(ChatColor.RED + "Error: " + message);
 	}
 
 	public boolean isPermitted(String command, String subcommand) {
+		if (player == null) {
+			return true;
+		}
+		
 		if (plugin.permissions != null) {
 			if (subcommand != null) {
 				return plugin.permissions.has(player, "XcraftGate." + command

@@ -91,6 +91,17 @@ public class XcraftGate extends JavaPlugin {
 		}		
 	}
 	
+	class RunLoadAllWorlds implements Runnable {
+		@Override
+		public void run() {
+			for (XcraftGateWorld thisWorld : worlds.values()) {
+				if (thisWorld.world == null) {
+					thisWorld.load();
+				}
+			}
+		}		
+	}
+	
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
 		saveGates();
@@ -143,12 +154,14 @@ public class XcraftGate extends JavaPlugin {
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
 		
 		if (config.getBoolean("dynworld.enabled", true)) {
-			getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), 1200, 1200);
+			getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), config.getInt("dynworld.checkInterval", 60) * 20, config.getInt("dynworld.checkInterval", 60) * 20);
+		} else {
+			getServer().getScheduler().scheduleSyncDelayedTask(this, new RunLoadAllWorlds());
 		}
 		
 		try {
-			getCommand("gate").setExecutor(new CommandGate(this));
-			getCommand("gworld").setExecutor(new CommandWorld(this));
+			getCommand("gate").setExecutor(new CommandHandlerGate(this));
+			getCommand("gworld").setExecutor(new CommandHandlerWorld(this));
 		} catch (Exception ex) {
 			log.warning(getNameBrackets() + "getCommand().setExecutor() failed! Seems I got enabled by another plugin. Nag the bukkit team about this!");
 		}
@@ -208,11 +221,11 @@ public class XcraftGate extends JavaPlugin {
 
 	public boolean onCommand(CommandSender sender, Command cmd,	String commandLabel, String[] args) {
 		if (cmd.getName().equalsIgnoreCase("gate")) {
-			getCommand("gate").setExecutor(new CommandGate(this));
+			getCommand("gate").setExecutor(new CommandHandlerGate(this));
 			getCommand("gate").execute(sender, commandLabel, args);
 			return true;
 		} else if (cmd.getName().equalsIgnoreCase("gworld")) {
-			getCommand("gworld").setExecutor(new CommandWorld(this));						
+			getCommand("gworld").setExecutor(new CommandHandlerWorld(this));						
 			getCommand("gworld").execute(sender, commandLabel, args);
 			return true;
 		} else {

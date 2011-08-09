@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.generator.ChunkGenerator;
 
@@ -179,7 +180,7 @@ public class XcraftGateWorld {
 			return false;
 		}
 		
-		if (lastAction + 300 < System.currentTimeMillis()) {
+		if (lastAction + plugin.config.getInt("dynworld.maxInactiveTime", 300) * 1000 < System.currentTimeMillis()) {
 			return true;
 		}
 		
@@ -250,8 +251,8 @@ public class XcraftGateWorld {
 		boolean backup = this.allowWeatherChange;
 		this.allowWeatherChange = true;
 		this.setWeather = weather;
-		this.allowWeatherChange = backup;
 		setParameters();
+		this.allowWeatherChange = backup;
 	}
 
 	public void setDayTime(DayTime time) {
@@ -305,21 +306,21 @@ public class XcraftGateWorld {
 		setCreatureLimit(creatureLimit);
 	}
 	
-	public void sendInfo(Player player) {
-		player.sendMessage("World: " + name + " (" + environment.toString() + ")");
-		player.sendMessage("Player count: "	+ world.getPlayers().size());
-		player.sendMessage("Border: " + (border > 0 ? border : "none"));
-		player.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));
-		player.sendMessage("Animals allowed: " + (allowAnimals ? "yes" : "no"));
-		player.sendMessage("Monsters allowed: " + (allowMonsters ? "yes" : "no"));
-		player.sendMessage("Creature count/limit: "
+	public void sendInfo(CommandSender sender) {
+		sender.sendMessage("World: " + name + " (" + environment.toString() + ")");
+		sender.sendMessage("Player count: "	+ world.getPlayers().size());
+		sender.sendMessage("Border: " + (border > 0 ? border : "none"));
+		sender.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));
+		sender.sendMessage("Animals allowed: " + (allowAnimals ? "yes" : "no"));
+		sender.sendMessage("Monsters allowed: " + (allowMonsters ? "yes" : "no"));
+		sender.sendMessage("Creature count/limit: "
 				+ (world.getLivingEntities().size() - world.getPlayers().size()) + "/"
 				+ (creatureLimit > 0 ? creatureLimit : "unlimited"));
-		player.sendMessage("Health regaining suppressed: " + (suppressHealthRegain ? "yes" : "no"));
-		player.sendMessage("Weather changes allowed: " + (allowWeatherChange ? "yes" : "no"));
-		player.sendMessage("Current Weather: " + setWeather.toString());
-		player.sendMessage("Time frozen: " + (timeFrozen ? "yes" : "no"));
-		player.sendMessage("Current Time: " + timeToString(world.getTime()));
-		player.sendMessage("Seed: " + world.getSeed());
+		sender.sendMessage("Health regaining suppressed: " + (suppressHealthRegain ? "yes" : "no"));
+		sender.sendMessage("Weather changes allowed: " + (allowWeatherChange ? "yes" : "no"));
+		sender.sendMessage("Current Weather: " + setWeather.toString());
+		sender.sendMessage("Time frozen: " + (timeFrozen ? "yes" : "no"));
+		sender.sendMessage("Current Time: " + timeToString(world.getTime()));
+		sender.sendMessage("Seed: " + world.getSeed());
 	}
 }
