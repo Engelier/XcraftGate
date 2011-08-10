@@ -23,8 +23,8 @@ public class CommandGateWarp extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			plugin.justTeleportedFrom.put(((Player) sender).getName(), plugin.gates.get(gateName).getLocation());
-			plugin.gates.get(gateName).portHere((Player) sender);
+			plugin.justTeleportedFrom.put(((Player) sender).getName(), getGate(gateName).getLocation());
+			getGate(gateName).portHere((Player) sender);
 		}
 	}
 }

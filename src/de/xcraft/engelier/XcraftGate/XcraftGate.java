@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -14,7 +15,6 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.permissions.Permission;
@@ -39,13 +39,14 @@ public class XcraftGate extends JavaPlugin {
 	private final XcraftGateEntityListener entityListener = new XcraftGateEntityListener(this);
 	private final XcraftGateWeatherListener weatherListener = new XcraftGateWeatherListener(this);
 	private final XcraftGateWorldListener worldListener = new XcraftGateWorldListener(this);
+
+	private Map<String, XcraftGateWorld> worlds = new HashMap<String, XcraftGateWorld>();
+	private Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
+	private Map<String, String> gateLocations = new HashMap<String, String>();
 	
 	public PermissionHandler permissions = null;
 	public Configuration config = null;
 
-	public Map<String, XcraftGateWorld> worlds = new HashMap<String, XcraftGateWorld>();
-	public Map<String, XcraftGateGate> gates = new HashMap<String, XcraftGateGate>();
-	public Map<String, String> gateLocations = new HashMap<String, String>();
 	public Map<String, Location> justTeleported = new HashMap<String, Location>();
 	public Map<String, Location> justTeleportedFrom = new HashMap<String, Location>();
 	public Map<String, Integer> creatureCounter = new HashMap<String, Integer>();
@@ -55,17 +56,17 @@ public class XcraftGate extends JavaPlugin {
 
 	class RunCreatureLimit implements Runnable {
 		public void run() {
-			for(Map.Entry<String, XcraftGateWorld> thisWorld: worlds.entrySet()) {
-				thisWorld.getValue().checkCreatureLimit();
+			for (XcraftGateWorld thisWorld: worlds.values()) {
+				thisWorld.checkCreatureLimit();
 			}
 		}
 	}
 	
 	class RunTimeFrozen implements Runnable {
 		public void run() {
-			for (Map.Entry<String, XcraftGateWorld> thisWorld: worlds.entrySet()) {
-				if (thisWorld.getValue().timeFrozen) {
-					thisWorld.getValue().resetFrozenTime();
+			for (XcraftGateWorld thisWorld: worlds.values()) {
+				if (thisWorld.getTimeFrozen()) {
+					thisWorld.resetFrozenTime();
 				}
 			}
 		}
@@ -94,7 +95,7 @@ public class XcraftGate extends JavaPlugin {
 		@Override
 		public void run() {
 			for (XcraftGateWorld thisWorld : worlds.values()) {
-				if (thisWorld.world == null && (config.getBoolean("dynworld.enabled", true) == false || thisWorld.sticky)) {
+				if (!thisWorld.isLoaded() && (config.getBoolean("dynworld.enabled", true) == false || thisWorld.isSticky())) {
 					thisWorld.load();
 				}
 			}
@@ -232,14 +233,6 @@ public class XcraftGate extends JavaPlugin {
 		}
 	}
 	
-	public Boolean hasOpPermission(Player player, String permission) {
-		if (permissions != null) {
-			return permissions.has(player, permission);
-		} else {
-			return player.isOp();
-		}
-	}
-	
 	public void resetSuperPermission(String gatePerm) {
 		gatePerm = "XcraftGate.use." + gatePerm;
 		
@@ -256,7 +249,8 @@ public class XcraftGate extends JavaPlugin {
 		for (String name : gates.keySet()) {
 			children.put("XcraftGate.use." + name, true);
 		}
-		superPerm = new Permission("XcraftGate.use.*", descr, PermissionDefault.TRUE, children);
+		
+		superPerm = new Permission("XcraftGate.use.*", descr, (superPerm != null ? superPerm.getDefault() : PermissionDefault.TRUE), children);
 		getServer().getPluginManager().addPermission(superPerm);
 	}
 
@@ -271,34 +265,6 @@ public class XcraftGate extends JavaPlugin {
 		}
 	}
 
-	public void createGate(Location location, String name) {
-		XcraftGateGate newGate = new XcraftGateGate(this, name);
-		newGate.setLocation(getSaneLocation(location));
-		gates.put(name, newGate);
-		gateLocations.put(getLocationString(location), name);
-		saveGates();
-	}
-
-	public void createGateLink(String source, String destination) {
-		gates.get(source).gateTarget = destination;
-		saveGates();
-	}
-
-	public void createGateLoop(String gate1, String gate2) {
-		createGateLink(gate1, gate2);
-		createGateLink(gate2, gate1);
-	}
-
-	public void removeGateLink(String gate) {
-		gates.get(gate).gateTarget = null;
-		saveGates();
-	}
-
-	public void removeGateLoop(String gate1, String gate2) {
-		removeGateLink(gate1);
-		removeGateLink(gate2);
-	}
-	
 	public Location getSaneLocation(Location loc) {
 		double x = Math.floor(loc.getX()) + 0.5;
 		double y = loc.getY();
@@ -314,7 +280,7 @@ public class XcraftGate extends JavaPlugin {
 	public void checkWorld(World world) {
 		if (worlds.get(world.getName()) != null) {
 			log.info(getNameBrackets() + "World '" + world.getName() + "' loaded. Applying config.");
-			worlds.get(world.getName()).world = world;
+			worlds.get(world.getName()).setWorld(world);
 			worlds.get(world.getName()).setParameters();
 		} else {
 			log.info(getNameBrackets() + "World '" + world.getName() + "' detected. Adding to config.");
@@ -327,7 +293,7 @@ public class XcraftGate extends JavaPlugin {
 		
 		for (XcraftGateGate thisGate : gates.values()) {
 			if (thisGate.getWorldName().equalsIgnoreCase(world.getName())) {
-				gateLocations.put(getLocationString(thisGate.getLocation()), thisGate.gateName);
+				gateLocations.put(getLocationString(thisGate.getLocation()), thisGate.getName());
 				gateCounter++;
 			}
 		}
@@ -431,6 +397,26 @@ public class XcraftGate extends JavaPlugin {
 			ex.printStackTrace();
 		}
 	}
+
+	public Collection<XcraftGateWorld> getWorldCollection() {
+		return worlds.values();
+	}
+	
+	public void addWorld(String worldName, XcraftGateWorld world) {
+		worlds.put(worldName, world);
+	}
+	
+	public void delWorld(String worldName) {
+		worlds.remove(worldName);
+	}
+	
+	public XcraftGateWorld getWorld(World world) {
+		return getWorld(world.getName());
+	}
+	 
+	public XcraftGateWorld getWorld(String name) {
+		return worlds.get(name);
+	}
 	
 	@SuppressWarnings("unchecked")
 	public void loadGates() {
@@ -449,8 +435,7 @@ public class XcraftGate extends JavaPlugin {
 					.load(new FileInputStream(configFile));
 			for (Map.Entry<String, Object> thisGate : gatesYaml.entrySet()) {
 				String gateName = thisGate.getKey();
-				Map<String, Object> gateData = (Map<String, Object>) thisGate
-						.getValue();
+				Map<String, Object> gateData = (Map<String, Object>) thisGate.getValue();
 
 				if (worlds.get((String) gateData.get("world")) == null) {
 					log.severe(getNameBrackets() + "gate " + gateName
@@ -469,22 +454,28 @@ public class XcraftGate extends JavaPlugin {
 						((Double) gateData.get("locYaw")).floatValue(),
 						((Double) gateData.get("locP")).floatValue());
 
-				if (gateData.get("target") != null)
-					newGate.gateTarget = (String) gateData.get("target");
 
 				gates.put(gateName, newGate);
 				counter++;
 			}
+
+			for (Map.Entry<String, Object> thisGate : gatesYaml.entrySet()) {
+				String gateName = thisGate.getKey();
+				Map<String, Object> gateData = (Map<String, Object>) thisGate.getValue();
+
+				if (gateData.get("target") != null) {
+					XcraftGateGate thisTarget = getGate((String) gateData.get("target"));
+					
+					if (thisTarget == null) {
+						log.warning(getNameBrackets() + "removed invalid destination for gate " + gateName);
+					} else {
+						getGate(gateName).linkTo(thisTarget);
+					}
+				}
+			}
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
-
-		for (Map.Entry<String, XcraftGateGate> thisGate : gates.entrySet()) {
-			if (thisGate.getValue().gateTarget != null && gates.get(thisGate.getValue().gateTarget) == null) {
-				log.severe(getNameBrackets() + "gate " + thisGate.getKey()
-						+ " has an invalid destination. Destination removed.");
-				thisGate.getValue().gateTarget = null;
-			}
 		}
 
 		log.info(getNameBrackets() + "loaded " + counter + " gates");
@@ -504,21 +495,8 @@ public class XcraftGate extends JavaPlugin {
 
 		Map<String, Object> toDump = new HashMap<String, Object>();
 
-		for (Map.Entry<String, XcraftGateGate> thisGate : gates.entrySet()) {
-			String gateName = thisGate.getKey();
-			XcraftGateGate gate = thisGate.getValue();
-
-			Map<String, Object> values = new HashMap<String, Object>();
-
-			values.put("world", gate.getWorldName());
-			values.put("locX", gate.getX());
-			values.put("locY", gate.getY());
-			values.put("locZ", gate.getZ());
-			values.put("locP", gate.getPitch());
-			values.put("locYaw", gate.getYaw());
-			values.put("target", gate.gateTarget);
-
-			toDump.put(gateName, values);
+		for (XcraftGateGate thisGate : gates.values()) {
+			toDump.put(thisGate.getName(), thisGate.toMap());
 		}
 
 		Yaml yaml = new Yaml();
@@ -532,6 +510,55 @@ public class XcraftGate extends JavaPlugin {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	public void reloadGates() {
+		gates.clear();
+		gateLocations.clear();
+		loadGates();
+		
+		for (XcraftGateGate thisGate : gates.values()) {
+			if (getServer().getWorld(thisGate.getWorldName()) != null) {
+				gateLocations.put(getLocationString(thisGate.getLocation()), thisGate.getName());
+			}
+		}
+	}
+	
+	public void addGate(XcraftGateGate gate) {
+		gates.put(gate.getName(), gate);
+		gateLocations.put(getLocationString(gate.getLocation()), gate.getName());
+		saveGates();
+	}
+
+	public void delGate(String gateName) {
+		delGate(getGate(gateName));
+	}
+	
+	public void delGate(XcraftGateGate gate) {
+		gates.remove(gate);
+		
+		if (getWorld(gate.getWorldName()).isLoaded()) {
+			gateLocations.remove(getLocationString(gate.getLocation()));
+		}
+		
+		saveGates();
+	}
+	
+	public boolean hasGate(String name) {
+		return gates.containsKey(name);
+	}
+	
+	public XcraftGateGate getGate(String gateName) {
+		return gates.get(gateName);
+	}
+	
+	public XcraftGateGate getGateByLocation(Location loc) {
+		String gateName = gateLocations.get(getLocationString(loc));
+		return getGate(gateName);
+	}
+	
+	public Collection<XcraftGateGate> getGateCollection() {
+		return gates.values();
 	}
 	
 	private static Integer castInt(Object o) {

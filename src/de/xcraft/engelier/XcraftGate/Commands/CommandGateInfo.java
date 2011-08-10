@@ -22,13 +22,19 @@ public class CommandGateInfo extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
+			XcraftGateGate thisGate = getGate(gateName);
+
 			reply("Info for gate " + gateName);
-			XcraftGateGate thisGate = plugin.gates.get(gateName);
-			sender.sendMessage("Name: " + thisGate.gateName);
-			// TODO: what to do if the corresponding world isn't loaded?
-			sender.sendMessage("Position: " + plugin.getLocationString(thisGate.getLocation()));
-			sender.sendMessage("Destination: " + thisGate.gateTarget);
-			sender.sendMessage("Permission-Node: XcraftGate.use." + thisGate.gateName);
+			sender.sendMessage("Name: " + thisGate.getName());
+
+			if (plugin.getWorld(thisGate.getWorldName()).isLoaded()) {
+				sender.sendMessage("Position: " + plugin.getLocationString(thisGate.getLocation()));
+			} else {
+				sender.sendMessage("Position: World " + thisGate.getWorldName() + " is not loaded!");				
+			}
+
+			sender.sendMessage("Destination: " + thisGate.getTarget().getName());
+			sender.sendMessage("Permission-Node: XcraftGate.use." + thisGate.getName());
 		}
 	}
 

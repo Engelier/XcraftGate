@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
+import de.xcraft.engelier.XcraftGate.XcraftGateGate;
 
 public class CommandGateUnloop extends CommandHelperGate {
 
@@ -25,11 +26,14 @@ public class CommandGateUnloop extends CommandHelperGate {
 		} else if (!gateExists(gateTarget)) {
 			reply("Gate not found: " + gateTarget);
 		} else {
-			if (!plugin.gates.get(gateName).gateTarget.equals(gateTarget)
-				|| !plugin.gates.get(gateTarget).gateTarget.equals(gateName)) {
+			XcraftGateGate loop1 = getGate(gateName);
+			XcraftGateGate loop2 = getGate(gateTarget);
+			
+			if (!loop1.getTarget().equals(loop2) || !loop2.getTarget().equals(loop1)) {
 				reply("Gates " + gateName + " and " + gateTarget + " aren't linked together");
 			} else {
-				plugin.removeGateLoop(gateName, gateTarget);
+				loop1.unlink();
+				loop2.unlink();
 				reply("removed gate loop " + gateName + " <=> " + gateTarget);
 				plugin.saveGates();
 			}

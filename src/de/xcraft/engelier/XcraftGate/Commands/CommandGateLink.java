@@ -26,7 +26,7 @@ public class CommandGateLink extends CommandHelperGate {
 		} else if (!gateExists(gateTarget)) {
 			reply("Gate not found: " + gateTarget);
 		} else {
-			plugin.createGateLink(gateName, gateTarget);
+			getGate(gateName).linkTo(gateTarget);
 			reply("Linked Gate " + gateName + " to " + gateTarget);
 			plugin.saveGates();
 		}

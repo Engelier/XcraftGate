@@ -50,7 +50,7 @@ public class CommandWorldCreate extends CommandHelperWorld {
 			}
 
 			XcraftGateWorld thisWorld = new XcraftGateWorld(plugin, worldName, worldEnv, worldGen);
-			plugin.worlds.put(worldName, thisWorld);
+			plugin.addWorld(worldName, thisWorld);
 			plugin.saveWorlds();
 
 			if (args.size() < 2) {

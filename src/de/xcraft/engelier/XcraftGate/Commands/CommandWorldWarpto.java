@@ -24,8 +24,11 @@ public class CommandWorldWarpto extends CommandHelperWorld {
 		} else if (!hasWorld(worldName)) {
 			reply("World not found: " + worldName);
 		} else {
-			plugin.worlds.get(worldName).load();
-			Location loc = plugin.getServer().getWorld(worldName).getSpawnLocation();
+			if (!getWorld(worldName).isLoaded()) {
+				getWorld(worldName).load();
+			}
+			
+			Location loc = getWorld(worldName).getWorld().getSpawnLocation();
 			if (loc != null)
 				((Player) sender).teleport(loc);
 			else

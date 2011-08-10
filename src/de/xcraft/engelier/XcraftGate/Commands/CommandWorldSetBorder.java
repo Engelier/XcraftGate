@@ -33,10 +33,10 @@ public class CommandWorldSetBorder extends CommandHelperWorld {
 			}
 
 			if (border <= 0) {
-				plugin.worlds.get(worldName).setBorder(0);
+				getWorld(worldName).setBorder(0);
 				reply("Border of world " + worldName + " removed.");
 			} else {
-				plugin.worlds.get(worldName).setBorder(border);
+				getWorld(worldName).setBorder(border);
 				reply("Border of world " + worldName + " set to " + border + ".");
 			}
 			

@@ -22,7 +22,7 @@ public class CommandWorldLoad extends CommandHelperWorld {
 		} else if (!hasWorld(worldName)) {
 			reply("Unknown world: " + worldName);
 		} else {
-			if (getWorld(worldName).world != null) {
+			if (getWorld(worldName).isLoaded()) {
 				reply("World " + worldName + " already loaded.");
 			} else {
 				getWorld(worldName).load();

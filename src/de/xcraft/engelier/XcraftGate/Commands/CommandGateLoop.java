@@ -25,7 +25,8 @@ public class CommandGateLoop extends CommandHelperGate {
 		} else if (!gateExists(gateTarget)) {
 			reply("Gate not found: " + gateTarget);
 		} else {
-			plugin.createGateLoop(gateName, gateTarget);
+			getGate(gateName).linkTo(gateTarget);
+			getGate(gateTarget).linkTo(gateName);
 			reply("Looped Gates " + gateName + " <=> " + gateTarget);
 			plugin.saveGates();
 		}

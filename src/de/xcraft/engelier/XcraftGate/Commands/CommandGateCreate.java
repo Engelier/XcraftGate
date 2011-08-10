@@ -2,10 +2,12 @@ package de.xcraft.engelier.XcraftGate.Commands;
 
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
+import de.xcraft.engelier.XcraftGate.XcraftGateGate;
 
 public class CommandGateCreate extends CommandHelperGate {
 
@@ -23,12 +25,15 @@ public class CommandGateCreate extends CommandHelperGate {
 		} else if (gateExists(gateName)) {
 			reply("Gate already exists: " + gateName);
 		} else {
-			if (gateExists(((Player) sender).getLocation())) {
-				reply("There is already a gate at this location!");
+			Location loc = ((Player) sender).getLocation();
+			
+			if (gateExists(loc)) {
+				reply("There is already a gate at this location: " + getGateByLocation(loc).getName());
 			} else {
-				plugin.createGate(((Player) sender).getLocation(), gateName);
-				reply("Gate " + gateName + " created at "	+ plugin.getLocationString(((Player) sender).getLocation()));
-				plugin.saveGates();
+				XcraftGateGate newGate = new XcraftGateGate(plugin, gateName);
+				newGate.setLocation(plugin.getSaneLocation(loc));
+				plugin.addGate(newGate);
+				reply("Gate " + gateName + " created at "	+ plugin.getLocationString(newGate.getLocation()));
 			}
 		}
 	}

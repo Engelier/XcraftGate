@@ -1,6 +1,5 @@
 package de.xcraft.engelier.XcraftGate.Commands;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -34,28 +33,22 @@ public class CommandGateListnear extends CommandHelperGate {
 		double xx = now.getX();
 		double yy = now.getY();
 		double zz = now.getZ();
-		List<String> gatesFound = new ArrayList<String>();
+		boolean fail = true;
 		
 		for (int x = -radius; x <= radius; x++) {
-			for (int y = (radius > 127 ? -127 : -radius); y <= (radius > 127 ? 127 : radius); y++) {
+			for (int y = (yy - radius > 0 ? -radius : (int)-yy); y <= (y + radius > 127 ? 128 - y : radius); y++) {
 				for (int z = -radius; z <= radius; z++) {
-					String thisGateName = plugin.gateLocations.get(plugin.getLocationString(new Location(now.getWorld(), x + xx, y + yy, z + zz)));
-					if (thisGateName != null) {
-						gatesFound.add(thisGateName);
+					XcraftGateGate thisGate = plugin.getGateByLocation(new Location(now.getWorld(), x + xx, y + yy, z + zz));
+					if (thisGate != null) {
+						reply("Found " + thisGate.getName() + " at " + plugin.getLocationString(thisGate.getLocation()));
+						fail = false;
 					}
 				}
 			}
 		}
 		
-		if (gatesFound.size() == 0) {
+		if (fail) {
 			reply("No gates found.");
-		} else {
-			Object[] found = gatesFound.toArray();
-			java.util.Arrays.sort(found);
-			for (Object foundO : found) {
-				XcraftGateGate gate = plugin.gates.get((String) foundO);
-				reply("Found " + gate.gateName + " at " + plugin.getLocationString(gate.getLocation()));
-			}
-		}	}
-
+		}
+	}
 }

@@ -22,15 +22,16 @@ public class CommandWorldDelete extends CommandHelperWorld {
 		} else if (!hasWorld(worldName)) {
 			reply("World not found: " + worldName);
 		} else {
-			if (plugin.worlds.get(worldName).world != null) {
+			if (getWorld(worldName).isLoaded()) {
 				if (plugin.getServer().getWorld(worldName).getPlayers().size() > 0) {
 					error("Unable to unload world with active players.");
 					return;
 				} else {
-					plugin.getServer().unloadWorld(worldName, true);
+					getWorld(worldName).unload();
 				}
 			}
-			plugin.worlds.remove(worldName);
+			
+			plugin.delWorld(worldName);
 			reply("World " + worldName + " removed.");
 			plugin.saveWorlds();
 		}

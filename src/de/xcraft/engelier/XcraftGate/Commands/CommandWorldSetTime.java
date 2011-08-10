@@ -29,7 +29,7 @@ public class CommandWorldSetTime extends CommandHelperWorld {
 		} else {
 			for (DayTime thisTime : XcraftGateWorld.DayTime.values()) {
 				if (thisTime.toString().equalsIgnoreCase(args.get(0))) {
-					plugin.worlds.get(worldName).setDayTime(thisTime);
+					getWorld(worldName).setDayTime(thisTime);
 					reply("Time of world " + worldName + " changed to " + args.get(0) + ".");
 					plugin.saveWorlds();
 					return;

@@ -26,7 +26,7 @@ public class CommandWorldAllowMonsters extends CommandHelperWorld {
 			
 			allowed = (args.size() == 0 || !args.get(0).equalsIgnoreCase("false")) ? true : false;
 
-			plugin.worlds.get(worldName).setAllowMonsters(allowed);
+			getWorld(worldName).setAllowMonsters(allowed);
 			reply("Monster spawn on " + worldName + (allowed ? " enabled." : " disabled."));
 			plugin.saveWorlds();
 		}

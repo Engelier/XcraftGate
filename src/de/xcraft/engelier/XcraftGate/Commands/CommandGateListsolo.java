@@ -17,19 +17,18 @@ public class CommandGateListsolo extends CommandHelperGate {
 	public void execute(CommandSender sender, String gateName, List<String> args) {
 		this.sender = sender;
 		
-		for (XcraftGateGate thisGate : plugin.gates.values()) {
-			if (thisGate.gateTarget == null) {
+		for (XcraftGateGate thisGate : plugin.getGateCollection()) {
+			if (!thisGate.hasTarget()) {
 				boolean hasSource = false;
 				
-				for (XcraftGateGate sourceGate : plugin.gates.values()) {
-					if (sourceGate.gateTarget != null 
-							&& sourceGate.gateTarget.equals(thisGate.gateName)) {
+				for (XcraftGateGate sourceGate : plugin.getGateCollection()) {
+					if (sourceGate.getTarget().equals(thisGate)) { 
 						hasSource = true;
 					}
 				}
 				
 				if (!hasSource)
-					reply("Found orphan: " + thisGate.gateName);
+					reply("Found orphan: " + thisGate.getName());
 			}
 		}
 		

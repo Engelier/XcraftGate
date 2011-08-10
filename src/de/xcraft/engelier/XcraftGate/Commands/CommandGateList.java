@@ -16,7 +16,7 @@ public class CommandGateList extends CommandHelperGate {
 	public void execute(CommandSender sender, String gateName, List<String> args) {
 		this.sender = sender;
 		
-		Object[] gatesArray = plugin.gates.keySet().toArray();
+		Object[] gatesArray = plugin.getGateCollection().toArray();
 		java.util.Arrays.sort(gatesArray);
 		
 		String gateList = "";

@@ -22,7 +22,7 @@ public class CommandGateUnlink extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			plugin.removeGateLink(gateName);
+			getGate(gateName).unlink();
 			reply("removed link from gate " + gateName);
 			plugin.saveGates();
 		}

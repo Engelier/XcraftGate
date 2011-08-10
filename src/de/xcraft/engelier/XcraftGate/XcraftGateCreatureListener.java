@@ -11,7 +11,7 @@ public class XcraftGateCreatureListener extends EntityListener {
 	}
 
 	public void onCreatureSpawn(CreatureSpawnEvent event) {
-		if (plugin.worlds.get(event.getLocation().getWorld().getName()) != null)
-			plugin.worlds.get(event.getLocation().getWorld().getName()).checkCreatureLimit();
+		if (plugin.getWorld(event.getLocation().getWorld()) != null)
+			plugin.getWorld(event.getLocation().getWorld()).checkCreatureLimit();
 	}
 }

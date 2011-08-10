@@ -23,17 +23,16 @@ public class CommandGateDelete extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			for (XcraftGateGate checkGate : plugin.gates.values()) {
-				if (checkGate.gateTarget != null && checkGate.gateTarget.equals(gateName)) {
-					checkGate.gateTarget = null;
+			XcraftGateGate thisGate = getGate(gateName);
+			
+			for (XcraftGateGate checkGate : plugin.getGateCollection()) {
+				if (checkGate.getTarget().equals(thisGate)) {
+					checkGate.unlink();
 				}
 			}
 
-			// TODO: world loaded?
-			plugin.gateLocations.remove(plugin.getLocationString(plugin.gates.get(gateName).getLocation()));
-			plugin.gates.remove(gateName);
+			plugin.delGate(thisGate);
 			reply("Gate " + gateName + " removed.");
-			plugin.saveGates();
 		}
 	}
 

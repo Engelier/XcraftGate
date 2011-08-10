@@ -14,25 +14,26 @@ import org.bukkit.generator.ChunkGenerator;
 import de.xcraft.engelier.XcraftGate.Generator.Generator;
 
 public class XcraftGateWorld {
-	public String name;
-	public Environment environment;
-	public Boolean allowAnimals = true;
-	public Boolean allowMonsters = true;
-	public Boolean allowPvP = false;
-	public Boolean allowWeatherChange = true;
-	public Integer creatureLimit = 0;
-	public Integer border = 0;
-	public Weather setWeather = Weather.SUN;
-	public long setTime = 100;
-	public Boolean timeFrozen = false;
-	public Boolean suppressHealthRegain = true;
-	public Generator generator;
-	public Boolean sticky = false;
+	private static XcraftGate plugin;
+	private static Server server;
+
+	private String name;
+	private Environment environment;
+	private boolean allowAnimals = true;
+	private boolean allowMonsters = true;
+	private boolean allowPvP = false;
+	private boolean allowWeatherChange = true;
+	private int creatureLimit = 0;
+	private int border = 0;
+	private Weather setWeather = Weather.SUN;
+	private long setTime = 100;
+	private boolean timeFrozen = false;
+	private boolean suppressHealthRegain = true;
+	private Generator generator = Generator.DEFAULT;
+	private boolean sticky = false;
 		
-	private XcraftGate plugin;
-	private Server server;
-	private Long lastAction = null;
-	public World world;
+	private long lastAction = 0;
+	private World world;
 	
 	public XcraftGateWorld (XcraftGate instance) {
 		this(instance, null, World.Environment.NORMAL, null);
@@ -47,8 +48,8 @@ public class XcraftGateWorld {
 	}
 
 	public XcraftGateWorld (XcraftGate instance, String worldName, Environment env, Generator gen) {
-		this.plugin = instance;
-		this.server = plugin.getServer();
+		XcraftGateWorld.plugin = instance;
+		XcraftGateWorld.server = plugin.getServer();
 		this.allowPvP = plugin.castBoolean(plugin.serverconfig.getProperty("pvp", "false"));
 		
 		this.world = server.getWorld(worldName);
@@ -133,13 +134,34 @@ public class XcraftGateWorld {
 		
 		lastAction = System.currentTimeMillis();
 
-		this.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
+		XcraftGateWorld.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
 	}
 	
 	public void unload() {
-		this.plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
-		plugin.getServer().unloadWorld(world, true);
+		XcraftGateWorld.plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
+		server.unloadWorld(world, true);
 		this.world = null;
+	}
+	
+	public boolean isLoaded() {
+		return this.world != null;
+	}
+	
+	public World getWorld() {
+		return world;
+	}
+	
+	public void setWorld(World world) {
+		this.world = world;
+		
+		if (world != null) {
+			this.name = world.getName();
+			this.environment = world.getEnvironment();
+		}
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 	
 	public Map<String, Object> toMap() {
@@ -168,7 +190,7 @@ public class XcraftGateWorld {
 	public void checkCreatureLimit() {
 		if (world == null) return;
 		
-		Double max = creatureLimit.doubleValue();
+		Double max = (double)creatureLimit;
 		Integer alive = world.getLivingEntities().size() - world.getPlayers().size();
 
 		if (max <= 0) return;
@@ -230,6 +252,10 @@ public class XcraftGateWorld {
 		}
 	}
 	
+	public boolean isSticky() {
+		return this.sticky;
+	}
+	
 	public void setSticky(Boolean sticky) {
 		this.sticky = (sticky != null ? sticky : false);
 	}
@@ -246,8 +272,16 @@ public class XcraftGateWorld {
 		if (!allow) killAllMonsters();
 	}
 	
+	public boolean getAllowWeatherChange() {
+		return this.allowWeatherChange;
+	}
+
 	public void setAllowWeatherChange(Boolean allow) {
 		this.allowWeatherChange = (allow != null ? allow : true);
+	}
+	
+	public int getBorder() {
+		return this.border;
 	}
 	
 	public void setBorder(Integer border) {
@@ -277,9 +311,17 @@ public class XcraftGateWorld {
 		setParameters(true);
 	}
 
+	public boolean getTimeFrozen() {
+		return this.timeFrozen;
+	}
+	
 	public void setTimeFrozen(Boolean frozen) {
 		this.timeFrozen = (frozen != null ? frozen : false);
 		if (world != null) this.setTime = world.getTime();		
+	}
+	
+	public boolean getSuppressHealthRegain() {
+		return this.suppressHealthRegain;
 	}
 	
 	public void setSuppressHealthRegain(Boolean suppressed) {

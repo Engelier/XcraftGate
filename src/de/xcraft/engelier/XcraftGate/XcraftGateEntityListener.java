@@ -12,7 +12,7 @@ public class XcraftGateEntityListener extends EntityListener {
 	}
 	
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if (plugin.worlds.get(event.getEntity().getWorld().getName()).suppressHealthRegain && event.getRegainReason() == RegainReason.REGEN) {
+		if (plugin.getWorld(event.getEntity().getWorld()).getSuppressHealthRegain() && event.getRegainReason() == RegainReason.REGEN) {
 			event.setCancelled(true);
 		}
 	}

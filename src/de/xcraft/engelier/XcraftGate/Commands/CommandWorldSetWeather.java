@@ -29,7 +29,7 @@ public class CommandWorldSetWeather extends CommandHelperWorld {
 		} else {
 			for (Weather thisWeather : XcraftGateWorld.Weather.values()) {
 				if (thisWeather.toString().equalsIgnoreCase(args.get(0))) {
-					plugin.worlds.get(worldName).setWeather(thisWeather);
+					getWorld(worldName).setWeather(thisWeather);
 					reply("Weather of world " + worldName + " changed to " + args.get(0) + ".");
 					plugin.saveWorlds();
 					return;

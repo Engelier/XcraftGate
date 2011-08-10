@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
+import de.xcraft.engelier.XcraftGate.XcraftGateGate;
 
 public abstract class CommandHelperGate extends CommandHelper {
 	public CommandHelperGate(XcraftGate plugin) {
@@ -15,11 +16,18 @@ public abstract class CommandHelperGate extends CommandHelper {
 	public abstract void execute(CommandSender sender, String gateName, List<String> args);
 
 	public boolean gateExists(String name) {
-		return plugin.gates.containsKey(name);
+		return plugin.hasGate(name);
 	}
 
 	public boolean gateExists(Location location) {
-		return plugin.gateLocations.get(plugin.getLocationString(location)) != null;
+		return plugin.getGateByLocation(location) != null;
 	}
 
+	public XcraftGateGate getGate(String name) {
+		return plugin.getGate(name);
+	}
+	
+	public XcraftGateGate getGateByLocation(Location loc) {
+		return plugin.getGateByLocation(loc);
+	}
 }

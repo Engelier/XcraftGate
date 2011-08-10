@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
+import de.xcraft.engelier.XcraftGate.XcraftGateGate;
 
 public class CommandGateMove extends CommandHelperGate {
 
@@ -23,15 +24,14 @@ public class CommandGateMove extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			// TODO: oldLoc world loaded?
-			String oldLoc = plugin.getLocationString(plugin.gates.get(gateName).getLocation());
-			String newLoc = plugin.getLocationString(((Player) sender).getLocation());
-			plugin.gates.get(gateName).setLocation(plugin.getSaneLocation(((Player) sender).getLocation()));
-			plugin.gateLocations.remove(oldLoc);
-			plugin.gateLocations.put(newLoc, gateName);
-			plugin.justTeleported.put(((Player) sender).getName(), plugin.gates.get(gateName).getLocation());
-			plugin.justTeleportedFrom.put(((Player) sender).getName(), plugin.gates.get(gateName).getLocation());
-			reply("Gate " + gateName + " moved to " + newLoc);
+			XcraftGateGate thisGate = getGate(gateName);
+			plugin.delGate(thisGate);
+			thisGate.setLocation(((Player) sender).getLocation());
+			plugin.addGate(thisGate);
+
+			plugin.justTeleported.put(((Player) sender).getName(), thisGate.getLocation());
+			plugin.justTeleportedFrom.put(((Player) sender).getName(), thisGate.getLocation());
+			reply("Gate " + gateName + " moved to " + plugin.getLocationString(thisGate.getLocation()));
 		}
 	}
 

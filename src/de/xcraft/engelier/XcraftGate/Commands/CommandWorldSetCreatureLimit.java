@@ -33,10 +33,10 @@ public class CommandWorldSetCreatureLimit extends CommandHelperWorld {
 			}
 
 			if (limit <= 0) {
-				plugin.worlds.get(worldName).setCreatureLimit(0);
+				getWorld(worldName).setCreatureLimit(0);
 				reply("Creature limit of world " + worldName + " removed.");
 			} else {
-				plugin.worlds.get(worldName).setCreatureLimit(limit);
+				getWorld(worldName).setCreatureLimit(limit);
 				reply("Creature limit of world " + worldName + " set to " + limit + ".");
 			}
 

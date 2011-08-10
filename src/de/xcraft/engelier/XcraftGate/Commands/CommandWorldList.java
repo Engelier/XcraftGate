@@ -19,9 +19,9 @@ public class CommandWorldList extends CommandHelperWorld {
 		this.sender = sender;
 		
 		String worlds = "";
-		for (XcraftGateWorld thisWorld : plugin.worlds.values()) {
-			worlds += ", " + thisWorld.name;
-			if (plugin.getServer().getWorld(thisWorld.name) != null) {
+		for (XcraftGateWorld thisWorld : plugin.getWorldCollection()) {
+			worlds += ", " + thisWorld.getName();
+			if (plugin.getServer().getWorld(thisWorld.getName()) != null) {
 				worlds += "(*)";
 			}
 		}

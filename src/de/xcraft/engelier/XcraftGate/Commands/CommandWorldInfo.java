@@ -23,7 +23,7 @@ public class CommandWorldInfo extends CommandHelperWorld {
 			reply("World not found: " + worldName);
 		} else {
 			reply("Infos for world " + worldName + ":");
-			plugin.worlds.get(worldName).sendInfo(sender);
+			getWorld(worldName).sendInfo(sender);
 		}
 	}
 
