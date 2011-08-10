@@ -183,7 +183,7 @@ public class XcraftGateWorld {
 		return values;
 	}
 	
-	public void resetSpawnFlags() {
+	private void resetSpawnFlags() {
 		world.setSpawnFlags(allowMonsters, allowAnimals);
 	}
 	
@@ -223,7 +223,7 @@ public class XcraftGateWorld {
 		world.setTime(setTime - 100);
 	}
 		
-	public void killAllMonsters() {
+	private void killAllMonsters() {
 		if (world == null) return;
 		for (LivingEntity entity : world.getLivingEntities()) {
 			if (entity instanceof Zombie || entity instanceof Skeleton
@@ -234,7 +234,7 @@ public class XcraftGateWorld {
 		}
 	}
 
-	public void killAllAnimals() {
+	private void killAllAnimals() {
 		if (world == null) return;
 		for (LivingEntity entity : world.getLivingEntities()) {
 			if (entity instanceof Pig || entity instanceof Sheep
@@ -272,7 +272,7 @@ public class XcraftGateWorld {
 		if (!allow) killAllMonsters();
 	}
 	
-	public boolean getAllowWeatherChange() {
+	public boolean isAllowWeatherChange() {
 		return this.allowWeatherChange;
 	}
 
@@ -311,7 +311,7 @@ public class XcraftGateWorld {
 		setParameters(true);
 	}
 
-	public boolean getTimeFrozen() {
+	public boolean isTimeFrozen() {
 		return this.timeFrozen;
 	}
 	
@@ -320,7 +320,7 @@ public class XcraftGateWorld {
 		if (world != null) this.setTime = world.getTime();		
 	}
 	
-	public boolean getSuppressHealthRegain() {
+	public boolean isSuppressHealthRegain() {
 		return this.suppressHealthRegain;
 	}
 	

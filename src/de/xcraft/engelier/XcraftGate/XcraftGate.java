@@ -65,7 +65,7 @@ public class XcraftGate extends JavaPlugin {
 	class RunTimeFrozen implements Runnable {
 		public void run() {
 			for (XcraftGateWorld thisWorld: worlds.values()) {
-				if (thisWorld.getTimeFrozen()) {
+				if (thisWorld.isTimeFrozen()) {
 					thisWorld.resetFrozenTime();
 				}
 			}
