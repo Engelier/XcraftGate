@@ -32,7 +32,7 @@ public class CommandGateCreate extends CommandHelperGate {
 			} else {
 				XcraftGateGate newGate = new XcraftGateGate(plugin, gateName);
 				newGate.setLocation(plugin.getSaneLocation(loc));
-				plugin.addGate(newGate);
+				plugin.addGate(newGate, true);
 				reply("Gate " + gateName + " created at "	+ plugin.getLocationString(newGate.getLocation()));
 			}
 		}

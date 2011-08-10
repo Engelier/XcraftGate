@@ -26,7 +26,7 @@ public class CommandGateDelete extends CommandHelperGate {
 			XcraftGateGate thisGate = getGate(gateName);
 			
 			for (XcraftGateGate checkGate : plugin.getGateCollection()) {
-				if (checkGate.getTarget().equals(thisGate)) {
+				if (checkGate.hasTarget() && checkGate.getTarget().equals(thisGate)) {
 					checkGate.unlink();
 				}
 			}

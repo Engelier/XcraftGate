@@ -20,11 +20,11 @@ public class CommandGateListnear extends CommandHelperGate {
 		this.sender = sender;
 		Integer radius = 10;
 		
-		if (args.size() > 0) {
+		if (gateName != null) {
 			try {
-				radius = Integer.parseInt(args.get(0));
+				radius = Integer.parseInt(gateName);
 			} catch (Exception ex) {
-				error("Invalid radius number: " + args.get(0));
+				error("Invalid radius number: " + gateName);
 				return;
 			}
 		}

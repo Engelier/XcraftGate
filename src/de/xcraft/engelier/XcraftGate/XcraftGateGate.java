@@ -105,8 +105,20 @@ public class XcraftGateGate {
 	public XcraftGateGate getTarget() {
 		return gateTarget;
 	}
-	
+
+	public void linkTo(String gateName) {
+		linkTo(plugin.getGate(gateName));
+	}
+
+	public void linkTo(String gateName, boolean save) {
+		linkTo(plugin.getGate(gateName), save);
+	}
+
 	public void linkTo(XcraftGateGate gate) {
+		linkTo(gate, true);
+	}
+
+	public void linkTo(XcraftGateGate gate, boolean save) {
 		gateTarget = gate;
 		
 		if (gate != null) {
@@ -115,13 +127,9 @@ public class XcraftGateGate {
 			gateTargetName = null;
 		}
 		
-		plugin.saveGates();
+		if (save) plugin.saveGates();
 	}
-	
-	public void linkTo(String gateName) {
-		linkTo(plugin.getGate(gateName));
-	}
-	
+		
 	public void unlink() {
 		gateTarget = null;
 		gateTargetName = null;

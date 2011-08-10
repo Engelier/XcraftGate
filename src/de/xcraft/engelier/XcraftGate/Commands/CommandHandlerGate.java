@@ -78,6 +78,7 @@ public class CommandHandlerGate extends CommandHelper implements CommandExecutor
 		
 		if (!isPermitted("gate", (args.length > 0 ? permNodes.get(args[0]) : null))) {
 			error("You don't have permission to use this command");
+			return true;
 		}
 		
 		if (args.length == 0) {

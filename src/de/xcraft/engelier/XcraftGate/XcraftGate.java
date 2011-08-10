@@ -467,9 +467,9 @@ public class XcraftGate extends JavaPlugin {
 					XcraftGateGate thisTarget = getGate((String) gateData.get("target"));
 					
 					if (thisTarget == null) {
-						log.warning(getNameBrackets() + "removed invalid destination for gate " + gateName);
+						log.warning(getNameBrackets() + "ignored invalid destination for gate " + gateName);
 					} else {
-						getGate(gateName).linkTo(thisTarget);
+						getGate(gateName).linkTo(thisTarget, false);
 					}
 				}
 			}
@@ -501,7 +501,7 @@ public class XcraftGate extends JavaPlugin {
 
 		Yaml yaml = new Yaml();
 		String dump = yaml.dump(toDump);
-
+		
 		try {
 			FileOutputStream fh = new FileOutputStream(configFile);
 			new PrintStream(fh).println(dump);
@@ -525,9 +525,13 @@ public class XcraftGate extends JavaPlugin {
 	}
 	
 	public void addGate(XcraftGateGate gate) {
+		addGate(gate, false);
+	}
+	
+	public void addGate(XcraftGateGate gate, boolean save) {
 		gates.put(gate.getName(), gate);
 		gateLocations.put(getLocationString(gate.getLocation()), gate.getName());
-		saveGates();
+		if (save) saveGates();
 	}
 
 	public void delGate(String gateName) {
@@ -535,7 +539,7 @@ public class XcraftGate extends JavaPlugin {
 	}
 	
 	public void delGate(XcraftGateGate gate) {
-		gates.remove(gate);
+		gates.remove(gate.getName());
 		
 		if (getWorld(gate.getWorldName()).isLoaded()) {
 			gateLocations.remove(getLocationString(gate.getLocation()));

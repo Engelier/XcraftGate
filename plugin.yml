@@ -1,6 +1,6 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.9d6
+version: 0.9d7
 author: Engelier
 load: startup
 commands:
@@ -26,6 +26,7 @@ permissions:
     children:
       XcraftGate.gate: true
       XcraftGate.gate.create: true
+      XcraftGate.gate.delete: true
       XcraftGate.gate.link: true
       XcraftGate.gate.unlink: true
       XcraftGate.gate.info: true
@@ -35,6 +36,8 @@ permissions:
     description: Basic access to /gate
   XcraftGate.gate.create:
     description: Access to /gate create, /gate move
+  XcraftGate.gate.delete:
+    description: Access to /gate delete
   XcraftGate.gate.link:
     description: Access to /gate link, /gate loop
   XcraftGate.gate.unlink:
