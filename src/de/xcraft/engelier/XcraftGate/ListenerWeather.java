@@ -3,16 +3,16 @@ package de.xcraft.engelier.XcraftGate;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.event.weather.WeatherListener;
 
-public class XcraftGateWeatherListener extends WeatherListener {
+public class ListenerWeather extends WeatherListener {
 	private XcraftGate plugin;
 	
-	public XcraftGateWeatherListener (XcraftGate instance) {
+	public ListenerWeather (XcraftGate instance) {
 		plugin = instance;
 	}
 	
 	public void onWeatherChange(WeatherChangeEvent event) {
-		if (plugin.getWorld(event.getWorld()) == null) return;
+		if (plugin.getWorlds().get(event.getWorld()) == null) return;
 		
-		event.setCancelled(plugin.getWorld(event.getWorld()).isAllowWeatherChange());
+		event.setCancelled(plugin.getWorlds().get(event.getWorld()).isAllowWeatherChange());
 	}
 }

@@ -5,8 +5,8 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
-import de.xcraft.engelier.XcraftGate.XcraftGateWorld.DayTime;
+import de.xcraft.engelier.XcraftGate.DataWorld;
+import de.xcraft.engelier.XcraftGate.DataWorld.DayTime;
 
 public class CommandWorldSetTime extends CommandHelperWorld {
 
@@ -27,11 +27,10 @@ public class CommandWorldSetTime extends CommandHelperWorld {
 		} else if (!hasWorld(worldName)) {
 			reply("World not found: " + worldName);
 		} else {
-			for (DayTime thisTime : XcraftGateWorld.DayTime.values()) {
+			for (DayTime thisTime : DataWorld.DayTime.values()) {
 				if (thisTime.toString().equalsIgnoreCase(args.get(0))) {
 					getWorld(worldName).setDayTime(thisTime);
 					reply("Time of world " + worldName + " changed to " + args.get(0) + ".");
-					plugin.saveWorlds();
 					return;
 				}
 			}

@@ -24,7 +24,6 @@ public class CommandGateUnlink extends CommandHelperGate {
 		} else {
 			getGate(gateName).unlink();
 			reply("removed link from gate " + gateName);
-			plugin.saveGates();
 		}
 	}
 

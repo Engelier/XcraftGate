@@ -28,7 +28,6 @@ public class CommandWorldTimeFrozen extends CommandHelperWorld {
 
 			getWorld(worldName).setTimeFrozen(frozen);
 			reply("Time on " + worldName + (frozen ? " freezed." : " unfreezed."));
-			plugin.saveWorlds();
 		}
 	}
 

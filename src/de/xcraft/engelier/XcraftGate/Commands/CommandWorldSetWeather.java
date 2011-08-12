@@ -5,8 +5,8 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
-import de.xcraft.engelier.XcraftGate.XcraftGateWorld.Weather;
+import de.xcraft.engelier.XcraftGate.DataWorld;
+import de.xcraft.engelier.XcraftGate.DataWorld.Weather;
 
 public class CommandWorldSetWeather extends CommandHelperWorld {
 
@@ -27,11 +27,10 @@ public class CommandWorldSetWeather extends CommandHelperWorld {
 		} else if (!hasWorld(worldName)) {
 			reply("World not found: " + worldName);
 		} else {
-			for (Weather thisWeather : XcraftGateWorld.Weather.values()) {
+			for (Weather thisWeather : DataWorld.Weather.values()) {
 				if (thisWeather.toString().equalsIgnoreCase(args.get(0))) {
 					getWorld(worldName).setWeather(thisWeather);
 					reply("Weather of world " + worldName + " changed to " + args.get(0) + ".");
-					plugin.saveWorlds();
 					return;
 				}
 			}

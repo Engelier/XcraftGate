@@ -7,10 +7,10 @@ import org.bukkit.plugin.Plugin;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
 
-public class XcraftGatePluginListener extends ServerListener {
+public class ListenerServer extends ServerListener {
 	private XcraftGate plugin = null;
 
-	public XcraftGatePluginListener(XcraftGate instance) {
+	public ListenerServer(XcraftGate instance) {
 		plugin = instance;
 	}
 

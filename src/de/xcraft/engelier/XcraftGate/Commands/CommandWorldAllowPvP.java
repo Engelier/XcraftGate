@@ -28,7 +28,6 @@ public class CommandWorldAllowPvP extends CommandHelperWorld {
 
 			getWorld(worldName).setAllowPvP(allowed);
 			reply("PvP on " + worldName + (allowed ? " enabled." : " disabled."));
-			plugin.saveWorlds();
 		}
 	}
 

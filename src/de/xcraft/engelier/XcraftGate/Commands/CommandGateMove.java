@@ -5,8 +5,9 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import de.xcraft.engelier.XcraftGate.Util;
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateGate;
+import de.xcraft.engelier.XcraftGate.DataGate;
 
 public class CommandGateMove extends CommandHelperGate {
 
@@ -24,14 +25,14 @@ public class CommandGateMove extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			XcraftGateGate thisGate = getGate(gateName);
-			plugin.delGate(thisGate);
+			DataGate thisGate = getGate(gateName);
+			plugin.getGates().remove(thisGate);
 			thisGate.setLocation(((Player) sender).getLocation());
-			plugin.addGate(thisGate);
+			plugin.getGates().add(thisGate, true);
 
 			plugin.justTeleported.put(((Player) sender).getName(), thisGate.getLocation());
 			plugin.justTeleportedFrom.put(((Player) sender).getName(), thisGate.getLocation());
-			reply("Gate " + gateName + " moved to " + plugin.getLocationString(thisGate.getLocation()));
+			reply("Gate " + gateName + " moved to " + Util.getLocationString(thisGate.getLocation()));
 		}
 	}
 

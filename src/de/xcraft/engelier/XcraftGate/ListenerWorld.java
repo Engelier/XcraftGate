@@ -3,17 +3,17 @@ package de.xcraft.engelier.XcraftGate;
 import org.bukkit.World;
 import org.bukkit.event.world.*;
 
-public class XcraftGateWorldListener extends WorldListener {
+public class ListenerWorld extends WorldListener {
 	private XcraftGate plugin;
 	
-	public XcraftGateWorldListener (XcraftGate instance) {
+	public ListenerWorld (XcraftGate instance) {
 		plugin = instance;
 	}
 	
 	public void onWorldLoad(WorldLoadEvent event) {
 		World world = event.getWorld();
 
-		plugin.checkWorld(world);
+		plugin.getWorlds().onWorldLoad(world);
 	}
 	
 	public void onWorldUnload(WorldUnloadEvent event) {

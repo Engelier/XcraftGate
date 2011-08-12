@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
+import de.xcraft.engelier.XcraftGate.DataWorld;
 
 public abstract class CommandHelperWorld extends CommandHelper {	
 	public CommandHelperWorld(XcraftGate plugin) {
@@ -20,15 +20,15 @@ public abstract class CommandHelperWorld extends CommandHelper {
 	}
 
 	public boolean hasWorld(String world) {
-		return (plugin.getWorld(world) != null);
+		return (plugin.getWorlds().get(world) != null);
 	}
 	
-	public XcraftGateWorld getWorld(World world) {
+	public DataWorld getWorld(World world) {
 		return getWorld(world.getName());
 	}
 	
-	public XcraftGateWorld getWorld(String name) {
-		return plugin.getWorld(name);
+	public DataWorld getWorld(String name) {
+		return plugin.getWorlds().get(name);
 	}
 
 }

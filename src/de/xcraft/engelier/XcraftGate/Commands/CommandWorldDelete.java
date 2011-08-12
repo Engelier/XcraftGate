@@ -31,9 +31,8 @@ public class CommandWorldDelete extends CommandHelperWorld {
 				}
 			}
 			
-			plugin.delWorld(worldName);
+			plugin.getWorlds().remove(worldName);
 			reply("World " + worldName + " removed.");
-			plugin.saveWorlds();
 		}
 	}
 }

@@ -39,8 +39,6 @@ public class CommandWorldSetCreatureLimit extends CommandHelperWorld {
 				getWorld(worldName).setCreatureLimit(limit);
 				reply("Creature limit of world " + worldName + " set to " + limit + ".");
 			}
-
-			plugin.saveWorlds();
 		}
 	}
 

@@ -7,7 +7,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
+import de.xcraft.engelier.XcraftGate.DataWorld;
 import de.xcraft.engelier.XcraftGate.Generator.Generator;
 
 public class CommandWorldCreate extends CommandHelperWorld {
@@ -49,9 +49,8 @@ public class CommandWorldCreate extends CommandHelperWorld {
 				return;
 			}
 
-			XcraftGateWorld thisWorld = new XcraftGateWorld(plugin, worldName, worldEnv, worldGen);
-			plugin.addWorld(worldName, thisWorld);
-			plugin.saveWorlds();
+			DataWorld thisWorld = new DataWorld(plugin, worldName, worldEnv, worldGen);
+			plugin.getWorlds().add(thisWorld);
 
 			if (args.size() < 2) {
 				thisWorld.load();

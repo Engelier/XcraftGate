@@ -28,7 +28,6 @@ public class CommandWorldSetSticky extends CommandHelperWorld {
 
 			getWorld(worldName).setSticky(sticky);
 			reply((sticky ? "Sticked" : "Unsticked") + " world " + worldName + ".");
-			plugin.saveWorlds();
 		}
 	}
 

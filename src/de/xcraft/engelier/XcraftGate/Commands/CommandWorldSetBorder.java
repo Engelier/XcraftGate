@@ -39,8 +39,6 @@ public class CommandWorldSetBorder extends CommandHelperWorld {
 				getWorld(worldName).setBorder(border);
 				reply("Border of world " + worldName + " set to " + border + ".");
 			}
-			
-			plugin.saveWorlds();
 		}
 	}
 

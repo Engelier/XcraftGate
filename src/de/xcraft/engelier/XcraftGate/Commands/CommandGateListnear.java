@@ -6,8 +6,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.command.CommandSender;
 
+import de.xcraft.engelier.XcraftGate.Util;
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateGate;
+import de.xcraft.engelier.XcraftGate.DataGate;
 
 public class CommandGateListnear extends CommandHelperGate {
 
@@ -38,9 +39,9 @@ public class CommandGateListnear extends CommandHelperGate {
 		for (int x = -radius; x <= radius; x++) {
 			for (int y = (yy - radius > 0 ? -radius : (int)-yy); y <= (y + radius > 127 ? 128 - y : radius); y++) {
 				for (int z = -radius; z <= radius; z++) {
-					XcraftGateGate thisGate = plugin.getGateByLocation(new Location(now.getWorld(), x + xx, y + yy, z + zz));
+					DataGate thisGate = plugin.getGates().getByLocation(new Location(now.getWorld(), x + xx, y + yy, z + zz));
 					if (thisGate != null) {
-						reply("Found " + thisGate.getName() + " at " + plugin.getLocationString(thisGate.getLocation()));
+						reply("Found " + thisGate.getName() + " at " + Util.getLocationString(thisGate.getLocation()));
 						fail = false;
 					}
 				}

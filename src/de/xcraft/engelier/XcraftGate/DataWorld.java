@@ -13,7 +13,7 @@ import org.bukkit.generator.ChunkGenerator;
 
 import de.xcraft.engelier.XcraftGate.Generator.Generator;
 
-public class XcraftGateWorld {
+public class DataWorld {
 	private static XcraftGate plugin;
 	private static Server server;
 
@@ -35,22 +35,22 @@ public class XcraftGateWorld {
 	private long lastAction = 0;
 	private World world;
 	
-	public XcraftGateWorld (XcraftGate instance) {
+	public DataWorld (XcraftGate instance) {
 		this(instance, null, World.Environment.NORMAL, null);
 	}
 	
-	public XcraftGateWorld (XcraftGate instance, String worldName) {
+	public DataWorld (XcraftGate instance, String worldName) {
 		this(instance, worldName, World.Environment.NORMAL, null);
 	}
 
-	public XcraftGateWorld (XcraftGate instance, String worldName, Environment env) {
+	public DataWorld (XcraftGate instance, String worldName, Environment env) {
 		this(instance, worldName, env, null);
 	}
 
-	public XcraftGateWorld (XcraftGate instance, String worldName, Environment env, Generator gen) {
-		XcraftGateWorld.plugin = instance;
-		XcraftGateWorld.server = plugin.getServer();
-		this.allowPvP = plugin.castBoolean(plugin.serverconfig.getProperty("pvp", "false"));
+	public DataWorld (XcraftGate instance, String worldName, Environment env, Generator gen) {
+		DataWorld.plugin = instance;
+		DataWorld.server = plugin.getServer();
+		this.allowPvP = Util.castBoolean(plugin.serverconfig.getProperty("pvp", "false"));
 		
 		this.world = server.getWorld(worldName);
 		this.name = worldName;
@@ -134,11 +134,11 @@ public class XcraftGateWorld {
 		
 		lastAction = System.currentTimeMillis();
 
-		XcraftGateWorld.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
+		DataWorld.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
 	}
 	
 	public void unload() {
-		XcraftGateWorld.plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
+		DataWorld.plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
 		server.unloadWorld(world, true);
 		this.world = null;
 	}

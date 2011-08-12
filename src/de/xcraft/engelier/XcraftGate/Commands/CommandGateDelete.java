@@ -5,7 +5,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateGate;
+import de.xcraft.engelier.XcraftGate.DataGate;
 
 public class CommandGateDelete extends CommandHelperGate {
 
@@ -23,15 +23,15 @@ public class CommandGateDelete extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			XcraftGateGate thisGate = getGate(gateName);
+			DataGate thisGate = getGate(gateName);
 			
-			for (XcraftGateGate checkGate : plugin.getGateCollection()) {
+			for (DataGate checkGate : plugin.getGates()) {
 				if (checkGate.hasTarget() && checkGate.getTarget().equals(thisGate)) {
 					checkGate.unlink();
 				}
 			}
 
-			plugin.delGate(thisGate);
+			plugin.getGates().remove(thisGate);
 			reply("Gate " + gateName + " removed.");
 		}
 	}

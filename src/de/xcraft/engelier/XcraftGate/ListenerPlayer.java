@@ -5,12 +5,12 @@ import org.bukkit.Location;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class XcraftGatePlayerListener extends PlayerListener {
+public class ListenerPlayer extends PlayerListener {
 	private Location location;
-	private XcraftGateGate gate = null;	
+	private DataGate gate = null;	
 	private XcraftGate plugin = null;
 
-	public XcraftGatePlayerListener(XcraftGate instance) {
+	public ListenerPlayer(XcraftGate instance) {
 		plugin = instance;
 	}
 
@@ -20,9 +20,9 @@ public class XcraftGatePlayerListener extends PlayerListener {
 		Location portTo = null;
 		Location portFrom = null;
 		
-		if (plugin.getWorld(location.getWorld()) == null) return;
+		if (plugin.getWorlds().get(location.getWorld()) == null) return;
 		
-		int border = plugin.getWorld(location.getWorld()).getBorder();
+		int border = plugin.getWorlds().get(location.getWorld()).getBorder();
 		if (border > 0) {
 			double x = location.getX();
 			double z = location.getZ();
@@ -55,7 +55,7 @@ public class XcraftGatePlayerListener extends PlayerListener {
 				plugin.justTeleported.remove(event.getPlayer().getName());
 				plugin.justTeleportedFrom.remove(event.getPlayer().getName());
 			}
-		} else if ((gate = plugin.getGateByLocation(location)) != null) {
+		} else if ((gate = plugin.getGates().getByLocation(location)) != null) {
 			if (plugin.permissions == null ? event.getPlayer().hasPermission("XcraftGate.use." + gate.getName()) : plugin.permissions.has(event.getPlayer(), "XcraftGate.use." + gate.getName())) {
 				plugin.justTeleportedFrom.put(event.getPlayer().getName(), gate.getLocation());
 				gate.portToTarget(event);

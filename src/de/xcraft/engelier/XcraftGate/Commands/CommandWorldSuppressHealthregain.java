@@ -28,7 +28,6 @@ public class CommandWorldSuppressHealthregain extends CommandHelperWorld {
 
 			getWorld(worldName).setSuppressHealthRegain(suppressed);
 			reply("Automatic health regain on " + worldName + (suppressed ? " suppressed." : " enabled."));
-			plugin.saveWorlds();
 		}
 	}
 

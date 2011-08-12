@@ -28,7 +28,6 @@ public class CommandWorldAllowWeatherchange extends CommandHelperWorld {
 
 			getWorld(worldName).setAllowAnimals(allowed);
 			reply("Weather changes on " + worldName + (allowed ? " enabled." : " disabled."));
-			plugin.saveWorlds();
 		}
 	}
 }

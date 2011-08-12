@@ -4,15 +4,15 @@ import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 
-public class XcraftGateEntityListener extends EntityListener {
+public class ListenerEntity extends EntityListener {
 	private static XcraftGate plugin;
 	
-	public XcraftGateEntityListener(XcraftGate instance) {
+	public ListenerEntity(XcraftGate instance) {
 		plugin = instance;
 	}
 	
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-		if (plugin.getWorld(event.getEntity().getWorld()).isSuppressHealthRegain() && event.getRegainReason() == RegainReason.REGEN) {
+		if (plugin.getWorlds().get(event.getEntity().getWorld()).isSuppressHealthRegain() && event.getRegainReason() == RegainReason.REGEN) {
 			event.setCancelled(true);
 		}
 	}

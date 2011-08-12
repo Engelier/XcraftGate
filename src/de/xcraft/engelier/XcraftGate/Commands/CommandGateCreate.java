@@ -6,8 +6,9 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import de.xcraft.engelier.XcraftGate.Util;
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateGate;
+import de.xcraft.engelier.XcraftGate.DataGate;
 
 public class CommandGateCreate extends CommandHelperGate {
 
@@ -30,10 +31,10 @@ public class CommandGateCreate extends CommandHelperGate {
 			if (gateExists(loc)) {
 				reply("There is already a gate at this location: " + getGateByLocation(loc).getName());
 			} else {
-				XcraftGateGate newGate = new XcraftGateGate(plugin, gateName);
-				newGate.setLocation(plugin.getSaneLocation(loc));
-				plugin.addGate(newGate, true);
-				reply("Gate " + gateName + " created at "	+ plugin.getLocationString(newGate.getLocation()));
+				DataGate newGate = new DataGate(plugin, gateName);
+				newGate.setLocation(Util.getSaneLocation(loc));
+				plugin.getGates().add(newGate, true);
+				reply("Gate " + gateName + " created at "	+ Util.getLocationString(newGate.getLocation()));
 			}
 		}
 	}

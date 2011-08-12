@@ -4,12 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
 
-public class XcraftGateGate {
+public class DataGate {
 	private static XcraftGate plugin;
 	
 	private double x;
@@ -21,17 +20,11 @@ public class XcraftGateGate {
 
 	private String gateName = null;
 	private String gateTargetName = null;
-	private XcraftGateGate gateTarget = null;
+	private DataGate gateTarget = null;
 
-	public XcraftGateGate(XcraftGate instance, String name) {
+	public DataGate(XcraftGate instance, String name) {
 		plugin = instance;
-		gateName = name;
-		
-		if (plugin.getServer().getPluginManager().getPermission("XcraftGate.use." + name) == null) {
-			Permission gatePerm = new Permission("XcraftGate.use." + name, PermissionDefault.TRUE);
-			plugin.getServer().getPluginManager().addPermission(gatePerm);
-			plugin.resetSuperPermission(name);
-		}
+		gateName = name;		
 	}
 	
 	public Map<String, Object> toMap() {
@@ -50,7 +43,7 @@ public class XcraftGateGate {
 	}
 
 	public void setLocation(Location loc) {
-		loc = plugin.getSaneLocation(loc);
+		loc = Util.getSaneLocation(loc);
 		setLocation(loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
 	}
 	
@@ -67,7 +60,7 @@ public class XcraftGateGate {
 		if (plugin.getServer().getWorld(worldName) == null) return null;
 		
 		Location ret = new Location(plugin.getServer().getWorld(worldName), x, y, z, yaw, pitch);
-		return plugin.getSaneLocation(ret);
+		return Util.getSaneLocation(ret);
 	}
 	
 	public String getName() {
@@ -102,23 +95,23 @@ public class XcraftGateGate {
 		return gateTarget != null;
 	}
 	
-	public XcraftGateGate getTarget() {
+	public DataGate getTarget() {
 		return gateTarget;
 	}
 
 	public void linkTo(String gateName) {
-		linkTo(plugin.getGate(gateName));
+		linkTo(plugin.getGates().get(gateName));
 	}
 
 	public void linkTo(String gateName, boolean save) {
-		linkTo(plugin.getGate(gateName), save);
+		linkTo(plugin.getGates().get(gateName), save);
 	}
 
-	public void linkTo(XcraftGateGate gate) {
+	public void linkTo(DataGate gate) {
 		linkTo(gate, true);
 	}
 
-	public void linkTo(XcraftGateGate gate, boolean save) {
+	public void linkTo(DataGate gate, boolean save) {
 		gateTarget = gate;
 		
 		if (gate != null) {
@@ -127,7 +120,7 @@ public class XcraftGateGate {
 			gateTargetName = null;
 		}
 		
-		if (save) plugin.saveGates();
+		if (save) plugin.getGates().save();
 	}
 		
 	public void unlink() {
@@ -136,8 +129,8 @@ public class XcraftGateGate {
 	}
 	
 	private void checkWorld() {
-		if (!plugin.getWorld(worldName).isLoaded()) {
-			plugin.getWorld(worldName).load();
+		if (!plugin.getWorlds().get(worldName).isLoaded()) {
+			plugin.getWorlds().get(worldName).load();
 		}		
 	}
 	
@@ -163,5 +156,18 @@ public class XcraftGateGate {
 		if (gateTarget != null) {
 			gateTarget.portHere(event);
 		}
+	}
+	
+	public void sendInfo(CommandSender sender) {
+		sender.sendMessage("Name: " + getName());
+
+		if (plugin.getWorlds().get(getWorldName()).isLoaded()) {
+			sender.sendMessage("Position: " + Util.getLocationString(getLocation()));
+		} else {
+			sender.sendMessage("Position: World " + getWorldName() + " is not loaded!");				
+		}
+
+		sender.sendMessage("Destination: " + getTarget().getName());
+		sender.sendMessage("Permission-Node: XcraftGate.use." + getName());
 	}
 }

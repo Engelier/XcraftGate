@@ -10,7 +10,6 @@ public class CommandGateLink extends CommandHelperGate {
 
 	public CommandGateLink(XcraftGate plugin) {
 		super(plugin);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -28,7 +27,6 @@ public class CommandGateLink extends CommandHelperGate {
 		} else {
 			getGate(gateName).linkTo(gateTarget);
 			reply("Linked Gate " + gateName + " to " + gateTarget);
-			plugin.saveGates();
 		}
 	}
 }

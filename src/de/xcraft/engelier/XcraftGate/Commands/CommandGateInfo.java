@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateGate;
 
 public class CommandGateInfo extends CommandHelperGate {
 	public CommandGateInfo(XcraftGate instance) {
@@ -22,19 +21,8 @@ public class CommandGateInfo extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			XcraftGateGate thisGate = getGate(gateName);
-
 			reply("Info for gate " + gateName);
-			sender.sendMessage("Name: " + thisGate.getName());
-
-			if (plugin.getWorld(thisGate.getWorldName()).isLoaded()) {
-				sender.sendMessage("Position: " + plugin.getLocationString(thisGate.getLocation()));
-			} else {
-				sender.sendMessage("Position: World " + thisGate.getWorldName() + " is not loaded!");				
-			}
-
-			sender.sendMessage("Destination: " + thisGate.getTarget().getName());
-			sender.sendMessage("Permission-Node: XcraftGate.use." + thisGate.getName());
+			getGate(gateName).sendInfo(sender);
 		}
 	}
 

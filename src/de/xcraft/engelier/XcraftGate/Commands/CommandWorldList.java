@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
-import de.xcraft.engelier.XcraftGate.XcraftGateWorld;
+import de.xcraft.engelier.XcraftGate.DataWorld;
 
 public class CommandWorldList extends CommandHelperWorld {
 
@@ -19,7 +19,7 @@ public class CommandWorldList extends CommandHelperWorld {
 		this.sender = sender;
 		
 		String worlds = "";
-		for (XcraftGateWorld thisWorld : plugin.getWorldCollection()) {
+		for (DataWorld thisWorld : plugin.getWorlds()) {
 			worlds += ", " + thisWorld.getName();
 			if (thisWorld.isLoaded()) {
 				worlds += "(*)";

@@ -16,9 +16,9 @@ public class CommandGateReload extends CommandHelperGate {
 	public void execute(CommandSender sender, String gateName, List<String> args) {
 		this.sender = sender;
 		
-		plugin.reloadGates();
+		plugin.getGates().reload();
 		
-		reply("Loaded " + plugin.getGateCollection().size() + " gates.");		
+		reply("Loaded " + plugin.getGates().size() + " gates.");		
 	}
 
 }

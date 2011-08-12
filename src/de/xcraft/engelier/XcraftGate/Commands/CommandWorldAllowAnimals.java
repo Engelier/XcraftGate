@@ -28,7 +28,6 @@ public class CommandWorldAllowAnimals extends CommandHelperWorld {
 
 			getWorld(worldName).setAllowAnimals(allowed);
 			reply("Animal spawn on " + worldName + (allowed ? " enabled." : " disabled."));
-			plugin.saveWorlds();
 		}
 	}
 
