@@ -13,6 +13,6 @@ public class ListenerWeather extends WeatherListener {
 	public void onWeatherChange(WeatherChangeEvent event) {
 		if (plugin.getWorlds().get(event.getWorld()) == null) return;
 		
-		event.setCancelled(plugin.getWorlds().get(event.getWorld()).isAllowWeatherChange());
+		event.setCancelled(!plugin.getWorlds().get(event.getWorld()).isAllowWeatherChange());
 	}
 }

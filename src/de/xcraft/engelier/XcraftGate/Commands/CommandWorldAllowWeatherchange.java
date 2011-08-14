@@ -26,7 +26,7 @@ public class CommandWorldAllowWeatherchange extends CommandHelperWorld {
 			
 			allowed = (args.size() == 0 || !args.get(0).equalsIgnoreCase("false")) ? true : false;
 
-			getWorld(worldName).setAllowAnimals(allowed);
+			getWorld(worldName).setAllowWeatherChange(allowed);
 			reply("Weather changes on " + worldName + (allowed ? " enabled." : " disabled."));
 		}
 	}

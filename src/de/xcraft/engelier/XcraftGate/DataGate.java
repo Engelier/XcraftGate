@@ -167,7 +167,7 @@ public class DataGate {
 			sender.sendMessage("Position: World " + getWorldName() + " is not loaded!");				
 		}
 
-		sender.sendMessage("Destination: " + getTarget().getName());
+		sender.sendMessage("Destination: " + (getTarget() != null ? getTarget().getName() : "none"));
 		sender.sendMessage("Permission-Node: XcraftGate.use." + getName());
 	}
 }

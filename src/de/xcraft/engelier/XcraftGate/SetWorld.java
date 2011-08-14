@@ -26,6 +26,7 @@ public class SetWorld implements Iterable<DataWorld> {
 	@SuppressWarnings("unchecked")
 	public void load() {
 		File configFile = plugin.getConfigFile("worlds.yml");
+		int counter = 0;
 	
 		try {
 			Yaml yaml = new Yaml();
@@ -79,10 +80,14 @@ public class SetWorld implements Iterable<DataWorld> {
 						newWorld.setWeather(thisWeather);
 					}
 				}
+				
+				counter++;
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}		
+		
+		plugin.log.info(plugin.getNameBrackets() + "loaded " + counter + " world configurations");
 	}
 
 	public void save() {
@@ -108,10 +113,10 @@ public class SetWorld implements Iterable<DataWorld> {
 	}
 	
 	public void onWorldLoad(World world) {
-		if (worlds.get(world) != null) {
+		if (worlds.get(world.getName()) != null) {
 			plugin.log.info(plugin.getNameBrackets() + "World '" + world.getName() + "' detected. Applying config.");
-			worlds.get(world).setWorld(world);
-			worlds.get(world).setParameters();
+			worlds.get(world.getName()).setWorld(world);
+			worlds.get(world.getName()).setParameters();
 		} else {
 			plugin.log.info(plugin.getNameBrackets() + "World '" + world.getName() + "' detected. Adding to config.");
 			DataWorld newWorld = new DataWorld(plugin, world.getName(), world.getEnvironment());
@@ -138,10 +143,9 @@ public class SetWorld implements Iterable<DataWorld> {
 		return worlds.get(name);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<DataWorld> iterator() {
-		return (Iterator<DataWorld>) worlds.values();
+		return worlds.values().iterator();
 	}
 
 }

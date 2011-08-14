@@ -134,11 +134,11 @@ public class DataWorld {
 		
 		lastAction = System.currentTimeMillis();
 
-		DataWorld.plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
+		plugin.log.info(plugin.getNameBrackets() + "loaded world " + name + " (Environment: " + environment.toString() + ", Seed: " + world.getSeed() + ", Generator: " + generator.toString() + ")");
 	}
 	
 	public void unload() {
-		DataWorld.plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
+		plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
 		server.unloadWorld(world, true);
 		this.world = null;
 	}

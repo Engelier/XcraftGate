@@ -114,7 +114,9 @@ public class SetGate implements Iterable<DataGate> {
 	
 	public void add(DataGate gate, boolean save) {
 		gates.put(gate.getName(), gate);
-		gateLocations.put(Util.getLocationString(gate.getLocation()), gate.getName());
+		if (gate.getLocation() != null) {
+			gateLocations.put(Util.getLocationString(gate.getLocation()), gate.getName());
+		}
 		
 		resetSuperPermission(gate.getName());
 		if (save) save();
@@ -214,10 +216,9 @@ public class SetGate implements Iterable<DataGate> {
 		return gates.keySet().toArray();
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public Iterator<DataGate> iterator() {
-		return (Iterator<DataGate>) gates.values();
+		return gates.values().iterator();
 	}
 
 }
