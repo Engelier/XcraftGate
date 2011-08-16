@@ -79,7 +79,7 @@ public class XcraftGate extends JavaPlugin {
 		@Override
 		public void run() {
 			for (DataWorld thisWorld : worlds) {
-				if (!thisWorld.isLoaded() && (config.getBoolean("dynworld.enabled", true) == false || thisWorld.isSticky())) {
+				if (!thisWorld.isLoaded() && (config.getBoolean("dynworld.enabled", false) == false || thisWorld.isSticky())) {
 					thisWorld.load();
 				}
 			}
@@ -137,7 +137,7 @@ public class XcraftGate extends JavaPlugin {
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
 		
-		if (config.getBoolean("dynworld.enabled", true)) {
+		if (config.getBoolean("dynworld.enabled", false)) {
 			getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCheckWorldInactive(), config.getInt("dynworld.checkInterval", 60) * 20, config.getInt("dynworld.checkInterval", 60) * 20);
 		}
 		
@@ -170,7 +170,7 @@ public class XcraftGate extends JavaPlugin {
 	}
 	
 	private void setConfigDefaults() {
-		config.getBoolean("dynworld.enabled", true);
+		config.getBoolean("dynworld.enabled", false);
 		config.getInt("dynworld.checkInterval", 60);
 		config.getInt("dynworld.maxInactiveTime", 300);
 		
