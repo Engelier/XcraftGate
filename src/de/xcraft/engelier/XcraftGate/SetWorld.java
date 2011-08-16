@@ -115,14 +115,16 @@ public class SetWorld implements Iterable<DataWorld> {
 	public void onWorldLoad(World world) {
 		if (worlds.get(world.getName()) != null) {
 			plugin.log.info(plugin.getNameBrackets() + "World '" + world.getName() + "' detected. Applying config.");
-			worlds.get(world.getName()).setWorld(world);
-			worlds.get(world.getName()).setParameters();
+			get(world).setWorld(world);
+			get(world).setParameters();
 		} else {
 			plugin.log.info(plugin.getNameBrackets() + "World '" + world.getName() + "' detected. Adding to config.");
 			DataWorld newWorld = new DataWorld(plugin, world.getName(), world.getEnvironment());
 			add(newWorld);
 			save();
 		}
+		
+		plugin.getGates().onWorldLoad(get(world));
 	}
 
 	public void add(DataWorld world) {

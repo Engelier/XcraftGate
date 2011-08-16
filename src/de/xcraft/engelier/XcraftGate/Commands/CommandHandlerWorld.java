@@ -41,6 +41,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		permNodes.put("load", "load");
 		permNodes.put("unload", "load");
 		permNodes.put("setsticky", "load");
+		permNodes.put("keepspawninmemory", "load");
 
 		subcommands.put("create", new CommandWorldCreate(plugin));
 		subcommands.put("info", new CommandWorldInfo(plugin));
@@ -62,6 +63,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		subcommands.put("load", new CommandWorldLoad(plugin));
 		subcommands.put("unload", new CommandWorldUnload(plugin));
 		subcommands.put("setsticky", new CommandWorldSetSticky(plugin));
+		subcommands.put("keepspawninmemory", new CommandWorldKeepSpawnInMemory(plugin));
 	}
 
 	public void printUsage() {
@@ -69,6 +71,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld list");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld info <world>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld listenv");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld listplayers <world>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld create <name> [normal|nether|skylands [seed]]");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld delete <name>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld warpto <name>");
@@ -82,7 +85,8 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld timefrozen <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld settime <world> <sunrise|noon|sunset|midnight>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshealthregain <world> <true|false>");
-		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld listplayers <world>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setsticky <world> <true|false>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld keepspawninmemory <world> <true|false>");
 	}
 
 	@Override

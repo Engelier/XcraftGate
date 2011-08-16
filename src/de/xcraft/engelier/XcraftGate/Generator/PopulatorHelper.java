@@ -32,9 +32,11 @@ public abstract class PopulatorHelper extends BlockPopulator {
 	}
 	
 	public void createLake(Random random, World world, int x, int y, int z, int radius, Material mat) {
-		// get lowest block in reach
-		int lowerY = 128;
+		int lowerY = world.getMaxHeight();
 		
+		radius++;
+		
+		// get lowest block in reach
 		for (int ax = x - radius; ax <= x + radius; ax++) {
 			for (int az = z - radius; az <= z + radius; az++) {
 				int check = world.getHighestBlockYAt(ax, az) - 1;
@@ -42,11 +44,18 @@ public abstract class PopulatorHelper extends BlockPopulator {
 			}
 		}
 		
+		// fill radius with water and make sure 2 blocks above is air
 		for (int ax = x - radius; ax <= x + radius; ax++) {
 			for (int az = z - radius; az <= z + radius; az++) {
-				if (getDistance(x, y, z, ax, y, az) > radius + random.nextInt(2) - 1) continue;				
+				if (getDistance(x, y, z, ax, y, az) > radius - random.nextInt(2)) continue;
+				
+				if (world.getBlockAt(ax, lowerY, az).getType() == Material.SAND || world.getBlockAt(ax, lowerY, az).getType() == Material.AIR
+						|| world.getBlockAt(ax, lowerY + 1, az).getType() == Material.LOG) {
+					continue;
+				}
+				
 				world.getBlockAt(ax, lowerY, az).setType(mat);
-				for (int ay = lowerY + 1; ay <= lowerY + 3; ay++) {
+				for (int ay = lowerY + 1; ay <= lowerY + 2; ay++) {
 					world.getBlockAt(ax, ay, az).setType(Material.AIR);
 				}
 			}

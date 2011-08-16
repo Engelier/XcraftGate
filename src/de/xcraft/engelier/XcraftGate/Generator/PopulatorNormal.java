@@ -52,8 +52,10 @@ public class PopulatorNormal extends PopulatorHelper {
 				
 				String bioHere = blockAffected.getBiome().toString().toLowerCase();
 				
-				// we don't have to populate AIR, WATER or LAVA
-				if (blockBelow.getType() == Material.LAVA || blockBelow.getType() == Material.WATER || blockBelow.getType() == Material.AIR) {
+				// we don't have to populate AIR, BEDROCK, WATER or LAVA
+				if (blockBelow.getType() == Material.LAVA || blockBelow.getType() == Material.STATIONARY_LAVA
+						|| blockBelow.getType() == Material.WATER || blockBelow.getType() == Material.STATIONARY_WATER
+						|| blockBelow.getType() == Material.AIR || blockBelow.getType() == Material.BEDROCK) {
 					continue;
 				}
 

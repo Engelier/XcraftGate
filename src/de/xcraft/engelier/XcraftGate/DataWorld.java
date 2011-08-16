@@ -31,6 +31,8 @@ public class DataWorld {
 	private boolean suppressHealthRegain = true;
 	private Generator generator = Generator.DEFAULT;
 	private boolean sticky = false;
+	private int viewDistance = 10;
+	private boolean keepSpawnInMemory = false;
 		
 	private long lastAction = 0;
 	private World world;
@@ -328,6 +330,24 @@ public class DataWorld {
 		this.suppressHealthRegain = (suppressed != null ? suppressed : true);
 	}
 	
+	public void setViewDistance(int distance) {
+		this.viewDistance = distance;
+		setParameters();
+	}
+	
+	public int getViewDistance() {
+		return viewDistance;
+	}
+	
+	public void setKeepSpawnInMemory(boolean keep) {
+		this.keepSpawnInMemory = keep;
+		setParameters();
+	}
+	
+	public boolean getKeepSpawnInMemory() {
+		return this.keepSpawnInMemory;
+	}
+	
 	public boolean checkBorder(Location location) {
 		return (border > 0 && Math.abs(location.getX()) <= border && Math.abs(location.getZ()) <= border) || border == 0;
 	}
@@ -356,12 +376,14 @@ public class DataWorld {
 		world.setPVP(allowPvP);
 		world.setSpawnFlags(allowMonsters, allowAnimals);
 		world.setStorm(setWeather.getId() == Weather.STORM.getId());
+		world.setKeepSpawnInMemory(keepSpawnInMemory);
 		if (changeTime) world.setTime(setTime);
 		setCreatureLimit(creatureLimit);
 	}
 	
 	public void sendInfo(CommandSender sender) {
 		sender.sendMessage("World: " + name + " (" + (generator == Generator.DEFAULT ? environment.toString() : generator.toString()) + ")" + (sticky ? " Sticky!" : ""));
+		sender.sendMessage("Spawnlocation: " + (world == null ? "world not loaded!" : Util.getLocationString(Util.getSaneLocation(world.getSpawnLocation()))) + (keepSpawnInMemory ? " (Stays in memory!)" : ""));
 		sender.sendMessage("Seed: " + (world != null ? world.getSeed() : "world not loaded!"));
 		sender.sendMessage("Player count: "	+ (world != null ? world.getPlayers().size() : "world not loaded!"));
 		sender.sendMessage("Border: " + (border > 0 ? border : "none"));

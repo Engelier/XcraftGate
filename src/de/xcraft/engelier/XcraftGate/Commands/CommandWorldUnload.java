@@ -26,8 +26,12 @@ public class CommandWorldUnload extends CommandHelperWorld {
 			if (!getWorld(worldName).isLoaded()) {
 				reply("World " + worldName + " is not loaded.");
 			} else {
-				getWorld(worldName).unload();
-				reply("Unloaded world " + worldName);
+				if (plugin.getServer().getWorld(worldName).getPlayers().size() > 0) {
+					error("Unable to unload world with active players.");
+				} else {
+					getWorld(worldName).unload();
+					reply("Unloaded world " + worldName);
+				}
 			}
 		}
 	}

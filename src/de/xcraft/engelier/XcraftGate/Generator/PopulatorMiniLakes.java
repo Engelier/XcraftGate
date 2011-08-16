@@ -30,26 +30,33 @@ public class PopulatorMiniLakes extends PopulatorHelper {
 				int realX = (chunk.getX() * 16) + x;
 				int realZ = (chunk.getZ() * 16) + z;
 				int realY = world.getHighestBlockYAt(realX, realZ);
-				
+								
 				Block blockAffected = world.getBlockAt(realX, realY, realZ);
 				Block blockBelow = world.getBlockAt(realX, realY - 1, realZ);
 				
 				String bioHere = blockAffected.getBiome().toString().toLowerCase();
 				
-				// we don't have to populate AIR, WATER or LAVA
-				if (blockBelow.getType() == Material.LAVA || blockBelow.getType() == Material.WATER || blockBelow.getType() == Material.AIR) {
+				// we don't have to populate AIR, BEDROCK, WATER or LAVA
+				if (blockBelow.getType() == Material.LAVA || blockBelow.getType() == Material.STATIONARY_LAVA 
+						|| blockBelow.getType() == Material.WATER || blockBelow.getType() == Material.STATIONARY_WATER
+						|| blockBelow.getType() == Material.AIR || blockBelow.getType() == Material.BEDROCK) {
 					continue;
 				}
 
+				// we don't want lakes in SAND
+				if (blockBelow.getType() == Material.SAND) {
+					continue;
+				}
+				
 				// one roll to change it all ...
 				int rnd = random.nextInt(1000);
 				
 				if (rnd < getLakeChance(bioHere)) {
 					if (rnd <= config.getInt("biomes." + bioHere + ".chanceLakeWater", 0)) {
 						if (bioHere.equals("swampland")) {
-							createLake(random, world, realX, realY, realZ, 1 + random.nextInt(2), Material.WATER);
+							createLake(random, world, realX, realY, realZ, 1 + random.nextInt(2), Material.STATIONARY_WATER);
 						} else {
-							createLake(random, world, realX, realY, realZ, 2 + random.nextInt(3), Material.WATER);							
+							createLake(random, world, realX, realY, realZ, 2 + random.nextInt(3), Material.STATIONARY_WATER);							
 						}
 					} else {
 						createLake(random, world, realX, realY, realZ, 2 + random.nextInt(3), Material.LAVA);													

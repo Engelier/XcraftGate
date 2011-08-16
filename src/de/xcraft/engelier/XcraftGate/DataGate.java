@@ -63,6 +63,13 @@ public class DataGate {
 		return Util.getSaneLocation(ret);
 	}
 	
+	public Location getPortLocation() {
+		if (plugin.getServer().getWorld(worldName) == null) return null;
+		
+		Location ret = new Location(plugin.getServer().getWorld(worldName), x, y + 1.5, z, yaw, pitch);
+		return Util.getSaneLocation(ret);
+	}
+
 	public String getName() {
 		return gateName;
 	}
@@ -143,7 +150,7 @@ public class DataGate {
 	public void portHere(PlayerMoveEvent event) {
 		checkWorld();
 		plugin.justTeleported.put(event.getPlayer().getName(), getLocation());
-		event.setTo(getLocation());
+		event.setTo(getPortLocation());
 	}
 	
 	public void portToTarget(Player player) {

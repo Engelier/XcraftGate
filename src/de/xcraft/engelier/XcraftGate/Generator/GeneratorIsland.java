@@ -25,7 +25,7 @@ public class GeneratorIsland extends GeneratorHelper {
 	private final byte matRedstoneOre = (byte)Material.REDSTONE_ORE.getId();
 	private final byte matSand = (byte)Material.SAND.getId();
 	private final byte matStone = (byte)Material.STONE.getId();
-	private final byte matWater = (byte)Material.WATER.getId();
+	private final byte matWater = (byte)Material.STATIONARY_WATER.getId();
 	
 	private XcraftGate plugin = null;
 
@@ -108,7 +108,7 @@ public class GeneratorIsland extends GeneratorHelper {
 
 	@Override
 	public List<BlockPopulator> getDefaultPopulators(World world) {
-		return (List<BlockPopulator>) Arrays.asList((BlockPopulator) new PopulatorNormal(plugin), new PopulatorMiniLakes(plugin));
+		return (List<BlockPopulator>) Arrays.asList((BlockPopulator) new PopulatorMiniLakes(plugin), new PopulatorNormal(plugin));
 	}
 
 

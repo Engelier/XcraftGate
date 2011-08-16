@@ -16,7 +16,7 @@ public class GeneratorHills extends GeneratorHelper {
 	private final byte matDirt = (byte)Material.DIRT.getId();
 	private final byte matGrass = (byte)Material.GRASS.getId();
 	private final byte matStone = (byte)Material.STONE.getId();
-	private final byte matWater = (byte)Material.WATER.getId();
+	private final byte matWater = (byte)Material.STATIONARY_WATER.getId();
 	
 	private XcraftGate plugin = null;
 
