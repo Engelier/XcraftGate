@@ -1,6 +1,6 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.9rc1
+version: 0.9
 author: Engelier
 load: startup
 commands:
@@ -84,5 +84,5 @@ permissions:
   XcraftGate.world.info:
     description: Access to /gworld info, /gworld list
   XcraftGate.world.load:
-    description: Access to /gworld load, /gworld unload, /gworld setsticky
+    description: Access to /gworld load, /gworld unload, /gworld setsticky, /gworld keepspawninmemory
     
