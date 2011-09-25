@@ -1,17 +1,15 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.9
+version: 0.10d4
 author: Engelier
 load: startup
 commands:
   gate:
     description: Modify Teleporters
     usage: /<command> help
-    permission: XcraftGate.gate
   gworld:
     description: Manage Worlds
     usage: /<command> help
-    permission: XcraftGate.world
 permissions:
   XcraftGate.*:
     description: Access to all commands/gates this plugin provides

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -31,6 +32,8 @@ public class XcraftGate extends JavaPlugin {
 	private final ListenerEntity entityListener = new ListenerEntity(this);
 	private final ListenerWeather weatherListener = new ListenerWeather(this);
 	private final ListenerWorld worldListener = new ListenerWorld(this);
+	
+	private static Integer cbVersion = 0;
 
 	private SetWorld worlds = new SetWorld(this);
 	private SetGate gates = new SetGate(this);
@@ -93,10 +96,16 @@ public class XcraftGate extends JavaPlugin {
 	}
 
 	public void onEnable() {
+		String cbVersionString = this.getServer().getVersion().replaceAll("^.*b([0-9]+)jnks.*$", "$1");
+		if (cbVersionString.length() > 0) {
+			cbVersion = Integer.parseInt(cbVersionString);
+		}
+		
 		PluginManager pm = this.getServer().getPluginManager();
 
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Event.Priority.Normal, this);
+		if (cbVersion >= 1185) pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
 		pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,	Event.Priority.Monitor, this);
@@ -123,8 +132,6 @@ public class XcraftGate extends JavaPlugin {
 			}
 		}
 
-		log.info(getNameBrackets() + "by Engelier loaded.");
-
 		config = getConfiguration();
 		setConfigDefaults();
 		worlds.load();
@@ -149,6 +156,17 @@ public class XcraftGate extends JavaPlugin {
 		} catch (Exception ex) {
 			log.warning(getNameBrackets() + "getCommand().setExecutor() failed! Seems I got enabled by another plugin. Nag the bukkit team about this!");
 		}
+	}
+	
+	public Configuration getConfig(String fileName) {
+		return getConfig(getConfigFile(fileName));
+	}
+	
+	public Configuration getConfig(File file) {
+		Configuration ret = new Configuration(file);
+		ret.load();
+		
+		return ret;
 	}
 	
 	public File getConfigFile(String fileName) {

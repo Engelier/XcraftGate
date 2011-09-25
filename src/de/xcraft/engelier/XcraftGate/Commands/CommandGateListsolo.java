@@ -22,7 +22,7 @@ public class CommandGateListsolo extends CommandHelperGate {
 				boolean hasSource = false;
 				
 				for (DataGate sourceGate : plugin.getGates()) {
-					if (sourceGate.getTarget().equals(thisGate)) { 
+					if (sourceGate.getTarget() != null && sourceGate.getTarget().equals(thisGate)) { 
 						hasSource = true;
 					}
 				}

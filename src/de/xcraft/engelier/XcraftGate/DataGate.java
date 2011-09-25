@@ -3,6 +3,7 @@ package de.xcraft.engelier.XcraftGate;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -135,22 +136,37 @@ public class DataGate {
 		gateTargetName = null;
 	}
 	
-	private void checkWorld() {
+	private boolean checkWorld() {
+		if (plugin.getWorlds().get(worldName) == null) {
+			return false;
+		}
+		
 		if (!plugin.getWorlds().get(worldName).isLoaded()) {
 			plugin.getWorlds().get(worldName).load();
 		}		
+		
+		return true;
 	}
 	
 	public void portHere(Player player) {
-		checkWorld();
+		if (!checkWorld()) {
+			player.sendMessage(ChatColor.RED + "Error: Target world '" + worldName + "' doesn't exist. Please alert your administrator!");
+			return;
+		}
+
 		plugin.justTeleported.put(player.getName(), getLocation());
 		player.teleport(getLocation());
 	}
 
 	public void portHere(PlayerMoveEvent event) {
-		checkWorld();
+		if (!checkWorld()) {
+			event.getPlayer().sendMessage(ChatColor.RED + "Error: Target world '" + worldName + "' doesn't exist. Please alert your administrator!");
+			return;
+		}
+
 		plugin.justTeleported.put(event.getPlayer().getName(), getLocation());
-		event.setTo(getPortLocation());
+		//event.setTo(getPortLocation());
+		event.getPlayer().teleport(getLocation());
 	}
 	
 	public void portToTarget(Player player) {

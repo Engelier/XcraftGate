@@ -29,6 +29,7 @@ public class DataWorld {
 	private long setTime = 100;
 	private boolean timeFrozen = false;
 	private boolean suppressHealthRegain = true;
+	private boolean suppressHunger = false;
 	private Generator generator = Generator.DEFAULT;
 	private boolean sticky = false;
 	private int viewDistance = 10;
@@ -181,6 +182,7 @@ public class DataWorld {
 		values.put("setTime", setTime);
 		values.put("timeFrozen", timeFrozen);
 		values.put("suppressHealthRegain", suppressHealthRegain);
+		values.put("suppressHunger", suppressHunger);
 		values.put("sticky", sticky);
 		return values;
 	}
@@ -330,6 +332,14 @@ public class DataWorld {
 		this.suppressHealthRegain = (suppressed != null ? suppressed : true);
 	}
 	
+	public boolean isSuppressHunger() {
+		return this.suppressHunger;
+	}
+	
+	public void setSuppressHunger(Boolean suppressed) {
+		this.suppressHunger = (suppressed != null ? suppressed : true);
+	}
+	
 	public void setViewDistance(int distance) {
 		this.viewDistance = distance;
 		setParameters();
@@ -394,6 +404,7 @@ public class DataWorld {
 				(world.getLivingEntities().size() - world.getPlayers().size()) + "/"
 				+ (creatureLimit > 0 ? creatureLimit : "unlimited") : "world not loaded!"));
 		sender.sendMessage("Health regaining suppressed: " + (suppressHealthRegain ? "yes" : "no"));
+		sender.sendMessage("Food bar depletion suppressed: " + (suppressHunger ? "yes" : "no"));
 		sender.sendMessage("Weather changes allowed: " + (allowWeatherChange ? "yes" : "no"));
 		sender.sendMessage("Current Weather: " + setWeather.toString());
 		sender.sendMessage("Time frozen: " + (timeFrozen ? "yes" : "no"));

@@ -70,6 +70,7 @@ public class SetWorld implements Iterable<DataWorld> {
 				newWorld.setTimeFrozen(Util.castBoolean(worldData.get("timeFrozen")));
 				newWorld.setDayTime(Util.castInt(worldData.get("setTime")));
 				newWorld.setSuppressHealthRegain(Util.castBoolean(worldData.get("suppressHealthRegain")));
+				newWorld.setSuppressHunger(Util.castBoolean(worldData.get("suppressHunger")));
 				newWorld.setSticky(Util.castBoolean(worldData.get("sticky")));
 				
 				worlds.put(worldName, newWorld);

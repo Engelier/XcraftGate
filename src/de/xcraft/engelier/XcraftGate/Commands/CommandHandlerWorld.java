@@ -29,6 +29,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		permNodes.put("allowanimals", "setcreaturelimit");
 		permNodes.put("allowmonsters", "setcreaturelimit");
 		permNodes.put("suppresshealthregain", "setcreaturelimit");
+		permNodes.put("suppresshunger", "setcreaturelimit");
 		permNodes.put("allowpvp", "pvp");
 		permNodes.put("allowweatherchange", "weather");
 		permNodes.put("setweather", "weather");
@@ -59,6 +60,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		subcommands.put("timefrozen", new CommandWorldTimeFrozen(plugin));
 		subcommands.put("settime", new CommandWorldSetTime(plugin));
 		subcommands.put("suppresshealthregain", new CommandWorldSuppressHealthregain(plugin));
+		subcommands.put("suppresshunger", new CommandWorldSuppressHunger(plugin));
 		subcommands.put("listplayers", new CommandWorldListPlayers(plugin));
 		subcommands.put("load", new CommandWorldLoad(plugin));
 		subcommands.put("unload", new CommandWorldUnload(plugin));
@@ -85,6 +87,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld timefrozen <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld settime <world> <sunrise|noon|sunset|midnight>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshealthregain <world> <true|false>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshunger <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setsticky <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld keepspawninmemory <world> <true|false>");
 	}
