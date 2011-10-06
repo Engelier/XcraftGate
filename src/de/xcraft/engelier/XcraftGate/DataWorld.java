@@ -3,6 +3,8 @@ package de.xcraft.engelier.XcraftGate;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -35,6 +37,9 @@ public class DataWorld {
 	private boolean sticky = false;
 	private int viewDistance = 10;
 	private boolean keepSpawnInMemory = false;
+	private int gamemode = 0;
+	private int difficulty = 0;
+	private boolean announcePlayerDeath = true;
 		
 	private long lastAction = 0;
 	private World world;
@@ -55,6 +60,8 @@ public class DataWorld {
 		DataWorld.plugin = instance;
 		DataWorld.server = plugin.getServer();
 		this.allowPvP = Util.castBoolean(plugin.serverconfig.getProperty("pvp", "false"));
+		this.gamemode = Util.castInt(plugin.serverconfig.getProperty("gamemode", "0"));
+		this.difficulty = Util.castInt(plugin.serverconfig.getProperty("difficulty", "1"));
 		
 		this.world = server.getWorld(worldName);
 		this.name = worldName;
@@ -190,6 +197,9 @@ public class DataWorld {
 		values.put("suppressHealthRegain", suppressHealthRegain);
 		values.put("suppressHunger", suppressHunger);
 		values.put("sticky", sticky);
+		values.put("gamemode", gamemode);
+		values.put("difficulty", difficulty);
+		values.put("announcePlayerDeath", announcePlayerDeath);
 		return values;
 	}
 	
@@ -239,7 +249,8 @@ public class DataWorld {
 			if (entity instanceof Zombie || entity instanceof Skeleton
 					|| entity instanceof PigZombie || entity instanceof Creeper
 					|| entity instanceof Ghast || entity instanceof Spider
-					|| entity instanceof Giant || entity instanceof Slime)
+					|| entity instanceof Giant || entity instanceof Slime
+					|| entity instanceof Enderman);
 				entity.remove();
 		}
 	}
@@ -364,6 +375,32 @@ public class DataWorld {
 		return this.keepSpawnInMemory;
 	}
 	
+	public void setGameMode(int gamemode) {
+		this.gamemode = gamemode;
+		setParameters();
+	}
+	
+	public int getGameMode() {
+		return this.gamemode;
+	}
+	
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
+		setParameters();
+	}
+	
+	public int getDifficulty() {
+		return this.difficulty;
+	}
+	
+	public void setAnnouncePlayerDeath(boolean announce) {
+		this.announcePlayerDeath = announce;
+	}
+	
+	public boolean getAnnouncePlayerDeath() {
+		return this.announcePlayerDeath;
+	}
+	
 	public boolean checkBorder(Location location) {
 		return (border > 0 && Math.abs(location.getX()) <= border && Math.abs(location.getZ()) <= border) || border == 0;
 	}
@@ -393,6 +430,7 @@ public class DataWorld {
 		world.setSpawnFlags(allowMonsters, allowAnimals);
 		world.setStorm(setWeather.getId() == Weather.STORM.getId());
 		world.setKeepSpawnInMemory(keepSpawnInMemory);
+		world.setDifficulty(Difficulty.getByValue(difficulty));
 		if (changeTime) world.setTime(setTime);
 		setCreatureLimit(creatureLimit);
 	}
@@ -404,16 +442,15 @@ public class DataWorld {
 		sender.sendMessage("Player count: "	+ (world != null ? world.getPlayers().size() : "world not loaded!"));
 		sender.sendMessage("Border: " + (border > 0 ? border : "none"));
 		sender.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));
-		sender.sendMessage("Animals allowed: " + (allowAnimals ? "yes" : "no"));
-		sender.sendMessage("Monsters allowed: " + (allowMonsters ? "yes" : "no"));
+		sender.sendMessage("Animals/Monsters allowed: " + (allowAnimals ? "yes" : "no") + " / " + (allowMonsters ? "yes" : "no"));
 		sender.sendMessage("Creature count/limit: " + (world != null ? 
 				(world.getLivingEntities().size() - world.getPlayers().size()) + "/"
 				+ (creatureLimit > 0 ? creatureLimit : "unlimited") : "world not loaded!"));
 		sender.sendMessage("Health regaining suppressed: " + (suppressHealthRegain ? "yes" : "no"));
 		sender.sendMessage("Food bar depletion suppressed: " + (suppressHunger ? "yes" : "no"));
-		sender.sendMessage("Weather changes allowed: " + (allowWeatherChange ? "yes" : "no"));
-		sender.sendMessage("Current Weather: " + setWeather.toString());
-		sender.sendMessage("Time frozen: " + (timeFrozen ? "yes" : "no"));
-		sender.sendMessage("Current Time: " + (world != null ? timeToString(world.getTime()) : "world not loaded!"));
+		sender.sendMessage("Weather / changes allowed: " + setWeather.toString() + " / " + (allowWeatherChange ? "yes" : "no"));
+		sender.sendMessage("Current Time / frozen: " + (world != null ? timeToString(world.getTime()) : "world not loaded!") + " / " + (timeFrozen ? "yes" : "no"));
+		sender.sendMessage("GameMode / Difficulty: " + GameMode.getByValue(gamemode) + " / " + Difficulty.getByValue(difficulty));
+		sender.sendMessage("Announce player deaths: " + (announcePlayerDeath ? "Yes" : "No"));
 	}
 }

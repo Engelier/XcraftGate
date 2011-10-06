@@ -72,7 +72,10 @@ public class SetWorld implements Iterable<DataWorld> {
 				newWorld.setSuppressHealthRegain(Util.castBoolean(worldData.get("suppressHealthRegain")));
 				newWorld.setSuppressHunger(Util.castBoolean(worldData.get("suppressHunger")));
 				newWorld.setSticky(Util.castBoolean(worldData.get("sticky")));
-				
+				newWorld.setAnnouncePlayerDeath(Util.castBoolean(worldData.get("announcePlayerDeath")));
+				newWorld.setDifficulty(Util.castInt(worldData.get("difficulty")));
+				newWorld.setGameMode(Util.castInt(worldData.get("gamemode")));
+
 				worlds.put(worldName, newWorld);
 
 				String weather = (String) worldData.get("setWeather");

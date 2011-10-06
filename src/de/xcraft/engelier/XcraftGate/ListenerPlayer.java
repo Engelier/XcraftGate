@@ -1,7 +1,9 @@
 package de.xcraft.engelier.XcraftGate;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -14,6 +16,10 @@ public class ListenerPlayer extends PlayerListener {
 		plugin = instance;
 	}
 
+	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+		event.getPlayer().setGameMode(GameMode.getByValue(plugin.getWorlds().get(event.getPlayer().getWorld()).getGameMode()));
+	}
+	
 	public void onPlayerMove(PlayerMoveEvent event) {
 		location = event.getTo();
 

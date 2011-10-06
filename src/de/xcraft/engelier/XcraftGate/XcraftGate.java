@@ -95,7 +95,7 @@ public class XcraftGate extends JavaPlugin {
 		if (cbVersionString.length() > 0) {
 			if (Integer.parseInt(cbVersionString) < minCBVersion) {
 				log.severe(getNameBrackets() + "Sorry. But this version of XcraftGate requires CraftBukkit build " + minCBVersion + " or higher.");
-				// disable myself!
+				// FIXME: need to find a save way to disable myself without losing my config
 				return;
 			}
 		}
@@ -104,8 +104,10 @@ public class XcraftGate extends JavaPlugin {
 		
 		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.PLAYER_CHANGED_WORLD, playerListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,	Event.Priority.Monitor);
 		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.WORLD_LOAD, worldListener, Event.Priority.Highest);

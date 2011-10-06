@@ -1,6 +1,6 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.10d5
+version: 0.10d9
 author: Engelier
 load: startup
 commands:
@@ -67,6 +67,9 @@ permissions:
       XcraftGate.world.time: true
       XcraftGate.world.info: true
       XcraftGate.world.load: true
+      XcraftGate.world.difficulty: true
+      XcraftGate.world.gamemode: true
+      XcraftGate.world.spawn: true
   XcraftGate.world:
     description: Basic access to /gworld
   XcraftGate.world.create:
@@ -89,4 +92,9 @@ permissions:
     description: Access to /gworld info, /gworld list
   XcraftGate.world.load:
     description: Access to /gworld load, /gworld unload, /gworld setsticky, /gworld keepspawninmemory
-    
+  XcraftGate.world.difficulty:
+    description: Access to /gworld setdifficulty, /gworld setannouncedeath
+  XcraftGate.world.gamemode:
+    description: Access to /gworld gamemode
+  XcraftGate.world.spawn:
+    description: Access to /gworld setspawn

@@ -43,7 +43,11 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		permNodes.put("unload", "load");
 		permNodes.put("setsticky", "load");
 		permNodes.put("keepspawninmemory", "load");
-
+		permNodes.put("setdifficulty", "difficulty");
+		permNodes.put("setannouncedeath", "difficulty");
+		permNodes.put("setgamemode", "gamemode");
+		permNodes.put("setspawn", "spawn");
+		
 		subcommands.put("create", new CommandWorldCreate(plugin));
 		subcommands.put("info", new CommandWorldInfo(plugin));
 		subcommands.put("listenv", new CommandWorldListEnv(plugin));
@@ -66,6 +70,10 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		subcommands.put("unload", new CommandWorldUnload(plugin));
 		subcommands.put("setsticky", new CommandWorldSetSticky(plugin));
 		subcommands.put("keepspawninmemory", new CommandWorldKeepSpawnInMemory(plugin));
+		subcommands.put("setdifficulty", new CommandWorldSetDifficulty(plugin));
+		subcommands.put("setgamemode", new CommandWorldSetGameMode(plugin));
+		subcommands.put("setannouncedeath", new CommandWorldSetAnnounceDeath(plugin));
+		subcommands.put("setspawn", new CommandWorldSetSpawn(plugin));
 	}
 
 	public void printUsage() {
@@ -86,6 +94,10 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setweather <world> <sun|storm>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld timefrozen <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld settime <world> <sunrise|noon|sunset|midnight>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setdifficulty <world> <peaceful|easy|normal|hard>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setannouncedeath <world> <true|false>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setgamemode <world> <survival|creative>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setspawn <world>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshealthregain <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshunger <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setsticky <world> <true|false>");
@@ -107,7 +119,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 			return true;
 		}
 
-		if (player == null && args[0].equals("warpto")) {
+		if (player == null && (args[0].equalsIgnoreCase("warpto") || args[0].equalsIgnoreCase("setspawn"))) {
 			error("/gworld warpto cannot be used from the console");
 			return true;
 		}
