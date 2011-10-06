@@ -62,6 +62,8 @@ public class DataWorld {
 		this.allowPvP = Util.castBoolean(plugin.serverconfig.getProperty("pvp", "false"));
 		this.gamemode = Util.castInt(plugin.serverconfig.getProperty("gamemode", "0"));
 		this.difficulty = Util.castInt(plugin.serverconfig.getProperty("difficulty", "1"));
+		this.allowAnimals = Util.castBoolean(plugin.serverconfig.getProperty("spawn-animals", "true"));
+		this.allowMonsters = Util.castBoolean(plugin.serverconfig.getProperty("spawn-monsters", "true"));
 		
 		this.world = server.getWorld(worldName);
 		this.name = worldName;

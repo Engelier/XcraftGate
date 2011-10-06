@@ -120,7 +120,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		}
 
 		if (player == null && (args[0].equalsIgnoreCase("warpto") || args[0].equalsIgnoreCase("setspawn"))) {
-			error("/gworld warpto cannot be used from the console");
+			error("/gworld warpto or setspawn cannot be used from the console");
 			return true;
 		}
 		
