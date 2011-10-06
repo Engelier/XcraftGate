@@ -34,6 +34,8 @@ public class CommandHandlerGate extends CommandHelper implements CommandExecutor
 		permNodes.put("listsolo", "info");
 		permNodes.put("warp", "warp");
 		permNodes.put("reload", "reload");
+		permNodes.put("setdenysilent", "denysilent");
+		permNodes.put("settoll", "toll");
 		
 		subcommands.put("create", new CommandGateCreate(plugin));
 		subcommands.put("move", new CommandGateMove(plugin));
@@ -48,7 +50,8 @@ public class CommandHandlerGate extends CommandHelper implements CommandExecutor
 		subcommands.put("listsolo", new CommandGateListsolo(plugin));
 		subcommands.put("warp", new CommandGateWarp(plugin));
 		subcommands.put("reload", new CommandGateReload(plugin));
-		
+		subcommands.put("setdenysilent", new CommandGateSetDenySilent(plugin));
+		subcommands.put("settoll", new CommandGateSetToll(plugin));
 	}
 	
 	public void printUsage() {
@@ -61,6 +64,8 @@ public class CommandHandlerGate extends CommandHelper implements CommandExecutor
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate unlink <name>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate unloop <name1> <name2>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate delete <name>");
+		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate settoll <name> <amount>");
+		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate setdenysilent <name> <true|false>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate list");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate listnear [radius]");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate listsolo");

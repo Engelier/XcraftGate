@@ -1,6 +1,6 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.10d4
+version: 0.10d5
 author: Engelier
 load: startup
 commands:
@@ -30,6 +30,8 @@ permissions:
       XcraftGate.gate.info: true
       XcraftGate.gate.warp: true
       XcraftGate.gate.reload: true
+      XcraftGate.gate.toll: true
+      XcraftGate.gate.denysilent: true
   XcraftGate.gate:
     description: Basic access to /gate
   XcraftGate.gate.create:
@@ -40,6 +42,10 @@ permissions:
     description: Access to /gate link, /gate loop
   XcraftGate.gate.unlink:
     description: Access to /gate unlink, /gate unloop
+  XcraftGate.gate.toll:
+    description: Access to /gate settoll
+  XcraftGate.gate.denysilent:
+    description: Access to /gate denysilent
   XcraftGate.gate.info:
     description: Access to /gate list, /gate listsolo, /gate listnear, /gate info
   XcraftGate.gate.warp:

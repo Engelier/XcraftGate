@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.generator.ChunkGenerator;
@@ -127,13 +128,18 @@ public class DataWorld {
 		
 		ChunkGenerator thisGen = (generator != Generator.DEFAULT) ? generator.getChunkGenerator(plugin) : null;
 		
-		if (seed == null && thisGen == null) {
-			this.world = server.createWorld(name, environment);
-		} else if (seed == null && thisGen != null) {
-			this.world = server.createWorld(name, World.Environment.NORMAL, thisGen);
-		} else {
-			this.world = server.createWorld(name, World.Environment.NORMAL, seed, thisGen);
+		WorldCreator creator = new WorldCreator(name);
+		creator.environment(environment);
+		
+		if (seed != null) {
+			creator.seed(seed);
 		}
+		
+		if (thisGen != null) {
+			creator.generator(thisGen);
+		}
+
+		this.world = creator.createWorld();
 		
 		lastAction = System.currentTimeMillis();
 

@@ -13,13 +13,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 import de.xcraft.engelier.XcraftGate.Commands.*;
 import de.xcraft.engelier.XcraftGate.Generator.Generator;
@@ -31,8 +26,10 @@ public class XcraftGate extends JavaPlugin {
 	private final ListenerEntity entityListener = new ListenerEntity(this);
 	private final ListenerWeather weatherListener = new ListenerWeather(this);
 	private final ListenerWorld worldListener = new ListenerWorld(this);
+
+	private PluginManager pm = null;
 	
-	private static Integer cbVersion = 0;
+	private static final Integer minCBVersion = 1236;
 
 	private SetWorld worlds = new SetWorld(this);
 	private SetGate gates = new SetGate(this);
@@ -40,7 +37,6 @@ public class XcraftGate extends JavaPlugin {
 	public Map<String, Location> justTeleported = new HashMap<String, Location>();
 	public Map<String, Location> justTeleportedFrom = new HashMap<String, Location>();
 
-	public PermissionHandler permissions = null;
 	public Configuration config = null;
 
 	public final Logger log = Logger.getLogger("Minecraft");
@@ -97,28 +93,24 @@ public class XcraftGate extends JavaPlugin {
 	public void onEnable() {
 		String cbVersionString = this.getServer().getVersion().replaceAll("^.*b([0-9]+)jnks.*$", "$1");
 		if (cbVersionString.length() > 0) {
-			cbVersion = Integer.parseInt(cbVersionString);
+			if (Integer.parseInt(cbVersionString) < minCBVersion) {
+				log.severe(getNameBrackets() + "Sorry. But this version of XcraftGate requires CraftBukkit build " + minCBVersion + " or higher.");
+				// disable myself!
+				return;
+			}
 		}
 		
-		PluginManager pm = this.getServer().getPluginManager();
-
-		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Event.Priority.Normal, this);
-		if (cbVersion >= 1185) pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.PLUGIN_ENABLE, pluginListener, Event.Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,	Event.Priority.Monitor, this);
-		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.Normal, this);
-		pm.registerEvent(Event.Type.WORLD_LOAD, worldListener, Event.Priority.Highest, this);
-		pm.registerEvent(Event.Type.WORLD_UNLOAD, worldListener, Event.Priority.Highest, this);
-
-		Plugin permissionsCheck = pm.getPlugin("Permissions");
-		if (permissionsCheck != null && permissionsCheck.isEnabled()) {
-			permissions = ((Permissions) permissionsCheck).getHandler();
-			log.info(getNameBrackets() + "hooked into Permissions "
-					+ permissionsCheck.getDescription().getVersion());
-		}
+		pm = new PluginManager(this);
 		
+		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,	Event.Priority.Monitor);
+		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.WORLD_LOAD, worldListener, Event.Priority.Highest);
+		pm.registerEvent(Event.Type.WORLD_UNLOAD, worldListener, Event.Priority.Highest);
+
 		File serverconfigFile = new File("server.properties");
 		if (!serverconfigFile.exists()) {
 			log.severe(getNameBrackets() + "unable to load server.properties.");
@@ -148,6 +140,7 @@ public class XcraftGate extends JavaPlugin {
 		}
 		
 		getServer().getScheduler().scheduleSyncDelayedTask(this, new RunLoadAllWorlds());
+		getServer().getScheduler().scheduleSyncDelayedTask(this, pm);
 		
 		try {
 			getCommand("gate").setExecutor(new CommandHandlerGate(this));
@@ -262,6 +255,10 @@ public class XcraftGate extends JavaPlugin {
 	
 	public SetGate getGates() {
 		return gates;
+	}
+	
+	public PluginManager getPluginManager() {
+		return pm;
 	}
 	
 	public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {

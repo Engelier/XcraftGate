@@ -56,11 +56,27 @@ public class ListenerPlayer extends PlayerListener {
 				plugin.justTeleportedFrom.remove(event.getPlayer().getName());
 			}
 		} else if ((gate = plugin.getGates().getByLocation(location)) != null) {
-			if (plugin.permissions == null ? event.getPlayer().hasPermission("XcraftGate.use." + gate.getName()) : plugin.permissions.has(event.getPlayer(), "XcraftGate.use." + gate.getName())) {
+			if (plugin.getPluginManager().getPermissions() == null ?
+					event.getPlayer().hasPermission("XcraftGate.use." + gate.getName()) :
+					plugin.getPluginManager().getPermissions().has(event.getPlayer(), "XcraftGate.use." + gate.getName())) {
 				plugin.justTeleportedFrom.put(event.getPlayer().getName(), gate.getLocation());
-				gate.portToTarget(event);
+				if (plugin.getPluginManager().getEcoMethod() != null && gate.getToll() > 0) {
+					if (plugin.getPluginManager().getEcoMethod().getAccount(event.getPlayer().getName()).hasEnough(gate.getToll())) {
+						plugin.getPluginManager().getEcoMethod().getAccount(event.getPlayer().getName()).subtract(gate.getToll());
+						event.getPlayer().sendMessage(ChatColor.AQUA + "Took " + plugin.getPluginManager().getEcoMethod().format(gate.getToll()) + " from your account for using this gate.");
+						gate.portToTarget(event);
+					} else {
+						if (!gate.getDenySilent()) {
+							event.getPlayer().sendMessage(ChatColor.RED + "You don't have enough money to use this gate (Requires: " + plugin.getPluginManager().getEcoMethod().format(gate.getToll()) + ")");
+						}						
+					}
+				} else {
+					gate.portToTarget(event);
+				}
 			} else {
-				event.getPlayer().sendMessage(ChatColor.RED + "You're not allowed to use this gate!");
+				if (!gate.getDenySilent()) {
+					event.getPlayer().sendMessage(ChatColor.RED + "You're not allowed to use this gate!");
+				}
 			}
 		}
 	}

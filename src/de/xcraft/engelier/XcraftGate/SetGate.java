@@ -47,6 +47,8 @@ public class SetGate implements Iterable<DataGate> {
 						((Double) gateData.get("locYaw")).floatValue(),
 						((Double) gateData.get("locP")).floatValue());
 
+				newGate.setToll((Double) gateData.get("toll"));
+				newGate.setDenySilent((Boolean) gateData.get("denysilent"));
 
 				add(newGate);
 				counter++;

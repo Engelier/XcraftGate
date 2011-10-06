@@ -18,6 +18,8 @@ public class DataGate {
 	private float pitch;
 	private float yaw;
 	private String worldName;
+	private double toll = 0.00;
+	private boolean denysilent = false;
 
 	private String gateName = null;
 	private String gateTargetName = null;
@@ -39,6 +41,8 @@ public class DataGate {
 		values.put("locP", pitch);
 		values.put("locYaw", yaw);
 		values.put("target", gateTargetName);
+		values.put("toll", toll);
+		values.put("denysilent", denysilent);
 		
 		return values;
 	}
@@ -71,6 +75,22 @@ public class DataGate {
 		return Util.getSaneLocation(ret);
 	}
 
+	public void setToll(Double toll) {
+		this.toll = (toll != null) ? toll : 0.00;
+	}
+	
+	public double getToll() {
+		return this.toll;
+	}
+	
+	public void setDenySilent(Boolean denysilent) {
+		this.denysilent = denysilent != null ? denysilent : false;
+	}
+	
+	public boolean getDenySilent() {
+		return this.denysilent;
+	}
+	
 	public String getName() {
 		return gateName;
 	}
@@ -191,6 +211,10 @@ public class DataGate {
 		}
 
 		sender.sendMessage("Destination: " + (getTarget() != null ? getTarget().getName() : "none"));
+		if (plugin.getPluginManager().getEcoMethod() != null) {
+			sender.sendMessage("Toll: " + plugin.getPluginManager().getEcoMethod().format(toll));
+		}
+		sender.sendMessage("Deny usage silently: " + (denysilent ? "Yes" : "No"));
 		sender.sendMessage("Permission-Node: XcraftGate.use." + getName());
 	}
 }

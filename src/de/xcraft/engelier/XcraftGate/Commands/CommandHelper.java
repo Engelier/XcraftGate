@@ -28,12 +28,12 @@ public abstract class CommandHelper {
 			return true;
 		}
 		
-		if (plugin.permissions != null) {
+		if (plugin.getPluginManager().getPermissions() != null) {
 			if (subcommand != null) {
-				return plugin.permissions.has(player, "XcraftGate." + command
+				return plugin.getPluginManager().getPermissions().has(player, "XcraftGate." + command
 						+ "." + subcommand);
 			} else {
-				return plugin.permissions.has(player, "XcraftGate." + command);
+				return plugin.getPluginManager().getPermissions().has(player, "XcraftGate." + command);
 			}
 		} else {
 			if (subcommand != null) {
