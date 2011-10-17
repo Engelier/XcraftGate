@@ -6,12 +6,12 @@ import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.util.config.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
 
 public class PopulatorMiniLakes extends PopulatorHelper {
-	private Configuration config;
+	private YamlConfiguration config;
 	
 	public PopulatorMiniLakes(XcraftGate plugin) {
 		super(plugin);

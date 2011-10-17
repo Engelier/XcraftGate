@@ -2,6 +2,8 @@ package de.xcraft.engelier.XcraftGate;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -11,10 +13,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
 
 import de.xcraft.engelier.XcraftGate.Commands.*;
 import de.xcraft.engelier.XcraftGate.Generator.Generator;
@@ -37,7 +40,7 @@ public class XcraftGate extends JavaPlugin {
 	public Map<String, Location> justTeleported = new HashMap<String, Location>();
 	public Map<String, Location> justTeleportedFrom = new HashMap<String, Location>();
 
-	public Configuration config = null;
+	public YamlConfiguration config = null;
 
 	public final Logger log = Logger.getLogger("Minecraft");
 	public final Properties serverconfig = new Properties(); 
@@ -125,8 +128,12 @@ public class XcraftGate extends JavaPlugin {
 			}
 		}
 
-		config = getConfiguration();
-		setConfigDefaults();
+		config = getConfig(getConfigFile("config.yml"));
+		try {
+			setConfigDefaults();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		worlds.load();
 		gates.load();
 
@@ -152,13 +159,21 @@ public class XcraftGate extends JavaPlugin {
 		}
 	}
 	
-	public Configuration getConfig(String fileName) {
+	public YamlConfiguration getConfig(String fileName) {
 		return getConfig(getConfigFile(fileName));
 	}
 	
-	public Configuration getConfig(File file) {
-		Configuration ret = new Configuration(file);
-		ret.load();
+	public YamlConfiguration getConfig(File file) {
+		YamlConfiguration ret = new YamlConfiguration();
+		try {
+			ret.load(file);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
 		
 		return ret;
 	}
@@ -181,7 +196,7 @@ public class XcraftGate extends JavaPlugin {
 		return configFile;
 	}
 	
-	private void setConfigDefaults() {
+	private void setConfigDefaults() throws IOException {
 		config.getBoolean("dynworld.enabled", false);
 		config.getInt("dynworld.checkInterval", 60);
 		config.getInt("dynworld.maxInactiveTime", 300);
@@ -230,7 +245,7 @@ public class XcraftGate extends JavaPlugin {
 		config.getInt("biomes.taiga.chanceGrassTall", 2);
 		config.getInt("biomes.tundra.chanceLakeWater", 1);
 		
-		config.save();
+		config.save(getConfigFile("config.yml"));
 	}
 
 	public boolean onCommand(CommandSender sender, Command cmd,	String commandLabel, String[] args) {

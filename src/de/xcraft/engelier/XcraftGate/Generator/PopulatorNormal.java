@@ -8,12 +8,12 @@ import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
-import org.bukkit.util.config.Configuration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import de.xcraft.engelier.XcraftGate.XcraftGate;
 
 public class PopulatorNormal extends PopulatorHelper {
-	private Configuration config = null;
+	private YamlConfiguration config = null;
 	
 	public PopulatorNormal (XcraftGate plugin) {
 		super(plugin);
