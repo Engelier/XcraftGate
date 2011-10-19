@@ -23,6 +23,7 @@ public class CommandHandlerGate extends CommandHelper implements CommandExecutor
 				
 		permNodes.put("create", "create");
 		permNodes.put("move", "create");
+		permNodes.put("rename", "create");
 		permNodes.put("link", "link");
 		permNodes.put("loop", "link");
 		permNodes.put("unlink", "unlink");
@@ -39,6 +40,7 @@ public class CommandHandlerGate extends CommandHelper implements CommandExecutor
 		
 		subcommands.put("create", new CommandGateCreate(plugin));
 		subcommands.put("move", new CommandGateMove(plugin));
+		subcommands.put("rename", new CommandGateRename(plugin));
 		subcommands.put("link", new CommandGateLink(plugin));
 		subcommands.put("loop", new CommandGateLoop(plugin));
 		subcommands.put("unlink", new CommandGateUnlink(plugin));
@@ -59,6 +61,7 @@ public class CommandHandlerGate extends CommandHelper implements CommandExecutor
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate info <name>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate create <name>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate move <name>");
+		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate rename <name> <new_name>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate link <name1> <name2>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate loop <name1> <name2>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gate unlink <name>");

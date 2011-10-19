@@ -91,6 +91,10 @@ public class DataGate {
 		return this.denysilent;
 	}
 	
+	public void setName(String newName) {
+		this.gateName = newName;
+	}
+	
 	public String getName() {
 		return gateName;
 	}
