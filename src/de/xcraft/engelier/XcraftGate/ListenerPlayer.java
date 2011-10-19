@@ -1,11 +1,14 @@
 package de.xcraft.engelier.XcraftGate;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class ListenerPlayer extends PlayerListener {
 	private Location location;
@@ -85,5 +88,12 @@ public class ListenerPlayer extends PlayerListener {
 				}
 			}
 		}
+	}
+	
+	public void onPlayerTeleport(PlayerTeleportEvent event) {
+		Location targetLoc = event.getTo();
+		World targetWorld = targetLoc.getWorld();
+		Chunk targetChunk = targetWorld.getChunkAt(targetLoc);
+		targetWorld.refreshChunk(targetChunk.getX(), targetChunk.getZ());
 	}
 }

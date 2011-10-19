@@ -111,6 +111,7 @@ public class XcraftGate extends JavaPlugin {
 		pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.PLAYER_CHANGED_WORLD, playerListener, Event.Priority.Normal);
+		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,	Event.Priority.Monitor);
 		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.Normal);
 		pm.registerEvent(Event.Type.WORLD_LOAD, worldListener, Event.Priority.Highest);

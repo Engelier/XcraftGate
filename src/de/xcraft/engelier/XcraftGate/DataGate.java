@@ -179,14 +179,18 @@ public class DataGate {
 	}
 
 	public void portHere(PlayerMoveEvent event) {
+		/*
+		 * disabled due to event.setTo() not working as expected
+		 * 
 		if (!checkWorld()) {
 			event.getPlayer().sendMessage(ChatColor.RED + "Error: Target world '" + worldName + "' doesn't exist. Please alert your administrator!");
 			return;
 		}
 
 		plugin.justTeleported.put(event.getPlayer().getName(), getLocation());
-		//event.setTo(getPortLocation());
-		event.getPlayer().teleport(getLocation());
+		event.setTo(getPortLocation());
+		*/
+		portHere(event.getPlayer());
 	}
 	
 	public void portToTarget(Player player) {
