@@ -34,6 +34,11 @@ public class SetWorld implements Iterable<DataWorld> {
 			
 			DataWorld newWorld;
 			
+			if (worldsYaml.entrySet() == null) {
+				plugin.log.info(plugin.getNameBrackets() + "empty worlds.yml - initializing");
+				return;
+			}
+			
 			for (Map.Entry<String, Object> thisWorld : worldsYaml.entrySet()) {
 				String worldName = thisWorld.getKey();
 				Map<String, Object> worldData = (Map<String, Object>) thisWorld.getValue();
