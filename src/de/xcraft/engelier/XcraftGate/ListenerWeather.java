@@ -1,15 +1,17 @@
 package de.xcraft.engelier.XcraftGate;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.weather.WeatherChangeEvent;
-import org.bukkit.event.weather.WeatherListener;
 
-public class ListenerWeather extends WeatherListener {
+public class ListenerWeather implements Listener {
 	private XcraftGate plugin;
 	
 	public ListenerWeather (XcraftGate instance) {
 		plugin = instance;
 	}
 	
+	@EventHandler
 	public void onWeatherChange(WeatherChangeEvent event) {
 		if (plugin.getWorlds().get(event.getWorld()) == null) return;
 		

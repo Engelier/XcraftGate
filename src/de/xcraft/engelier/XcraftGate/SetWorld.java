@@ -34,7 +34,7 @@ public class SetWorld implements Iterable<DataWorld> {
 			
 			DataWorld newWorld;
 			
-			if (worldsYaml.entrySet() == null) {
+			if (worldsYaml == null) {
 				plugin.log.info(plugin.getNameBrackets() + "empty worlds.yml - initializing");
 				return;
 			}
@@ -72,6 +72,8 @@ public class SetWorld implements Iterable<DataWorld> {
 				newWorld.setAllowMonsters(Util.castBoolean(worldData.get("allowMonsters")));
 				newWorld.setCreatureLimit(Util.castInt(worldData.get("creatureLimit")));
 				newWorld.setAllowWeatherChange(Util.castBoolean(worldData.get("allowWeatherChange")));
+				newWorld.setAllowPortalNether(Util.castBoolean(worldData.get("allowPortalNether")));
+				newWorld.setAllowPortalTheEnd(Util.castBoolean(worldData.get("allowPortalTheEnd")));
 				newWorld.setTimeFrozen(Util.castBoolean(worldData.get("timeFrozen")));
 				newWorld.setDayTime(Util.castInt(worldData.get("setTime")));
 				newWorld.setSuppressHealthRegain(Util.castBoolean(worldData.get("suppressHealthRegain")));

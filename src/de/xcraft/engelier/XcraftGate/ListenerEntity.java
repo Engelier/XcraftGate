@@ -1,20 +1,22 @@
 package de.xcraft.engelier.XcraftGate;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityListener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-public class ListenerEntity extends EntityListener {
+public class ListenerEntity implements Listener {
 	private static XcraftGate plugin;
 	
 	public ListenerEntity(XcraftGate instance) {
 		plugin = instance;
 	}
 	
+	@EventHandler
 	public void onEntityDeath(EntityDeathEvent event) {
 		if (event instanceof PlayerDeathEvent) {
 			DataWorld world = plugin.getWorlds().get(event.getEntity().getWorld());
@@ -27,6 +29,7 @@ public class ListenerEntity extends EntityListener {
 		}
 	}
 	
+	@EventHandler
 	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
 		if (plugin.getWorlds().get(event.getEntity().getWorld()).isSuppressHealthRegain() && 
 				(event.getRegainReason() == RegainReason.REGEN || event.getRegainReason() == RegainReason.SATIATED)) {
@@ -34,6 +37,7 @@ public class ListenerEntity extends EntityListener {
 		}
 	}
 	
+	@EventHandler
 	public void onFoodLevelChange(FoodLevelChangeEvent event) {
 		if (plugin.getWorlds().get(event.getEntity().getWorld()).isSuppressHunger()) {
 			if (event.getEntity() instanceof Player) {

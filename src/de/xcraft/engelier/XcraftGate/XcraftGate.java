@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -104,19 +105,16 @@ public class XcraftGate extends JavaPlugin {
 		}
 		
 		pm = new PluginManager(this);
-		
-		pm.registerEvent(Event.Type.CREATURE_SPAWN, creatureListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.ENTITY_REGAIN_HEALTH, entityListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.ENTITY_DEATH, entityListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.FOOD_LEVEL_CHANGE, entityListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.PLAYER_MOVE, playerListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.PLAYER_CHANGED_WORLD, playerListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.PLUGIN_DISABLE, pluginListener,	Event.Priority.Monitor);
-		pm.registerEvent(Event.Type.WEATHER_CHANGE, weatherListener, Event.Priority.Normal);
-		pm.registerEvent(Event.Type.WORLD_LOAD, worldListener, Event.Priority.Highest);
-		pm.registerEvent(Event.Type.WORLD_UNLOAD, worldListener, Event.Priority.Highest);
+				
+		pm.registerEvents(creatureListener);
+		pm.registerEvents(entityListener);
+		pm.registerEvents(playerListener);
+		pm.registerEvents(pluginListener);
+		pm.registerEvents(weatherListener);
+		pm.registerEvents(worldListener);
 
+		
+		
 		File serverconfigFile = new File("server.properties");
 		if (!serverconfigFile.exists()) {
 			log.severe(getNameBrackets() + "unable to load server.properties.");

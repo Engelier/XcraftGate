@@ -22,7 +22,7 @@ public class CommandWorldCreate extends CommandHelperWorld {
 		
 		if (worldName == null) {
 			error("No world given.");
-			reply("Usage: /gworld create <worldname> [<environment [seed]]");
+			reply("Usage: /gworld create <worldname> [<environment> [seed]]");
 		} else if (hasWorld(worldName)) {
 			reply("World already exists: " + worldName);
 		} else {

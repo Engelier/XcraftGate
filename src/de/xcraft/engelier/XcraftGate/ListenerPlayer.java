@@ -5,12 +5,14 @@ import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-public class ListenerPlayer extends PlayerListener {
+public class ListenerPlayer implements Listener {
 	private Location location;
 	private DataGate gate = null;	
 	private XcraftGate plugin = null;
@@ -19,10 +21,12 @@ public class ListenerPlayer extends PlayerListener {
 		plugin = instance;
 	}
 
+	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		event.getPlayer().setGameMode(GameMode.getByValue(plugin.getWorlds().get(event.getPlayer().getWorld()).getGameMode()));
 	}
 	
+	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		location = event.getTo();
 
@@ -41,9 +45,9 @@ public class ListenerPlayer extends PlayerListener {
 				z = Math.abs(z) >= border ? (z > 0 ? border - 1 : -border + 1) : z;
 				
 				Location back = new Location(location.getWorld(), x, location.getY(), z, location.getYaw(), location.getPitch());
-				
-				event.setCancelled(true);
-				event.getPlayer().teleport(back);
+
+				//event.setCancelled(true);
+				event.setTo(back);
 				event.getPlayer().sendMessage(ChatColor.RED	+ "You reached the border of this world.");
 				return;
 			}			
@@ -90,7 +94,21 @@ public class ListenerPlayer extends PlayerListener {
 		}
 	}
 	
+	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
+		TeleportCause cause = event.getCause();
+		World fromWorld = event.getFrom().getWorld();
+		
+		System.out.println("TELEPORT " + event.getPlayer().getName() + " because of " + cause.toString());
+		
+		if ( (cause == TeleportCause.NETHER_PORTAL && !plugin.getWorlds().get(fromWorld).isPortalNetherAllowed())
+				|| (cause == TeleportCause.END_PORTAL && !plugin.getWorlds().get(fromWorld).isPortalTheEndAllowed())) {
+			System.out.println("Denied portal use for " + event.getPlayer().getName());
+			event.setCancelled(true);
+			event.getPlayer().sendMessage(ChatColor.RED + "You're not allowed to use this portal!");
+			return;
+		}
+		
 		Location targetLoc = event.getTo();
 		World targetWorld = targetLoc.getWorld();
 		Chunk targetChunk = targetWorld.getChunkAt(targetLoc);

@@ -1,6 +1,6 @@
 name: XcraftGate
 main: de.xcraft.engelier.XcraftGate.XcraftGate
-version: 0.10d13
+version: "0.10"
 author: Engelier
 load: startup
 commands:

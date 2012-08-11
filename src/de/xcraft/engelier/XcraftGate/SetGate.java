@@ -34,7 +34,7 @@ public class SetGate implements Iterable<DataGate> {
 			Yaml yaml = new Yaml();
 			Map<String, Object> gatesYaml = (Map<String, Object>) yaml.load(new FileInputStream(configFile));
 			
-			if (gatesYaml.entrySet() == null) {
+			if (gatesYaml == null) {
 				plugin.log.info(plugin.getNameBrackets() + "empty gates.yml - initializing");
 				return;
 			}

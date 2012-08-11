@@ -1,6 +1,5 @@
 package de.xcraft.engelier.XcraftGate;
 
-import org.bukkit.event.Event;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -22,8 +21,8 @@ public class PluginManager implements Runnable {
 		this.pm = core.getServer().getPluginManager();
 	}
 	
-	public void registerEvent(Event.Type type, Listener listener, Event.Priority prio) {
-		pm.registerEvent(type, listener, prio, core);
+	public void registerEvents(Listener listener) {
+		pm.registerEvents(listener, core);
 	}
 
 	public PermissionHandler getPermissions() {

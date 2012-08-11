@@ -40,6 +40,8 @@ public class DataWorld {
 	private int gamemode = 0;
 	private int difficulty = 0;
 	private boolean announcePlayerDeath = true;
+	private boolean allowPortalNether = true;
+	private boolean allowPortalTheEnd = true;
 		
 	private long lastAction = 0;
 	private World world;
@@ -193,6 +195,8 @@ public class DataWorld {
 		values.put("allowMonsters", allowMonsters);
 		values.put("allowPvP", allowPvP);
 		values.put("allowWeatherChange", allowWeatherChange);
+		values.put("allowPortalNether", allowPortalNether);
+		values.put("allowPortalTheEnd", allowPortalTheEnd);
 		values.put("setWeather", setWeather.toString());
 		values.put("setTime", setTime);
 		values.put("timeFrozen", timeFrozen);
@@ -239,10 +243,17 @@ public class DataWorld {
 		return false;
 	}
 	
+	public void setWorldTime(long time) {
+		long actTime = world.getTime();
+		actTime -= actTime % 24000;
+		actTime += time + 24000;
+		world.setTime(actTime);
+	}
+	
 	public void resetFrozenTime() {
 		if (world == null) return;
 		if (!timeFrozen) return;		
-		world.setTime(setTime - 100);
+		setWorldTime(setTime - 100);
 	}
 		
 	private void killAllMonsters() {
@@ -316,6 +327,22 @@ public class DataWorld {
 		setParameters();
 	}
 	
+	public void setAllowPortalNether(Boolean allow) {
+		this.allowPortalNether = (allow != null ? allow : true);
+	}
+	
+	public boolean isPortalNetherAllowed() {
+		return allowPortalNether;
+	}
+	
+	public void setAllowPortalTheEnd(Boolean allow) {
+		this.allowPortalTheEnd = (allow != null ? allow : true);
+	}
+
+	public boolean isPortalTheEndAllowed() {
+		return allowPortalTheEnd;
+	}
+		
 	public void setWeather(Weather weather) {
 		boolean backup = this.allowWeatherChange;
 		this.allowWeatherChange = true;
@@ -340,7 +367,7 @@ public class DataWorld {
 	
 	public void setTimeFrozen(Boolean frozen) {
 		this.timeFrozen = (frozen != null ? frozen : false);
-		if (world != null) this.setTime = world.getTime();		
+		if (world != null) this.setTime = world.getTime() % 24000;		
 	}
 	
 	public boolean isSuppressHealthRegain() {
@@ -433,7 +460,7 @@ public class DataWorld {
 		world.setStorm(setWeather.getId() == Weather.STORM.getId());
 		world.setKeepSpawnInMemory(keepSpawnInMemory);
 		world.setDifficulty(Difficulty.getByValue(difficulty));
-		if (changeTime) world.setTime(setTime);
+		if (changeTime) setWorldTime(setTime);
 		setCreatureLimit(creatureLimit);
 	}
 	
@@ -445,6 +472,7 @@ public class DataWorld {
 		sender.sendMessage("Border: " + (border > 0 ? border : "none"));
 		sender.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));
 		sender.sendMessage("Animals/Monsters allowed: " + (allowAnimals ? "yes" : "no") + " / " + (allowMonsters ? "yes" : "no"));
+		sender.sendMessage("Portals allowed (Nether/The End): " + (allowPortalNether ? "yes" : "no" + " / " + (allowPortalTheEnd ? "yes" : "no")));
 		sender.sendMessage("Creature count/limit: " + (world != null ? 
 				(world.getLivingEntities().size() - world.getPlayers().size()) + "/"
 				+ (creatureLimit > 0 ? creatureLimit : "unlimited") : "world not loaded!"));

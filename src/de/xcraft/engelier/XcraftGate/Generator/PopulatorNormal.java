@@ -176,7 +176,7 @@ public class PopulatorNormal extends PopulatorHelper {
 				
 				Block blockAffected = world.getBlockAt(realX, realY, realZ);
 				
-				if (blockAffected.getBiome() != Biome.TAIGA && blockAffected.getBiome() != Biome.TUNDRA) continue;
+				if (blockAffected.getBiome() != Biome.TAIGA && blockAffected.getBiome() != Biome.ICE_PLAINS) continue;
 				
 				if (world.getBlockAt(realX, realY - 1, realZ).getType() == Material.WATER) {
 					world.getBlockAt(realX, realY - 1, realZ).setType(Material.ICE);

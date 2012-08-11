@@ -88,7 +88,7 @@ public abstract class PopulatorHelper extends BlockPopulator {
 				}
 
 				if (block.getType() == Material.AIR && blockBelow.getType() == Material.GRASS && rnd < grassChance) {
-					if (rnd < grassChance / 4 && (biome == Biome.RAINFOREST || biome == Biome.SEASONAL_FOREST)) {
+					if (rnd < grassChance / 4 && (biome == Biome.FOREST_HILLS || biome == Biome.FOREST)) {
 						block.setTypeIdAndData(Material.LONG_GRASS.getId(), (byte) 2, true);
 					} else {
 						block.setTypeIdAndData(Material.LONG_GRASS.getId(), (byte) 1, true);						
