@@ -1,5 +1,9 @@
 package de.xcraft.engelier.XcraftGate;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,19 +18,66 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.yaml.snakeyaml.Yaml;
 
 public class ListenerPlayer implements Listener {
 	private Location location;
 	private DataGate gate = null;	
 	private XcraftGate plugin = null;
 	private Map<String, String> playerDiedInWorld = new HashMap<String, String>();
+	private Map<String, String> playerLeftInWorld = new HashMap<String, String>();
 
 	public ListenerPlayer(XcraftGate instance) {
 		plugin = instance;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void loadPlayers() {
+		File configFile = plugin.getConfigFile("playerWorlds.yml");
+		try {
+			Yaml yaml = new Yaml();
+			if ((playerLeftInWorld = (Map<String, String>) yaml.load(new FileInputStream(configFile))) == null) {
+				playerLeftInWorld = new HashMap<String, String>();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void savePlayers() {
+		File configFile = plugin.getConfigFile("playerWorlds.yml");
+		Yaml yaml = new Yaml();
+		String dump = yaml.dump(playerLeftInWorld);
+		try {
+			FileOutputStream fh = new FileOutputStream(configFile);
+			new PrintStream(fh).println(dump);
+			fh.flush();
+			fh.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		playerLeftInWorld.put(event.getPlayer().getName(), event.getPlayer().getWorld().getName());
+	}
+	
+	@EventHandler
+	public void onPlayerPreLogin(PlayerPreLoginEvent event) {
+		String worldName = playerLeftInWorld.get(event.getName());
+		DataWorld world = plugin.getWorlds().get(worldName);
+		
+		System.out.println("Player " + event.getName() + " trying to join in world " + worldName);
+		
+		if (world != null && !world.isLoaded())
+			world.load();
+	}
+	
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
 		event.getPlayer().setGameMode(GameMode.getByValue(plugin.getWorlds().get(event.getPlayer().getWorld()).getGameMode()));

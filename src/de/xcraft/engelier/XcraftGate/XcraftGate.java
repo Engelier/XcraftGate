@@ -88,6 +88,7 @@ public class XcraftGate extends JavaPlugin {
 	
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
+		playerListener.savePlayers();
 		gates.save();
 		worlds.save();
 	}
@@ -101,6 +102,8 @@ public class XcraftGate extends JavaPlugin {
 				return;
 			}
 		}
+		
+		playerListener.loadPlayers();
 		
 		pm = new PluginManager(this);
 				
