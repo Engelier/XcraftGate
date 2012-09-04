@@ -40,8 +40,8 @@ public class DataWorld {
 	private int gamemode = 0;
 	private int difficulty = 0;
 	private boolean announcePlayerDeath = true;
-	private boolean allowPortalNether = true;
-	private boolean allowPortalTheEnd = true;
+	private RespawnLocation respawnLocation = RespawnLocation.WORLDSPAWN;
+	private String respawnWorld = null;
 		
 	private long lastAction = 0;
 	private World world;
@@ -128,6 +128,33 @@ public class DataWorld {
 		}
 	}
 	
+	public enum RespawnLocation {
+		WORLDSPAWN(0),
+		BEDSPAWN(1),
+		WORLD(2);
+		
+		private final int id;
+		private static final Map<Integer, RespawnLocation> lookup = new HashMap<Integer, RespawnLocation>();
+		
+		private RespawnLocation(int id) {
+			this.id = id;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public static RespawnLocation getRespawnLocation(int id) {
+			return lookup.get(id);
+		}
+
+		static {
+			for (RespawnLocation env : values()) {
+				lookup.put(env.getId(), env);
+			}
+		}
+	}
+	
 	public void load() {
 		load(null);
 	}
@@ -158,8 +185,8 @@ public class DataWorld {
 	}
 	
 	public void unload() {
-		plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
 		server.unloadWorld(world, true);
+		plugin.log.info(plugin.getNameBrackets() + "unloaded world " + world.getName());
 		this.world = null;
 	}
 	
@@ -195,8 +222,6 @@ public class DataWorld {
 		values.put("allowMonsters", allowMonsters);
 		values.put("allowPvP", allowPvP);
 		values.put("allowWeatherChange", allowWeatherChange);
-		values.put("allowPortalNether", allowPortalNether);
-		values.put("allowPortalTheEnd", allowPortalTheEnd);
 		values.put("setWeather", setWeather.toString());
 		values.put("setTime", setTime);
 		values.put("timeFrozen", timeFrozen);
@@ -206,6 +231,8 @@ public class DataWorld {
 		values.put("gamemode", gamemode);
 		values.put("difficulty", difficulty);
 		values.put("announcePlayerDeath", announcePlayerDeath);
+		values.put("respawnLocation", respawnLocation.toString());
+		values.put("respawnWorld", respawnWorld);
 		return values;
 	}
 	
@@ -327,22 +354,6 @@ public class DataWorld {
 		setParameters();
 	}
 	
-	public void setAllowPortalNether(Boolean allow) {
-		this.allowPortalNether = (allow != null ? allow : true);
-	}
-	
-	public boolean isPortalNetherAllowed() {
-		return allowPortalNether;
-	}
-	
-	public void setAllowPortalTheEnd(Boolean allow) {
-		this.allowPortalTheEnd = (allow != null ? allow : true);
-	}
-
-	public boolean isPortalTheEndAllowed() {
-		return allowPortalTheEnd;
-	}
-		
 	public void setWeather(Weather weather) {
 		boolean backup = this.allowWeatherChange;
 		this.allowWeatherChange = true;
@@ -430,6 +441,22 @@ public class DataWorld {
 		return this.announcePlayerDeath;
 	}
 	
+	public void setRespawnLocation(RespawnLocation loc) {
+		this.respawnLocation = (loc != null ? loc : RespawnLocation.WORLDSPAWN);
+	}
+	
+	public String getRespawnWorldName() {
+		return this.respawnWorld;
+	}
+
+	public void setRespawnWorldName(String name) {
+		this.respawnWorld = (plugin.getWorlds().get(name) != null ? name : null); 
+	}
+	
+	public RespawnLocation getRespawnLocation() {
+		return this.respawnLocation;
+	}
+	
 	public boolean checkBorder(Location location) {
 		return (border > 0 && Math.abs(location.getX()) <= border && Math.abs(location.getZ()) <= border) || border == 0;
 	}
@@ -466,13 +493,12 @@ public class DataWorld {
 	
 	public void sendInfo(CommandSender sender) {
 		sender.sendMessage("World: " + name + " (" + (generator == Generator.DEFAULT ? environment.toString() : generator.toString()) + ")" + (sticky ? " Sticky!" : ""));
-		sender.sendMessage("Spawnlocation: " + (world == null ? "world not loaded!" : Util.getLocationString(Util.getSaneLocation(world.getSpawnLocation()))) + (keepSpawnInMemory ? " (Stays in memory!)" : ""));
+		sender.sendMessage("Spawnlocation: " + (world == null ? "world not loaded!" : Util.getLocationString(Util.getSaneLocation(world.getSpawnLocation()))) + (keepSpawnInMemory ? " (Stays in memory!)" : "") + " (" + this.getRespawnLocation().toString() + (this.getRespawnLocation() == RespawnLocation.WORLD ? ": " + this.getRespawnWorldName() : "") + ")");
 		sender.sendMessage("Seed: " + (world != null ? world.getSeed() : "world not loaded!"));
 		sender.sendMessage("Player count: "	+ (world != null ? world.getPlayers().size() : "world not loaded!"));
 		sender.sendMessage("Border: " + (border > 0 ? border : "none"));
 		sender.sendMessage("PvP allowed: " + (allowPvP ? "yes" : "no"));
 		sender.sendMessage("Animals/Monsters allowed: " + (allowAnimals ? "yes" : "no") + " / " + (allowMonsters ? "yes" : "no"));
-		sender.sendMessage("Portals allowed (Nether/The End): " + (allowPortalNether ? "yes" : "no" + " / " + (allowPortalTheEnd ? "yes" : "no")));
 		sender.sendMessage("Creature count/limit: " + (world != null ? 
 				(world.getLivingEntities().size() - world.getPlayers().size()) + "/"
 				+ (creatureLimit > 0 ? creatureLimit : "unlimited") : "world not loaded!"));

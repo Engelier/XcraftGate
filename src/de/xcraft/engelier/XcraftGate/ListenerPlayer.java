@@ -1,21 +1,27 @@
 package de.xcraft.engelier.XcraftGate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 public class ListenerPlayer implements Listener {
 	private Location location;
 	private DataGate gate = null;	
 	private XcraftGate plugin = null;
+	private Map<String, String> playerDiedInWorld = new HashMap<String, String>();
 
 	public ListenerPlayer(XcraftGate instance) {
 		plugin = instance;
@@ -95,23 +101,54 @@ public class ListenerPlayer implements Listener {
 	}
 	
 	@EventHandler
-	public void onPlayerTeleport(PlayerTeleportEvent event) {
-		TeleportCause cause = event.getCause();
-		World fromWorld = event.getFrom().getWorld();
-		
-		System.out.println("TELEPORT " + event.getPlayer().getName() + " because of " + cause.toString());
-		
-		if ( (cause == TeleportCause.NETHER_PORTAL && !plugin.getWorlds().get(fromWorld).isPortalNetherAllowed())
-				|| (cause == TeleportCause.END_PORTAL && !plugin.getWorlds().get(fromWorld).isPortalTheEndAllowed())) {
-			System.out.println("Denied portal use for " + event.getPlayer().getName());
-			event.setCancelled(true);
-			event.getPlayer().sendMessage(ChatColor.RED + "You're not allowed to use this portal!");
-			return;
-		}
-		
+	public void onPlayerTeleport(PlayerTeleportEvent event) {		
 		Location targetLoc = event.getTo();
 		World targetWorld = targetLoc.getWorld();
 		Chunk targetChunk = targetWorld.getChunkAt(targetLoc);
 		targetWorld.refreshChunk(targetChunk.getX(), targetChunk.getZ());
 	}
+
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		playerDiedInWorld.put(event.getEntity().getName(), event.getEntity().getWorld().getName());
+		
+		DataWorld world = plugin.getWorlds().get(event.getEntity().getWorld());
+		
+		if (world == null) return;
+			
+		if (!world.getAnnouncePlayerDeath()) {
+			((PlayerDeathEvent)event).setDeathMessage("");
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		DataWorld worldDied = plugin.getWorlds().get(playerDiedInWorld.get(event.getPlayer().getName()));
+		
+		switch (worldDied.getRespawnLocation()) {
+		case WORLDSPAWN:
+			event.setRespawnLocation(worldDied.getWorld().getSpawnLocation());
+			break;
+		case BEDSPAWN:
+			if (event.getPlayer().getBedSpawnLocation() != null) {
+				event.setRespawnLocation(event.getPlayer().getBedSpawnLocation());
+			} else {
+				event.setRespawnLocation(worldDied.getWorld().getSpawnLocation());
+			}
+			break;
+		case WORLD:
+			String respawnWorldName = worldDied.getRespawnWorldName();
+			DataWorld respawnWorld;
+			
+			if (respawnWorldName != null) {
+				respawnWorld = plugin.getWorlds().get(respawnWorldName);
+			} else {
+				respawnWorld = worldDied;
+			}
+
+			event.setRespawnLocation(respawnWorld.getWorld().getSpawnLocation());
+			break;
+		}
+	}
+	
 }

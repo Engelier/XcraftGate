@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.yaml.snakeyaml.Yaml;
 
+import de.xcraft.engelier.XcraftGate.DataWorld.RespawnLocation;
 import de.xcraft.engelier.XcraftGate.DataWorld.Weather;
 import de.xcraft.engelier.XcraftGate.Generator.Generator;
 
@@ -72,8 +73,6 @@ public class SetWorld implements Iterable<DataWorld> {
 				newWorld.setAllowMonsters(Util.castBoolean(worldData.get("allowMonsters")));
 				newWorld.setCreatureLimit(Util.castInt(worldData.get("creatureLimit")));
 				newWorld.setAllowWeatherChange(Util.castBoolean(worldData.get("allowWeatherChange")));
-				newWorld.setAllowPortalNether(Util.castBoolean(worldData.get("allowPortalNether")));
-				newWorld.setAllowPortalTheEnd(Util.castBoolean(worldData.get("allowPortalTheEnd")));
 				newWorld.setTimeFrozen(Util.castBoolean(worldData.get("timeFrozen")));
 				newWorld.setDayTime(Util.castInt(worldData.get("setTime")));
 				newWorld.setSuppressHealthRegain(Util.castBoolean(worldData.get("suppressHealthRegain")));
@@ -82,6 +81,7 @@ public class SetWorld implements Iterable<DataWorld> {
 				newWorld.setAnnouncePlayerDeath(Util.castBoolean(worldData.get("announcePlayerDeath")));
 				newWorld.setDifficulty(Util.castInt(worldData.get("difficulty")));
 				newWorld.setGameMode(Util.castInt(worldData.get("gamemode")));
+				newWorld.setRespawnWorldName((String) worldData.get("respawnWorld"));
 
 				worlds.put(worldName, newWorld);
 
@@ -89,6 +89,13 @@ public class SetWorld implements Iterable<DataWorld> {
 				for(Weather thisWeather: DataWorld.Weather.values()) {
 					if (thisWeather.toString().equalsIgnoreCase(weather)) {
 						newWorld.setWeather(thisWeather);
+					}
+				}
+				
+				String respawn = (String) worldData.get("respawnLocation");
+				for(RespawnLocation thisRLoc: DataWorld.RespawnLocation.values()) {
+					if (thisRLoc.toString().equalsIgnoreCase(respawn)) {
+						newWorld.setRespawnLocation(thisRLoc);
 					}
 				}
 				
