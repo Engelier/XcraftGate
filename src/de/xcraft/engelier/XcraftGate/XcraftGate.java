@@ -31,8 +31,6 @@ public class XcraftGate extends JavaPlugin {
 
 	private PluginManager pm = null;
 	
-	private static final Integer minCBVersion = 1317;
-
 	private SetWorld worlds = new SetWorld(this);
 	private SetGate gates = new SetGate(this);
 	
@@ -94,15 +92,6 @@ public class XcraftGate extends JavaPlugin {
 	}
 
 	public void onEnable() {
-		String cbVersionString = this.getServer().getVersion().replaceAll("^.*b([0-9]+)jnks.*$", "$1");
-		if (cbVersionString.length() > 0) {
-			if (Integer.parseInt(cbVersionString) < minCBVersion) {
-				log.severe(getNameBrackets() + "Sorry. But this version of XcraftGate requires CraftBukkit build " + minCBVersion + " or higher.");
-				// FIXME: need to find a save way to disable myself without losing my config
-				return;
-			}
-		}
-		
 		playerListener.loadPlayers();
 		
 		pm = new PluginManager(this);
@@ -197,9 +186,11 @@ public class XcraftGate extends JavaPlugin {
 	}
 	
 	private void setConfigDefaults() throws IOException {
-		config.getBoolean("dynworld.enabled", false);
+		config.getBoolean("dynworld.enabled", true);
 		config.getInt("dynworld.checkInterval", 60);
 		config.getInt("dynworld.maxInactiveTime", 300);
+		
+		config.getBoolean("fixes.chunkRefreshOnTeleport", false);
 		
 		config.getInt("biomes.desert.chanceCactus", 1);
 		config.getInt("biomes.desert.chanceDeadShrub", 2);

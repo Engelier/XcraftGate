@@ -153,10 +153,12 @@ public class ListenerPlayer implements Listener {
 	
 	@EventHandler
 	public void onPlayerTeleport(PlayerTeleportEvent event) {		
-		Location targetLoc = event.getTo();
-		World targetWorld = targetLoc.getWorld();
-		Chunk targetChunk = targetWorld.getChunkAt(targetLoc);
-		targetWorld.refreshChunk(targetChunk.getX(), targetChunk.getZ());
+		if (plugin.config.getBoolean("fixes.chunkRefreshOnTeleport")) {
+			Location targetLoc = event.getTo();
+			World targetWorld = targetLoc.getWorld();
+			Chunk targetChunk = targetWorld.getChunkAt(targetLoc);
+			targetWorld.refreshChunk(targetChunk.getX(), targetChunk.getZ());
+		}
 	}
 
 	@EventHandler
