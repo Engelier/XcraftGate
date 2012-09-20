@@ -31,7 +31,7 @@ public class DataWorld {
 	private Weather setWeather = Weather.SUN;
 	private long setTime = 100;
 	private boolean timeFrozen = false;
-	private boolean suppressHealthRegain = true;
+	private boolean suppressHealthRegain = false;
 	private boolean suppressHunger = false;
 	private Generator generator = Generator.DEFAULT;
 	private boolean sticky = false;
