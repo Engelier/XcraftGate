@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -64,7 +65,7 @@ public class ListenerPlayer implements Listener {
 
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		playerLeftInWorld.put(event.getPlayer().getName(), event.getPlayer().getWorld().getName());
+		//playerLeftInWorld.put(event.getPlayer().getName(), event.getPlayer().getWorld().getName());
 	}
 	
 	@EventHandler
@@ -80,7 +81,21 @@ public class ListenerPlayer implements Listener {
 	
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-		event.getPlayer().setGameMode(GameMode.getByValue(plugin.getWorlds().get(event.getPlayer().getWorld()).getGameMode()));
+		DataWorld fromWorld = plugin.getWorlds().get(event.getFrom());
+		DataWorld toWorld = plugin.getWorlds().get(event.getPlayer().getWorld());
+		
+		if (!fromWorld.getInventoryGroup().equalsIgnoreCase(toWorld.getInventoryGroup())) {
+			InventoryManager.changeInventory(event.getPlayer(), fromWorld, toWorld);
+		}
+		
+		event.getPlayer().setGameMode(GameMode.getByValue(toWorld.getGameMode()));
+		
+		playerLeftInWorld.put(event.getPlayer().getName(), event.getPlayer().getWorld().getName());
+	}
+	
+	@EventHandler
+	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		InventoryManager.changeInventroy(event.getPlayer(), event.getPlayer().getGameMode(), event.getNewGameMode(), plugin.getWorlds().get(event.getPlayer().getWorld()));
 	}
 	
 	@EventHandler

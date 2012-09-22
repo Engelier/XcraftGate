@@ -42,6 +42,7 @@ public class DataWorld {
 	private boolean announcePlayerDeath = true;
 	private RespawnLocation respawnLocation = RespawnLocation.WORLDSPAWN;
 	private String respawnWorld = null;
+	private String inventoryGroup = name;
 		
 	private long lastAction = 0;
 	private World world;
@@ -69,6 +70,7 @@ public class DataWorld {
 		
 		this.world = server.getWorld(worldName);
 		this.name = worldName;
+		this.inventoryGroup = worldName;
 		this.environment = env;
 		this.generator = (gen != null) ? gen : Generator.DEFAULT;
 		this.lastAction = System.currentTimeMillis();
@@ -233,6 +235,7 @@ public class DataWorld {
 		values.put("announcePlayerDeath", announcePlayerDeath);
 		values.put("respawnLocation", respawnLocation.toString());
 		values.put("respawnWorld", respawnWorld);
+		values.put("inventorygroup", inventoryGroup);
 		return values;
 	}
 	
@@ -307,10 +310,6 @@ public class DataWorld {
 	
 	public void setCreatureLimit(Integer limit) {
 		this.creatureLimit = (limit != null ? limit : 0);
-		if (this.creatureLimit > 0) {
-			killAllMonsters();
-			killAllAnimals();
-		}
 	}
 	
 	public boolean isSticky() {
@@ -441,6 +440,14 @@ public class DataWorld {
 		return this.announcePlayerDeath;
 	}
 	
+	public void setInventoryGroup(String groupName) {
+		this.inventoryGroup = groupName != null ? groupName : name;
+	}
+	
+	public String getInventoryGroup() {
+		return this.inventoryGroup;
+	}
+	
 	public void setRespawnLocation(RespawnLocation loc) {
 		this.respawnLocation = (loc != null ? loc : RespawnLocation.WORLDSPAWN);
 	}
@@ -485,7 +492,7 @@ public class DataWorld {
 		world.setPVP(allowPvP);
 		world.setSpawnFlags(allowMonsters, allowAnimals);
 		world.setStorm(setWeather.getId() == Weather.STORM.getId());
-		world.setKeepSpawnInMemory(keepSpawnInMemory);
+		//world.setKeepSpawnInMemory(keepSpawnInMemory); //FIXME: This is causing the bad behaviour (lag, falling through the world, etc ...)
 		world.setDifficulty(Difficulty.getByValue(difficulty));
 		if (changeTime) setWorldTime(setTime);
 		setCreatureLimit(creatureLimit);
@@ -506,6 +513,7 @@ public class DataWorld {
 		sender.sendMessage("Food bar depletion suppressed: " + (suppressHunger ? "yes" : "no"));
 		sender.sendMessage("Weather / changes allowed: " + setWeather.toString() + " / " + (allowWeatherChange ? "yes" : "no"));
 		sender.sendMessage("Current Time / frozen: " + (world != null ? timeToString(world.getTime()) : "world not loaded!") + " / " + (timeFrozen ? "yes" : "no"));
+		sender.sendMessage("Inventory Group: " + inventoryGroup);
 		sender.sendMessage("GameMode / Difficulty: " + GameMode.getByValue(gamemode) + " / " + Difficulty.getByValue(difficulty));
 		sender.sendMessage("Announce player deaths: " + (announcePlayerDeath ? "Yes" : "No"));
 	}

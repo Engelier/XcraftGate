@@ -28,6 +28,7 @@ public class XcraftGate extends JavaPlugin {
 	private final ListenerEntity entityListener = new ListenerEntity(this);
 	private final ListenerWeather weatherListener = new ListenerWeather(this);
 	private final ListenerWorld worldListener = new ListenerWorld(this);
+	private final InventoryManager inventoryManager = new InventoryManager(this);
 
 	private PluginManager pm = null;
 	
@@ -84,15 +85,21 @@ public class XcraftGate extends JavaPlugin {
 		}		
 	}
 	
+	public void saveAll() {
+		playerListener.savePlayers();
+		inventoryManager.save();
+		gates.save();
+		worlds.save();		
+	}
+	
 	public void onDisable() {
 		getServer().getScheduler().cancelTasks(this);
-		playerListener.savePlayers();
-		gates.save();
-		worlds.save();
+		saveAll();
 	}
 
 	public void onEnable() {
 		playerListener.loadPlayers();
+		inventoryManager.load();
 		
 		pm = new PluginManager(this);
 				

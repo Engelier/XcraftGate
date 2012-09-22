@@ -82,6 +82,7 @@ public class SetWorld implements Iterable<DataWorld> {
 				newWorld.setDifficulty(Util.castInt(worldData.get("difficulty")));
 				newWorld.setGameMode(Util.castInt(worldData.get("gamemode")));
 				newWorld.setRespawnWorldName((String) worldData.get("respawnWorld"));
+				newWorld.setInventoryGroup((String) worldData.get("inventorygroup"));
 
 				worlds.put(worldName, newWorld);
 
@@ -130,11 +131,11 @@ public class SetWorld implements Iterable<DataWorld> {
 		}
 	}
 	
-	public void onWorldLoad(World world) {
+	public void onWorldLoad(final World world) {
 		if (worlds.get(world.getName()) != null) {
-			plugin.log.info(plugin.getNameBrackets() + "World '" + world.getName() + "' detected. Applying config.");
+			plugin.log.info(plugin.getNameBrackets() + "World '" + world.getName() + "' loading. Applying config.");
 			get(world).setWorld(world);
-			get(world).setParameters();
+			get(world).setParameters();					
 		} else {
 			plugin.log.info(plugin.getNameBrackets() + "World '" + world.getName() + "' detected. Adding to config.");
 			DataWorld newWorld = new DataWorld(plugin, world.getName(), world.getEnvironment());

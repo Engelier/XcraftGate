@@ -48,6 +48,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		permNodes.put("setgamemode", "gamemode");
 		permNodes.put("setspawn", "spawn");
 		permNodes.put("setrespawnlocation", "spawn");
+		permNodes.put("setinventorygroup", "inventory");
 		
 		subcommands.put("create", new CommandWorldCreate(plugin));
 		subcommands.put("info", new CommandWorldInfo(plugin));
@@ -76,6 +77,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		subcommands.put("setannouncedeath", new CommandWorldSetAnnounceDeath(plugin));
 		subcommands.put("setspawn", new CommandWorldSetSpawn(plugin));
 		subcommands.put("setrespawnlocation", new CommandWorldSetRespawnLocation(plugin));
+		subcommands.put("setinventorygroup", new CommandWorldSetInventoryGroup(plugin));
 	}
 
 	public void printUsage() {
@@ -103,6 +105,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setrespawnlocation <world> <worldspawn|bedspawn|world <worldname>>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshealthregain <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshunger <world> <true|false>");
+		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setinventorygroup <world> <groupname>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setsticky <world> <true|false>");
 		player.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld keepspawninmemory <world> <true|false>");
 	}
