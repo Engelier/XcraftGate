@@ -160,6 +160,11 @@ public class XcraftGate extends JavaPlugin {
 		}
 	}
 	
+	@Override
+	public YamlConfiguration getConfig() {
+		return config;
+	}
+	
 	public YamlConfiguration getConfig(String fileName) {
 		return getConfig(getConfigFile(fileName));
 	}
@@ -198,56 +203,62 @@ public class XcraftGate extends JavaPlugin {
 	}
 	
 	private void setConfigDefaults() throws IOException {
-		config.getBoolean("dynworld.enabled", true);
-		config.getInt("dynworld.checkInterval", 60);
-		config.getInt("dynworld.maxInactiveTime", 300);
+		config.addDefault("dynworld.enabled", true);
+		config.addDefault("dynworld.checkInterval", 60);
+		config.addDefault("dynworld.maxInactiveTime", 300);
 		
-		config.getBoolean("fixes.chunkRefreshOnTeleport", false);
+		config.addDefault("invsep.enabled", true);
+		config.addDefault("invsep.exp", true);
+		config.addDefault("invsep.health", true);
+		config.addDefault("invsep.food", true);
 		
-		config.getInt("biomes.desert.chanceCactus", 1);
-		config.getInt("biomes.desert.chanceDeadShrub", 2);
-		config.getInt("biomes.forest.chanceLakeWater", 1);
-		config.getInt("biomes.forest.chanceTreeNormal", 32);
-		config.getInt("biomes.forest.chanceTreeBig", 2);
-		config.getInt("biomes.forest.chanceTreeBirch", 32);
-		config.getInt("biomes.forest.chanceTreeRedwood", 16);
-		config.getInt("biomes.forest.chanceTreeTallRedwood", 2);
-		config.getInt("biomes.forest.chanceFlowerYellow", 4);
-		config.getInt("biomes.forest.chanceFlowerRedRose", 4);
-		config.getInt("biomes.forest.chanceGrassTall", 50);
-		config.getInt("biomes.plains.chanceTreeNormal", 1);
-		config.getInt("biomes.plains.chanceFlowerYellow", 10);
-		config.getInt("biomes.plains.chanceFlowerRedRose", 10);
-		config.getInt("biomes.plains.chanceGrassTall", 150);
-		config.getInt("biomes.rainforest.chanceLakeWater", 3);
-		config.getInt("biomes.rainforest.chanceTreeNormal", 28);
-		config.getInt("biomes.rainforest.chanceTreeBig", 2);
-		config.getInt("biomes.rainforest.chanceTreeBirch", 28);
-		config.getInt("biomes.rainforest.chanceTreeRedwood", 32);
-		config.getInt("biomes.rainforest.chanceTreeTallRedwood", 2);
-		config.getInt("biomes.rainforest.chanceFlowerYellow", 5);
-		config.getInt("biomes.rainforest.chanceFlowerRedRose", 5);
-		config.getInt("biomes.rainforest.chanceGrassFern", 30);
-		config.getInt("biomes.rainforest.chanceGrassTall", 70);
-		config.getInt("biomes.savanna.chanceTreeNormal", 1);
-		config.getInt("biomes.seasonalforest.chanceLakeWater", 2);
-		config.getInt("biomes.seasonalforest.chanceTreeNormal", 32);
-		config.getInt("biomes.seasonalforest.chanceTreeBig", 2);
-		config.getInt("biomes.seasonalforest.chanceTreeBirch", 32);
-		config.getInt("biomes.seasonalforest.chanceTreeRedwood", 28);
-		config.getInt("biomes.seasonalforest.chanceTreeTallRedwood", 2);
-		config.getInt("biomes.seasonalforest.chanceFlowerYellow", 4);
-		config.getInt("biomes.seasonalforest.chanceFlowerRedRose", 4);
-		config.getInt("biomes.seasonalforest.chanceGrassTall", 70);
-		config.getInt("biomes.shrubland.chanceLakeLava", 1);
-		config.getInt("biomes.shrubland.chanceTreeNormal", 3);
-		config.getInt("biomes.shrubland.chanceGrassShrub", 5);
-		config.getInt("biomes.swampland.chanceSugarCane", 75);
-		config.getInt("biomes.swampland.chanceLakeWater", 10);
-		config.getInt("biomes.taiga.chanceTreeRedwood", 4);
-		config.getInt("biomes.taiga.chanceGrassTall", 2);
-		config.getInt("biomes.tundra.chanceLakeWater", 1);
+		config.addDefault("fixes.chunkRefreshOnTeleport", false);
 		
+		config.addDefault("biomes.desert.chanceCactus", 1);
+		config.addDefault("biomes.desert.chanceDeadShrub", 2);
+		config.addDefault("biomes.forest.chanceLakeWater", 1);
+		config.addDefault("biomes.forest.chanceTreeNormal", 32);
+		config.addDefault("biomes.forest.chanceTreeBig", 2);
+		config.addDefault("biomes.forest.chanceTreeBirch", 32);
+		config.addDefault("biomes.forest.chanceTreeRedwood", 16);
+		config.addDefault("biomes.forest.chanceTreeTallRedwood", 2);
+		config.addDefault("biomes.forest.chanceFlowerYellow", 4);
+		config.addDefault("biomes.forest.chanceFlowerRedRose", 4);
+		config.addDefault("biomes.forest.chanceGrassTall", 50);
+		config.addDefault("biomes.plains.chanceTreeNormal", 1);
+		config.addDefault("biomes.plains.chanceFlowerYellow", 10);
+		config.addDefault("biomes.plains.chanceFlowerRedRose", 10);
+		config.addDefault("biomes.plains.chanceGrassTall", 150);
+		config.addDefault("biomes.rainforest.chanceLakeWater", 3);
+		config.addDefault("biomes.rainforest.chanceTreeNormal", 28);
+		config.addDefault("biomes.rainforest.chanceTreeBig", 2);
+		config.addDefault("biomes.rainforest.chanceTreeBirch", 28);
+		config.addDefault("biomes.rainforest.chanceTreeRedwood", 32);
+		config.addDefault("biomes.rainforest.chanceTreeTallRedwood", 2);
+		config.addDefault("biomes.rainforest.chanceFlowerYellow", 5);
+		config.addDefault("biomes.rainforest.chanceFlowerRedRose", 5);
+		config.addDefault("biomes.rainforest.chanceGrassFern", 30);
+		config.addDefault("biomes.rainforest.chanceGrassTall", 70);
+		config.addDefault("biomes.savanna.chanceTreeNormal", 1);
+		config.addDefault("biomes.seasonalforest.chanceLakeWater", 2);
+		config.addDefault("biomes.seasonalforest.chanceTreeNormal", 32);
+		config.addDefault("biomes.seasonalforest.chanceTreeBig", 2);
+		config.addDefault("biomes.seasonalforest.chanceTreeBirch", 32);
+		config.addDefault("biomes.seasonalforest.chanceTreeRedwood", 28);
+		config.addDefault("biomes.seasonalforest.chanceTreeTallRedwood", 2);
+		config.addDefault("biomes.seasonalforest.chanceFlowerYellow", 4);
+		config.addDefault("biomes.seasonalforest.chanceFlowerRedRose", 4);
+		config.addDefault("biomes.seasonalforest.chanceGrassTall", 70);
+		config.addDefault("biomes.shrubland.chanceLakeLava", 1);
+		config.addDefault("biomes.shrubland.chanceTreeNormal", 3);
+		config.addDefault("biomes.shrubland.chanceGrassShrub", 5);
+		config.addDefault("biomes.swampland.chanceSugarCane", 75);
+		config.addDefault("biomes.swampland.chanceLakeWater", 10);
+		config.addDefault("biomes.taiga.chanceTreeRedwood", 4);
+		config.addDefault("biomes.taiga.chanceGrassTall", 2);
+		config.addDefault("biomes.tundra.chanceLakeWater", 1);
+		
+		System.out.println("Saving default config.");
 		config.save(getConfigFile("config.yml"));
 	}
 

@@ -20,7 +20,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.yaml.snakeyaml.Yaml;
@@ -64,11 +63,6 @@ public class ListenerPlayer implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {
-		//playerLeftInWorld.put(event.getPlayer().getName(), event.getPlayer().getWorld().getName());
-	}
-	
-	@EventHandler
 	public void onPlayerPreLogin(PlayerPreLoginEvent event) {
 		String worldName = playerLeftInWorld.get(event.getName());
 		DataWorld world = plugin.getWorlds().get(worldName);
@@ -84,7 +78,7 @@ public class ListenerPlayer implements Listener {
 		DataWorld fromWorld = plugin.getWorlds().get(event.getFrom());
 		DataWorld toWorld = plugin.getWorlds().get(event.getPlayer().getWorld());
 		
-		if (!fromWorld.getInventoryGroup().equalsIgnoreCase(toWorld.getInventoryGroup())) {
+		if (plugin.getConfig().getBoolean("invsep.enabled") && !fromWorld.getInventoryGroup().equalsIgnoreCase(toWorld.getInventoryGroup())) {
 			InventoryManager.changeInventory(event.getPlayer(), fromWorld, toWorld);
 		}
 		
@@ -95,7 +89,9 @@ public class ListenerPlayer implements Listener {
 	
 	@EventHandler
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
-		InventoryManager.changeInventroy(event.getPlayer(), event.getPlayer().getGameMode(), event.getNewGameMode(), plugin.getWorlds().get(event.getPlayer().getWorld()));
+		if (plugin.getConfig().getBoolean("invsep.enabled")) {
+			InventoryManager.changeInventroy(event.getPlayer(), event.getPlayer().getGameMode(), event.getNewGameMode(), plugin.getWorlds().get(event.getPlayer().getWorld()));
+		}
 	}
 	
 	@EventHandler
