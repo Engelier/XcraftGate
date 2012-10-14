@@ -259,6 +259,7 @@ public class XcraftGate extends JavaPlugin {
 		config.addDefault("biomes.tundra.chanceLakeWater", 1);
 		
 		System.out.println("Saving default config.");
+		config.options().copyDefaults();
 		config.save(getConfigFile("config.yml"));
 	}
 

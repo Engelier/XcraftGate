@@ -204,7 +204,7 @@ public class ListenerPlayer implements Listener {
 			String respawnWorldName = worldDied.getRespawnWorldName();
 			DataWorld respawnWorld;
 			
-			if (respawnWorldName != null) {
+			if (respawnWorldName != null && plugin.getWorlds().get(respawnWorldName) != null) {
 				respawnWorld = plugin.getWorlds().get(respawnWorldName);
 			} else {
 				respawnWorld = worldDied;

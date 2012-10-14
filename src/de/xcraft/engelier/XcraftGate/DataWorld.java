@@ -457,7 +457,7 @@ public class DataWorld {
 	}
 
 	public void setRespawnWorldName(String name) {
-		this.respawnWorld = (plugin.getWorlds().get(name) != null ? name : null); 
+		this.respawnWorld = name; 
 	}
 	
 	public RespawnLocation getRespawnLocation() {
