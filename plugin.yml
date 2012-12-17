@@ -98,3 +98,5 @@ permissions:
     description: Access to /gworld gamemode
   XcraftGate.world.spawn:
     description: Access to /gworld setspawn
+  XcraftGate.world.npgamemodechange:
+    description: Don't change player's gamemode on world change
