@@ -10,7 +10,6 @@ public class CommandWorldKeepSpawnInMemory extends CommandHelperWorld {
 
 	public CommandWorldKeepSpawnInMemory(XcraftGate plugin) {
 		super(plugin);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

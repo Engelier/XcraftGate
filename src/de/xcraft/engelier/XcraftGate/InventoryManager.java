@@ -42,9 +42,9 @@ public class InventoryManager {
 	}
 	
 	private static void saveInventory(Player player, DataWorld world, GameMode mode) {
-		ConfigurationSection playerInv = playerInventorys.getConfigurationSection(player.getName() + "." + world.getName() + "." + mode.toString());
+		ConfigurationSection playerInv = playerInventorys.getConfigurationSection(player.getName() + "." + world.getInventoryGroup() + "." + mode.toString());
 		if (playerInv == null) {
-			playerInv = playerInventorys.createSection(player.getName() + "." + world.getName() + "." + mode.toString());
+			playerInv = playerInventorys.createSection(player.getName() + "." + world.getInventoryGroup() + "." + mode.toString());
 		}
 		
 		ConfigurationSection armor = playerInv.getConfigurationSection("armor");
@@ -76,10 +76,19 @@ public class InventoryManager {
 	}
 	
 	private static void loadInventory(Player player, DataWorld world, GameMode mode) {
-		System.out.println("Loading Inventory " + mode.toString() + " in world " + world.getName() + " for " + player.getName());
-		ConfigurationSection playerInv = playerInventorys.getConfigurationSection(player.getName() + "." + world.getName() + "." + mode.toString());
+		System.out.println("Loading Inventory " + mode.toString() + " in world " + world.getName() + " (group " + world.getInventoryGroup() + ") for " + player.getName());
+		
+		boolean convertInv = false;
+		
+		ConfigurationSection playerInv = playerInventorys.getConfigurationSection(player.getName() + "." + world.getInventoryGroup() + "." + mode.toString());
 		if (playerInv == null) {
-			playerInv = playerInventorys.createSection(player.getName() + "." + world.getName() + "." + mode.toString());
+			playerInv = playerInventorys.getConfigurationSection(player.getName() + "." + world.getName() + "." + mode.toString());
+			convertInv = true;
+			
+			if (playerInv == null) {
+				playerInv = playerInventorys.createSection(player.getName() + "." + world.getInventoryGroup() + "." + mode.toString());
+				convertInv = false;
+			}
 		}
 		
 		ConfigurationSection armor = playerInv.getConfigurationSection("armor");
@@ -117,6 +126,10 @@ public class InventoryManager {
 			player.setTotalExperience(playerInv.getInt("exp_total", 0));
 			player.setLevel(playerInv.getInt("exp_level", 0));
 			player.setExp((float) playerInv.getDouble("exp_tolvl", 0.0));
+		}
+		
+		if (convertInv) {
+			playerInventorys.set(player.getName() + "." + world.getName() + "." + mode.toString(), null);
 		}
 		
 		player.updateInventory();
