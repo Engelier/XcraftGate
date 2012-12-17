@@ -77,6 +77,10 @@ public class XcraftGate extends JavaPlugin {
 	class RunLoadAllWorlds implements Runnable {
 		@Override
 		public void run() {
+			for(World thisWorld : getServer().getWorlds()) {
+				worlds.onWorldLoad(thisWorld);
+			}
+			
 			for (DataWorld thisWorld : worlds) {
 				if (!thisWorld.isLoaded() && (config.getBoolean("dynworld.enabled", false) == false || thisWorld.isSticky())) {
 					thisWorld.load();
@@ -133,10 +137,6 @@ public class XcraftGate extends JavaPlugin {
 		worlds.load();
 		gates.load();
 
-		for(World thisWorld : getServer().getWorlds()) {
-			worlds.onWorldLoad(thisWorld);
-		}
-		
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
