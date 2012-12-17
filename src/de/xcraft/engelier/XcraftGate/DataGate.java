@@ -219,8 +219,8 @@ public class DataGate {
 		}
 
 		sender.sendMessage("Destination: " + (getTarget() != null ? getTarget().getName() : "none"));
-		if (plugin.getPluginManager().getEcoMethod() != null) {
-			sender.sendMessage("Toll: " + plugin.getPluginManager().getEcoMethod().format(toll));
+		if (plugin.getPluginManager().getEconomy() != null) {
+			sender.sendMessage("Toll: " + plugin.getPluginManager().getEconomy().format(toll));
 		}
 		sender.sendMessage("Deny usage silently: " + (denysilent ? "Yes" : "No"));
 		sender.sendMessage("Permission-Node: XcraftGate.use." + getName());

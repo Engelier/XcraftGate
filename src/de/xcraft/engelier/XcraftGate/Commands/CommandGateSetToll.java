@@ -25,7 +25,7 @@ public class CommandGateSetToll extends CommandHelperGate {
 		} else if (!gateExists(gateName)) {
 			reply("Gate not found: " + gateName);
 		} else {
-			if (plugin.getPluginManager().getEcoMethod() == null) {
+			if (plugin.getPluginManager().getEconomy() == null) {
 				sender.sendMessage(ChatColor.RED + "ERROR: No economy plugin was found, so this setting has no effect.");
 				return;
 			}
@@ -40,7 +40,7 @@ public class CommandGateSetToll extends CommandHelperGate {
 			}
 			
 			getGate(gateName).setToll(toll);
-			reply("Gate " + gateName + (toll > 0 ? " now collecting " + plugin.getPluginManager().getEcoMethod().format(toll) + " toll." : " doesn't collect tolls"));
+			reply("Gate " + gateName + (toll > 0 ? " now collecting " + plugin.getPluginManager().getEconomy().format(toll) + " toll." : " doesn't collect tolls"));
 		}
 	}
 

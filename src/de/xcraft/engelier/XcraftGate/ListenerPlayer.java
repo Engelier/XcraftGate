@@ -142,14 +142,14 @@ public class ListenerPlayer implements Listener {
 					event.getPlayer().hasPermission("XcraftGate.use." + gate.getName()) :
 					plugin.getPluginManager().getPermissions().has(event.getPlayer(), "XcraftGate.use." + gate.getName())) {
 				plugin.justTeleportedFrom.put(event.getPlayer().getName(), gate.getLocation());
-				if (plugin.getPluginManager().getEcoMethod() != null && gate.getToll() > 0) {
-					if (plugin.getPluginManager().getEcoMethod().getAccount(event.getPlayer().getName()).hasEnough(gate.getToll())) {
-						plugin.getPluginManager().getEcoMethod().getAccount(event.getPlayer().getName()).subtract(gate.getToll());
-						event.getPlayer().sendMessage(ChatColor.AQUA + "Took " + plugin.getPluginManager().getEcoMethod().format(gate.getToll()) + " from your account for using this gate.");
+				if (plugin.getPluginManager().getEconomy() != null && gate.getToll() > 0) {
+					if (plugin.getPluginManager().getEconomy().has(event.getPlayer().getName(), gate.getToll())) {
+						plugin.getPluginManager().getEconomy().withdrawPlayer(event.getPlayer().getName(), gate.getToll());
+						event.getPlayer().sendMessage(ChatColor.AQUA + "Took " + plugin.getPluginManager().getEconomy().format(gate.getToll()) + " from your account for using this gate.");
 						gate.portToTarget(event);
 					} else {
 						if (!gate.getDenySilent()) {
-							event.getPlayer().sendMessage(ChatColor.RED + "You don't have enough money to use this gate (Requires: " + plugin.getPluginManager().getEcoMethod().format(gate.getToll()) + ")");
+							event.getPlayer().sendMessage(ChatColor.RED + "You don't have enough money to use this gate (Requires: " + plugin.getPluginManager().getEconomy().format(gate.getToll()) + ")");
 						}						
 					}
 				} else {
