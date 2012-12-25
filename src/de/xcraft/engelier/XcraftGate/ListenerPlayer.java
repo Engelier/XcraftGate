@@ -18,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -63,11 +64,11 @@ public class ListenerPlayer implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerPreLogin(PlayerPreLoginEvent event) {
-		String worldName = playerLeftInWorld.get(event.getName());
+	public void onPlayerLogin(PlayerLoginEvent event) {
+		String worldName = playerLeftInWorld.get(event.getPlayer().getName());
 		DataWorld world = plugin.getWorlds().get(worldName);
 		
-		System.out.println("Player " + event.getName() + " trying to join in world " + worldName);
+		System.out.println("Player " + event.getPlayer().getName() + " trying to join in world " + worldName);
 		
 		if (world != null && !world.isLoaded())
 			world.load();
