@@ -20,7 +20,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.yaml.snakeyaml.Yaml;
@@ -190,6 +189,11 @@ public class ListenerPlayer implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		DataWorld worldDied = plugin.getWorlds().get(playerDiedInWorld.get(event.getPlayer().getName()));
+		
+		if (worldDied == null) {
+			System.out.println("Player " + event.getPlayer().getName() + " died, but i don't know where?! (" + event.getPlayer().getWorld().getName() + ")");
+			return;
+		}
 		
 		switch (worldDied.getRespawnLocation()) {
 		case WORLDSPAWN:
