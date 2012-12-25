@@ -19,7 +19,7 @@ public class CommandWorldUnload extends CommandHelperWorld {
 		
 		if (worldName == null) {
 			error("No world given.");
-			reply("Usage: /gworld load <worldname>");
+			reply("Usage: /gworld unload <worldname>");
 		} else if (!hasWorld(worldName)) {
 			reply("Unknown world: " + worldName);
 		} else {

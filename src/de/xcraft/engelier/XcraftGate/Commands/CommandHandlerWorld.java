@@ -46,6 +46,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		permNodes.put("setdifficulty", "difficulty");
 		permNodes.put("setannouncedeath", "difficulty");
 		permNodes.put("setgamemode", "gamemode");
+		permNodes.put("setgamerule", "gamemode");
 		permNodes.put("setspawn", "spawn");
 		permNodes.put("setrespawnlocation", "spawn");
 		permNodes.put("setinventorygroup", "inventory");
@@ -74,6 +75,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		subcommands.put("keepspawninmemory", new CommandWorldKeepSpawnInMemory(plugin));
 		subcommands.put("setdifficulty", new CommandWorldSetDifficulty(plugin));
 		subcommands.put("setgamemode", new CommandWorldSetGameMode(plugin));
+		subcommands.put("setgamerule", new CommandWorldSetGameRule(plugin));
 		subcommands.put("setannouncedeath", new CommandWorldSetAnnounceDeath(plugin));
 		subcommands.put("setspawn", new CommandWorldSetSpawn(plugin));
 		subcommands.put("setrespawnlocation", new CommandWorldSetRespawnLocation(plugin));
@@ -101,6 +103,7 @@ public class CommandHandlerWorld extends CommandHelper implements CommandExecuto
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setdifficulty <world> <peaceful|easy|normal|hard>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setannouncedeath <world> <true|false>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setgamemode <world> <survival|creative|adventure>");
+		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setgamerule <world> <rulename> <value>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setspawn <world>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld setrespawnlocation <world> <worldspawn|bedspawn|world <worldname>>");
 		sender.sendMessage(ChatColor.LIGHT_PURPLE + "-> " + ChatColor.GREEN	+ "/gworld suppresshealthregain <world> <true|false>");
