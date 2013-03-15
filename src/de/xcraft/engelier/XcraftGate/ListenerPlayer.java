@@ -82,6 +82,9 @@ public class ListenerPlayer implements Listener {
 			InventoryManager.changeInventory(event.getPlayer(), fromWorld, toWorld);
 		}
 		
+		if (event.getPlayer().hasPermission("XcraftGate.world.info"))
+			event.getPlayer().sendMessage(ChatColor.AQUA + "World changed from " + fromWorld.getName() + " to " + toWorld.getName());
+		
 		if (!event.getPlayer().hasPermission("XcraftGate.world.nogamemodechange"))
 			event.getPlayer().setGameMode(GameMode.getByValue(toWorld.getGameMode()));
 		
