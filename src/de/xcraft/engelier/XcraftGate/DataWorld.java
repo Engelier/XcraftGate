@@ -245,15 +245,13 @@ public class DataWorld {
 	
 	public void checkCreatureLimit() {
 		if (world == null) return;
+		if (creatureLimit <= 0) return;
 		
-		Double max = (double)creatureLimit;
-		Integer alive = world.getLivingEntities().size() - world.getPlayers().size();
+		int alive = world.getLivingEntities().size() - world.getPlayers().size();
 
-		if (max <= 0) return;
-
-		if (alive >= max) {
+		if (alive >= creatureLimit) {
 			world.setSpawnFlags(false, false);
-		} else if (alive <= max * 0.8) {
+		} else if (alive <= creatureLimit * 0.8) {
 			resetSpawnFlags();
 		}		
 	}	

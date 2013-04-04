@@ -139,7 +139,7 @@ public class XcraftGate extends JavaPlugin {
 
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunCreatureLimit(), 600, 600);
 		getServer().getScheduler().scheduleSyncRepeatingTask(this, new RunTimeFrozen(), 200, 200);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+		getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
 			public void run() {
 				saveAll();
 			}
